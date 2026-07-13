@@ -7,7 +7,7 @@ public class main {
     public static void main(String[] args) {
         System.out.println("Ello");
         WeatherRepository weatherRepository = new WeatherRepositoryImpl();
-        weatherRepository.getByLocation("Toronto");
+        weatherRepository.getCurrentByLocation("Toronto");
         weatherRepository.getForecastByLocation("Toronto");
     }
 }
