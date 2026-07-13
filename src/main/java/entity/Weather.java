@@ -1,13 +1,13 @@
 package entity;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 /**
  * Represents a weather condition.
  */
 public final class Weather {
+    private final LocalDate timestamp;
     private final String condition;
-    private final ZonedDateTime timestamp;
     private final double temperature;
     private final double precipitation;
     private final double wind;
@@ -17,16 +17,16 @@ public final class Weather {
     /**
      * Constructs a new weather.
      *
-     * @param condition     the condition of the weather
      * @param timestamp     the timestamp of the weather
+     * @param condition     the condition of the weather
      * @param temperature   the temperature in Celsius of the weather
      * @param precipitation the precipitation in millimeter of the weather
      * @param wind          the wind speed in KPH of the weather
      * @param humidity      the humidity percentage of the weather
      * @param ultraviolet   the ultraviolet index of the weather
      */
-    public Weather(String condition,
-                   ZonedDateTime timestamp,
+    public Weather(LocalDate timestamp,
+                   String condition,
                    double temperature,
                    double precipitation,
                    double wind,
@@ -55,7 +55,7 @@ public final class Weather {
      *
      * @return the timestamp of the weather
      */
-    public ZonedDateTime getTimestamp() {
+    public LocalDate getTimestamp() {
         return timestamp;
     }
 
