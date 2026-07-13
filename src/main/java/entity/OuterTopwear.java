@@ -1,21 +1,37 @@
 package entity;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
- * Represents a OuterTopwear clothing item (e.g., coats, jackets, windbreakers, parkas).
+ * Represents an outer topwear clothing item (e.g. coats, hoodies, jackets, windbreakers, and parkas).
  */
-public class OuterTopwear extends Wear {
-    private final boolean isThick;
+public final class OuterTopwear extends AbstractWear {
+    private boolean isThick;
 
-    protected OuterTopwear(UUID uuid, String name, String brand, WearColor color, WearStyle style,
-                           ZonedDateTime purchaseDate, boolean isThick) {
-        super(uuid, name, brand, color, style, purchaseDate);
-        this.isThick = isThick;
+    /**
+     * Constructs a new outer topwear.
+     *
+     * @param uuid the UUID of the outer topwear.
+     */
+    public OuterTopwear(UUID uuid) {
+        super(uuid);
     }
 
+    /**
+     * Returns whether the bottomwear is thick.
+     *
+     * @return true if the bottomwear is thick; otherwise, false
+     */
     public boolean isThick() {
         return isThick;
+    }
+
+    /**
+     * Sets whether the bottomwear is thick.
+     *
+     * @param isThick true if the bottomwear is thick; otherwise, false
+     */
+    public void setIsThick(boolean isThick) {
+        this.isThick = isThick;
     }
 }

@@ -43,14 +43,13 @@ public class WeatherRepositoryImpl implements WeatherRepository {
                 final JSONObject current = responseBody.getJSONObject("current");
                 System.out.println(current.getDouble("temp_c"));
                 return new Weather(
-                        ZonedDateTime.now(),
                         current.getJSONObject("condition").getString("text"),
+                        ZonedDateTime.now(),
                         current.getDouble("temp_c"),
                         current.getDouble("precip_mm"),
                         current.getDouble("wind_kph"),
                         current.getDouble("humidity"),
-                        current.getInt("uv"),
-                        current.getDouble("feelslike_c")
+                        current.getInt("uv")
                 );
             }
             else {
@@ -75,14 +74,13 @@ public class WeatherRepositoryImpl implements WeatherRepository {
                     JSONObject dayMetrics = dayData.getJSONObject("day");
                     System.out.println(dayMetrics.getDouble("maxtemp_c"));
                     forecast.add(new Weather(
-                            ZonedDateTime.now().plusDays(i),
                             dayMetrics.getJSONObject("condition").getString("text"),
+                            ZonedDateTime.now().plusDays(i),
                             dayMetrics.getDouble("maxtemp_c"),
                             dayMetrics.getDouble("totalprecip_mm"),
                             dayMetrics.getDouble("maxwind_kph"),
                             dayMetrics.getDouble("avghumidity"),
-                            dayMetrics.getInt("uv"),
-                            dayMetrics.getDouble("maxtemp_c")
+                            dayMetrics.getInt("uv")
                     ));
                 }
                 return forecast;

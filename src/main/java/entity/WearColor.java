@@ -15,14 +15,24 @@ public enum WearColor {
     BLUE("Blue"),
     PURPLE("Purple"),
     PINK("Pink"),
-    MULTI("Multi-colored/Patterned"); // For complex shirts!
+    MULTI("Multicolored / Patterned");
 
     private final String displayName;
 
+    /**
+     * Constructs a new wear color.
+     *
+     * @param displayName the display name of the wear color
+     */
     WearColor(String displayName) {
         this.displayName = displayName;
     }
 
+    /**
+     * Returns the display name of the wear color.
+     *
+     * @return the display name of the wear color
+     */
     public String getDisplayName() {
         return displayName;
     }

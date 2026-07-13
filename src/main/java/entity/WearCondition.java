@@ -10,10 +10,20 @@ public enum WearCondition {
 
     private final String displayName;
 
+    /**
+     * Constructs a new wear condition.
+     *
+     * @param displayName the display name of the wear condition
+     */
     WearCondition(String displayName) {
         this.displayName = displayName;
     }
 
+    /**
+     * Returns the display name of the wear condition.
+     *
+     * @return the display name of the wear condition
+     */
     public String getDisplayName() {
         return displayName;
     }
