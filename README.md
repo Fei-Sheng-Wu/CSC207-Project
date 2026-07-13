@@ -15,9 +15,13 @@ java Main.java
 
 ## Development
 
-See [GitHub Issues](https://github.com/Fei-Sheng-Wu/CSC207-Project/issues) and [GitHub Pull Requests](https://github.com/Fei-Sheng-Wu/CSC207-Project/pulls) for development.
+See [GitHub Issues](https://github.com/Fei-Sheng-Wu/CSC207-Project/issues) and [GitHub Pull Requests](https://github.com/Fei-Sheng-Wu/CSC207-Project/pulls) for development. When possible, please conform to the templates for issues and pull requests. Changes to the templates can be discussed if necessary.
 
-When possible, please conform to the templates for issues and pull requests. Changes to the templates can be discussed when necessary.
+> [!WARNING]
+> Please do not push to the `main` branch directly. Instead, create new branches and request merges into `main` via a pull request. A pull request requires at least one reviewer and approvals from the reviewers before merging. In addition, to avoid merge conflicts, one may use `git checkout -b <branch-name> main` when creating a new branch, ensuring the branch stems from `main` and not an unmerged pull request.
+
+> [!TIP]
+> For organization purposes, it is suggested to follow a consistent branch naming scheme in the structure `<category>/<name>`, where the category can be `feat` for feature-related implementations, `fix` for issue resolutions, `test` for testing-related changes, `refactor` for code refactors, and `chore` for general maintenance and updates. For example, one may name a branch `feat/item-addition`.
 
 ## License
 
