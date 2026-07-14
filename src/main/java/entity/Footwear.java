@@ -1,21 +1,37 @@
 package entity;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
- * Represents a footwear clothing item (e.g., sneakers, boots, sandals, heels).
+ * Represents a footwear clothing item (e.g. sneakers, boots, sandals, and heels).
  */
-public class Footwear extends Wear {
-    private final boolean isWaterProof;
+public final class Footwear extends AbstractWear {
+    private boolean isWaterproof;
 
-    protected Footwear(UUID uuid, String name, String brand, WearColor color, WearStyle style,
-                       ZonedDateTime purchaseDate, boolean isWaterProof) {
-        super(uuid, name, brand, color, style, purchaseDate);
-        this.isWaterProof = isWaterProof;
+    /**
+     * Constructs a new footwear.
+     *
+     * @param uuid the UUID of the footwear.
+     */
+    public Footwear(UUID uuid) {
+        super(uuid);
     }
 
-    public boolean isWaterProof() {
-        return isWaterProof;
+    /**
+     * Returns whether the footwear is waterproof.
+     *
+     * @return true if the footwear is waterproof; otherwise, false
+     */
+    public boolean isWaterproof() {
+        return isWaterproof;
+    }
+
+    /**
+     * Sets whether the footwear is waterproof.
+     *
+     * @param isWaterproof true if the footwear is waterproof; otherwise, false
+     */
+    public void setIsWaterproof(boolean isWaterproof) {
+        this.isWaterproof = isWaterproof;
     }
 }

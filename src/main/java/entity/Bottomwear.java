@@ -1,21 +1,37 @@
 package entity;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
- * Represents a bottomwear clothing item (e.g., pants, jeans, shorts).
+ * Represents a bottomwear clothing item (e.g. pants, jeans, skirts, and shorts).
  */
-public class Bottomwear extends Wear {
-    private final boolean isLong;
+public final class Bottomwear extends AbstractWear {
+    private boolean isLong;
 
-    protected Bottomwear(UUID uuid, String name, String brand, WearColor color, WearStyle style,
-                         ZonedDateTime purchaseDate, boolean isLong) {
-        super(uuid, name, brand, color, style, purchaseDate);
-        this.isLong = isLong;
+    /**
+     * Constructs a new bottomwear.
+     *
+     * @param uuid the UUID of the bottomwear.
+     */
+    public Bottomwear(UUID uuid) {
+        super(uuid);
     }
 
+    /**
+     * Returns whether the bottomwear is long.
+     *
+     * @return true if the bottomwear is long; otherwise, false
+     */
     public boolean isLong() {
         return isLong;
+    }
+
+    /**
+     * Sets whether the bottomwear is long.
+     *
+     * @param isLong true if the bottomwear is long; otherwise, false
+     */
+    public void setIsLong(boolean isLong) {
+        this.isLong = isLong;
     }
 }

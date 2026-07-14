@@ -3,24 +3,71 @@ package entity;
 import java.util.List;
 
 /**
- * Represents the user's entire collection of clothing.
+ * Represents a collection of clothing items.
  */
-public class Wardrobe {
-    private final List<Wear> items;
+public final class Wardrobe {
+    private final List<AbstractWear> items;
 
-    public Wardrobe(List<Wear> items) {
+    /**
+     * Constructs a new wardrobe.
+     *
+     * @param items the initial collection of items
+     */
+    public Wardrobe(List<AbstractWear> items) {
         this.items = items;
     }
 
-    public List<Wear> getItems() {
+    /**
+     * Returns the collection of items in the wardrobe.
+     *
+     * @return the collection of items in the wardrobe
+     */
+    public List<AbstractWear> getItems() {
         return items;
     }
 
-    public void addItem(Wear item) {
-        this.items.add(item);
+    /**
+     * Adds a clothing item to the wardrobe.
+     *
+     * @param item the clothing item to add
+     */
+    public void addItem(AbstractWear item) {
+        items.add(item);
     }
 
-    public void clearWardrobe() {
-        this.items.clear();
+    /**
+     * Updates a clothing item in the wardrobe.
+     *
+     * @param item the clothing item to update, whether its UUID is used to locate its existence in the wardrobe
+     * @return true if the clothing item was in the wardrobe and is updated; otherwise, false
+     */
+    public boolean updateItem(AbstractWear item) {
+        for (int i = 0; i < items.size(); i++) {
+            if (!items.get(i).getUuid().equals(item.getUuid())) {
+                continue;
+            }
+
+            items.set(i, item);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Removes a clothing item from the wardrobe.
+     *
+     * @param item the clothing item to remove
+     * @return true if the clothing item was in the wardrobe and is removed; otherwise, false
+     */
+    public boolean removeItem(AbstractWear item) {
+        return items.remove(item);
+    }
+
+    /**
+     * Removes all clothing items from the wardrobe.
+     */
+    public void clearItems() {
+        items.clear();
     }
 }

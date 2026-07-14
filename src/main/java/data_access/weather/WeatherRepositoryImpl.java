@@ -1,7 +1,7 @@
 package data_access.weather;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,14 +43,13 @@ public class WeatherRepositoryImpl implements WeatherRepository {
                 final JSONObject current = responseBody.getJSONObject("current");
                 System.out.println(current.getDouble("temp_c"));
                 return new Weather(
-                        ZonedDateTime.now(),
+                        LocalDate.now(),
                         current.getJSONObject("condition").getString("text"),
                         current.getDouble("temp_c"),
                         current.getDouble("precip_mm"),
                         current.getDouble("wind_kph"),
                         current.getDouble("humidity"),
-                        current.getInt("uv"),
-                        current.getDouble("feelslike_c")
+                        current.getInt("uv")
                 );
             }
             else {
@@ -75,14 +74,13 @@ public class WeatherRepositoryImpl implements WeatherRepository {
                     JSONObject dayMetrics = dayData.getJSONObject("day");
                     System.out.println(dayMetrics.getDouble("maxtemp_c"));
                     forecast.add(new Weather(
-                            ZonedDateTime.now().plusDays(i),
+                            LocalDate.now().plusDays(i),
                             dayMetrics.getJSONObject("condition").getString("text"),
                             dayMetrics.getDouble("maxtemp_c"),
                             dayMetrics.getDouble("totalprecip_mm"),
                             dayMetrics.getDouble("maxwind_kph"),
                             dayMetrics.getDouble("avghumidity"),
-                            dayMetrics.getInt("uv"),
-                            dayMetrics.getDouble("maxtemp_c")
+                            dayMetrics.getInt("uv")
                     ));
                 }
                 return forecast;
