@@ -1,6 +1,6 @@
 package entity;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -8,8 +8,8 @@ import java.util.List;
  */
 public final class Event {
     private final String name;
-    private final ZonedDateTime dateStart;
-    private final ZonedDateTime dateEnd;
+    private final OffsetDateTime dateStart;
+    private final OffsetDateTime dateEnd;
     private final List<WearColor> wearColors;
     private final List<WearStyle> wearStyles;
 
@@ -23,8 +23,8 @@ public final class Event {
      * @param wearStyles the outfit styles of the event
      */
     public Event(String name,
-                 ZonedDateTime dateStart,
-                 ZonedDateTime dateEnd,
+                 OffsetDateTime dateStart,
+                 OffsetDateTime dateEnd,
                  List<WearColor> wearColors,
                  List<WearStyle> wearStyles) {
         this.name = name;
@@ -48,7 +48,7 @@ public final class Event {
      *
      * @return the start date of the event
      */
-    public ZonedDateTime getDateStart() {
+    public OffsetDateTime getDateStart() {
         return dateStart;
     }
 
@@ -57,7 +57,7 @@ public final class Event {
      *
      * @return the end date of the event
      */
-    public ZonedDateTime getDateEnd() {
+    public OffsetDateTime getDateEnd() {
         return dateEnd;
     }
 

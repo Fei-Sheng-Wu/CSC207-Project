@@ -2,8 +2,11 @@ package entity;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a piece of clothing item (e.g. topwears, headwears, and accessories).
@@ -11,14 +14,14 @@ import java.util.UUID;
 public abstract class AbstractWear {
     private final UUID uuid;
 
-    private String name;
-    private String brand;
+    private String name = "";
+    private String brand = "";
     private WearColor color;
     private WearStyle style;
     private WearCondition condition;
     private LocalDate purchaseDate;
-    private double fondness;
-    private List<String> tags;
+    private double fondness = 1.0;
+    private List<String> tags = new ArrayList<>();
 
     /**
      * Constructs a new abstract wear.
@@ -81,6 +84,7 @@ public abstract class AbstractWear {
      *
      * @return the color of the clothing item
      */
+    @Nullable
     public WearColor getColor() {
         return color;
     }
@@ -90,7 +94,7 @@ public abstract class AbstractWear {
      *
      * @param color the color of the clothing item
      */
-    public void setColor(WearColor color) {
+    public void setColor(@Nullable WearColor color) {
         this.color = color;
     }
 
@@ -99,6 +103,7 @@ public abstract class AbstractWear {
      *
      * @return the style of the clothing item
      */
+    @Nullable
     public WearStyle getStyle() {
         return style;
     }
@@ -108,7 +113,7 @@ public abstract class AbstractWear {
      *
      * @param style the style of the clothing item
      */
-    public void setStyle(WearStyle style) {
+    public void setStyle(@Nullable WearStyle style) {
         this.style = style;
     }
 
@@ -117,6 +122,7 @@ public abstract class AbstractWear {
      *
      * @return the condition of the clothing item
      */
+    @Nullable
     public WearCondition getCondition() {
         return condition;
     }
@@ -126,7 +132,7 @@ public abstract class AbstractWear {
      *
      * @param condition the condition of the clothing item
      */
-    public void setCondition(WearCondition condition) {
+    public void setCondition(@Nullable WearCondition condition) {
         this.condition = condition;
     }
 
@@ -135,6 +141,7 @@ public abstract class AbstractWear {
      *
      * @return the purchase date of the clothing item
      */
+    @Nullable
     public LocalDate getPurchaseDate() {
         return purchaseDate;
     }
@@ -144,7 +151,7 @@ public abstract class AbstractWear {
      *
      * @param purchaseDate the purchase date of the clothing item
      */
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(@Nullable LocalDate purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 
