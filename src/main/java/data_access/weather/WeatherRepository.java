@@ -1,30 +1,26 @@
 package data_access.weather;
 
-import org.json.JSONException;
+import java.util.List;
 
 import entity.Weather;
 
-import java.util.List;
-
 /**
- * WeatherRepository is an interface that defines the methods that
- * the WeatherRepository implementation must provide to retrieve weather data.
+ * Defines the interface of a weather repository that provides weather data.
  */
 public interface WeatherRepository {
     /**
-     * A method that returns the current weather for a given location.
-     * @param location is the city for which to retrieve its current weather.
-     * @return the Weather entity containing current meteorological data,
-     * including temperature, precipitation, humidity.
-     * @throws JSONException if an error occurs.
+     * Returns the current weather of the specified location.
+     *
+     * @param location the location as a city name
+     * @return the current weather
      */
-    Weather getByLocation(String location) throws JSONException;
+    Weather getCurrentByLocation(String location);
 
     /**
-     * A method that returns a 7-day weather forecast for a given location.
-     * @param location is the city to retrieve the 7-day forecast for.
-     * @return a List of Weather entities, each representing a day in the 7-day forecast.
-     * @throws JSONException if an error occurs.
+     * Returns a 7-day weather forecast of the specified location.
+     *
+     * @param location the location as a city name
+     * @return a collection of weather data, each representing a day in the 7-day forecast
      */
-    List<Weather> getForecastByLocation(String location) throws JSONException;
+    List<Weather> getForecastByLocation(String location);
 }
