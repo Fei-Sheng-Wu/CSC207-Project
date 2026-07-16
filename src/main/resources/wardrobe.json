@@ -1,0 +1,31 @@
+{
+    "items": [
+        {
+            "comment": "// I asked Gemini to generate this dummy JsonObj",
+            "type": "Shirts",
+            "uuid": "123e4567-e89b-12d3-a456-426614174000",
+            "name": "Blue Shirt",
+            "brand": "Nike",
+            "color": "BLUE",
+            "style": "CASUAL",
+            "condition": "NEW",
+            "purchaseDate": "2026-05-12",
+            "fondness": 1.0,
+            "tags": ["summer", "casual", "gym"],
+            "sleeveLength": "SHORT"
+        },
+        {
+            "type": "Pants",
+            "uuid": "987f6543-e89b-12d3-a456-426614174000",
+            "name": "Jeans",
+            "brand": "Levi's",
+            "color": "BLACK",
+            "style": "CASUAL",
+            "condition": "FAIR",
+            "purchaseDate": "2023-01-10",
+            "fondness": 0.8,
+            "tags": ["winter", "durable"],
+            "inseam": 32
+        }
+    ]
+}
