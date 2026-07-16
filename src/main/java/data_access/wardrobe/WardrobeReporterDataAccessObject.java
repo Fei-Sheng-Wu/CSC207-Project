@@ -26,7 +26,11 @@ import use_case.wardrobe_reporter.WardrobeReporterDataAccessInterface;
 public class WardrobeReporterDataAccessObject implements WardrobeReporterDataAccessInterface {
     // Should we rename this to WardrobeRepository... since it will be used by other use_cases as well?
     private static final String FILE_PATH = "src/main/resources/wardrobe.json";
-    private final WearFactory wearFactory = new WearFactory();
+    private final WearFactory wearFactory;
+
+    public WardrobeReporterDataAccessObject(WearFactory wearFactory) {
+        this.wearFactory = wearFactory;
+    }
 
     @Override
     public Wardrobe fetchWardrobe() {

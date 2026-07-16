@@ -3,6 +3,7 @@ package app;
 import data_access.wardrobe.WardrobeReporterDataAccessObject;
 import data_access.weather.WeatherRepository;
 import data_access.weather.WeatherRepositoryImpl;
+import entity.WearFactory;
 import use_case.wardrobe_reporter.WardrobeReporterInteractor;
 
 public class Main {
@@ -14,7 +15,8 @@ public class Main {
         weatherRepository.getForecastByLocation("Toronto");
 
         // Testing for Wardrobe use_case.
-        final WardrobeReporterDataAccessObject dao = new WardrobeReporterDataAccessObject();
+        final WearFactory factory = new WearFactory();
+        final WardrobeReporterDataAccessObject dao = new WardrobeReporterDataAccessObject(factory);
         // Passed "null" for the Presenter since we commented it out. It is also not ready yet.
         final WardrobeReporterInteractor interactor = new WardrobeReporterInteractor(dao, null);
         interactor.report();
