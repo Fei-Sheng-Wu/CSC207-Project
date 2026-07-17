@@ -61,7 +61,16 @@ public final class Wardrobe {
      * @return true if the clothing item was in the wardrobe and is removed; otherwise, false
      */
     public boolean removeItem(AbstractWear item) {
-        return items.remove(item);
+        for (int i = 0; i < items.size(); i++) {
+            if (!items.get(i).getUuid().equals(item.getUuid())) {
+                continue;
+            }
+
+            items.remove(i);
+            return true;
+        }
+
+        return false;
     }
 
     /**
