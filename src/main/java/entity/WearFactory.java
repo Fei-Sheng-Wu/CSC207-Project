@@ -18,6 +18,7 @@ public class WearFactory {
     public AbstractWear constructWear(String type, UUID uuid) { // Should we make it static?
         switch (type.toLowerCase()) {
             // --- ACCESSORIES (e.g. watches, rings, sunglasses, bags, earrings) ---
+            case "accessory":
             case "watch":
             case "ring":
             case "sunglasses":
@@ -28,6 +29,7 @@ public class WearFactory {
                 break;
 
             // --- BOTTOMWEAR (e.g. pants, jeans, skirts, and shorts) ---
+            case "bottomwear":
             case "pants":
             case "jeans":
             case "skirt":
@@ -36,6 +38,7 @@ public class WearFactory {
                 break;
 
             // ---  FOOTWEAR (e.g. sneakers, boots, sandals, and heels) ---
+            case "footwear":
             case "sneakers":
             case "boots":
             case "sandals":
@@ -47,6 +50,7 @@ public class WearFactory {
                 break;
 
             // --- HEADWEAR (e.g. hats, caps, and beanies) ---
+            case "headwear":
             case "hat":
             case "cap":
             case "beanie":
@@ -54,6 +58,7 @@ public class WearFactory {
                 break;
 
             // --- INNERTOPWEAR (e.g. shirts, crew-necks, sports bras, and tank tops) ---
+            case "innertopwear":
             case "shirts":
             case "t-shirts":
             // case "crew-necks": Should this be removed? It is a broad category, not a specific one.
@@ -65,6 +70,7 @@ public class WearFactory {
                 break;
 
             // --- OUTERTOPWEAR (e.g. coats, hoodies, jackets, windbreakers, and parkas). ---
+            case "outertopwear":
             case "coats":
             case "hoodies":
             case "jackets": // Should this be removed? It is a broad category, not a specific one.
