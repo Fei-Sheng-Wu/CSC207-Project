@@ -25,16 +25,20 @@ public class WearFactory {
     public static AbstractWear constructWear(String type, UUID uuid) throws IllegalArgumentException {
         AbstractWear wear = null;
         for (Class<?> targetType : TYPES) {
-            if (targetType.getSimpleName().equals(type.toLowerCase())) {
-                try {
-                    wear = (AbstractWear) targetType.getDeclaredConstructor(UUID.class).newInstance(uuid);
-                } catch (NoSuchMethodException
-                         | InstantiationException
-                         | IllegalAccessException
-                         | InvocationTargetException ex) {
-                    throw new RuntimeException(ex);
-                }
+            if (!targetType.getSimpleName().equals(type.toLowerCase())) {
+                continue;
             }
+
+            try {
+                wear = (AbstractWear) targetType.getDeclaredConstructor(UUID.class).newInstance(uuid);
+            } catch (NoSuchMethodException
+                     | InstantiationException
+                     | IllegalAccessException
+                     | InvocationTargetException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            break;
         }
 
         if (wear == null) {
