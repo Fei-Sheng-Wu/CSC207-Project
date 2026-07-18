@@ -7,7 +7,7 @@ import okhttp3.OkHttpClient;
 /**
  * Represents an HTTP-based repository implementation.
  */
-public abstract class AbstractHttpRepositoryImpl {
+public abstract class AbstractHttpDataAccessObject {
     protected static final int CODE_OK = 200;
     protected static final int CODE_BAD_REQUEST = 400;
 
