@@ -2,8 +2,8 @@ package data_access.wardrobe;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import data_access.AbstractFileDataAccessObject;
 import entity.AbstractWear;
 import entity.Wardrobe;
 import entity.WearColor;
@@ -22,117 +23,116 @@ import entity.WearStyle;
 import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
 
 /**
- * The DAO for the Wardrobe Reporter.
+ * Represents the data access implementation for wardrobe-related actions.
  */
-public class WardrobeActorDataAccessObject implements WardrobeActorDataAccessInterface {
-    // Should we rename this to WardrobeRepository... since it will be used by other use_cases as well?
-    private static final String FILE_PATH = "src/main/resources/wardrobe.json";
-    private static final String BRAND_KEY = "brand";
-    private static final String NAME_KEY = "name";
-    private static final String PURCHASE_DATE_KEY = "purchaseData";
-    private static final String FONDNESS_KEY = "fondness";
-    private static final String COLOR_KEY = "color";
-    private static final String STYLE_KEY = "style";
-    private static final String CONDITION_KEY = "condition";
-    private static final String TAGS_KEY = "tags";
+public class WardrobeActorDataAccessObject
+    extends AbstractFileDataAccessObject
+    implements WardrobeActorDataAccessInterface {
+    private static final String FILE_NAME = "wardrobe.json";
     private static final int INDENT_FACTOR = 4;
-    private final WearFactory wearFactory;
 
-    public WardrobeActorDataAccessObject(WearFactory wearFactory) {
-        this.wearFactory = wearFactory;
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_UUID = "uuid";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_BRAND = "brand";
+    private static final String KEY_COLOR = "color";
+    private static final String KEY_STYLE = "style";
+    private static final String KEY_CONDITION = "condition";
+    private static final String KEY_PURCHASE_DATE = "purchaseDate";
+    private static final String KEY_FONDNESS = "fondness";
+    private static final String KEY_TAGS = "tags";
+
+    /**
+     * Constructs a new data access object.
+     */
+    public WardrobeActorDataAccessObject() {
+
     }
 
     @Override
     public Wardrobe fetchWardrobe() {
-        final List<AbstractWear> savedClothes = new ArrayList<>();
+        final List<AbstractWear> result = new ArrayList<>();
 
         try {
-            final String jsonContent = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
+            final String jsonContent = Files.readString(getPath(FILE_NAME), StandardCharsets.UTF_8);
+            final JSONArray jsonItems;
+            if (jsonContent.isEmpty()) {
+                jsonItems = new JSONArray();
+            } else {
+                jsonItems = new JSONArray(jsonContent);
+            }
 
-            final JSONObject jsonObject = new JSONObject(jsonContent);
-            final JSONArray itemsArray = jsonObject.getJSONArray("items");
-
-            for (int i = 0; i < itemsArray.length(); i++) {
-                final JSONObject jsonItem = itemsArray.getJSONObject(i);
-
-                final String type = jsonItem.optString("type", "Unknown");
-                final UUID uuid = UUID.fromString(jsonItem.getString("uuid"));
-
-                final AbstractWear wear = wearFactory.constructWear(type, uuid);
-
+            for (int i = 0; i < jsonItems.length(); i++) {
+                final JSONObject jsonItem = jsonItems.getJSONObject(i);
+                final AbstractWear wear = WearFactory.constructWear(
+                    jsonItem.getString(KEY_TYPE),
+                    UUID.fromString(jsonItem.getString(KEY_UUID))
+                );
                 populateBasicAttributes(jsonItem, wear);
                 populateEnumAttributes(jsonItem, wear);
                 populateTags(jsonItem, wear);
 
-                savedClothes.add(wear);
+                result.add(wear);
             }
-        }
-        catch (IOException | JSONException ex) {
+        } catch (IOException | JSONException | IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         }
-        return new Wardrobe(savedClothes);
+
+        return new Wardrobe(result);
     }
 
     @Override
     public void saveWardrobe(Wardrobe wardrobe) {
-        final JSONObject parentJSONObject = new JSONObject();
-        final JSONArray itemsJSONArray = new JSONArray();
-
-        for (AbstractWear wear: wardrobe.getItems()) {
+        final JSONArray jsonItems = new JSONArray();
+        for (AbstractWear wear : wardrobe.getItems()) {
             final JSONObject jsonItem = new JSONObject();
+            jsonItem.put(KEY_TYPE, wear.getClass().getSimpleName());
+            jsonItem.put(KEY_UUID, wear.getUuid().toString());
+            serializeBasicAttributes(jsonItem, wear);
+            serializeEnumAttributes(jsonItem, wear);
+            serializeTags(jsonItem, wear);
 
-            jsonItem.put("uuid", wear.getUuid().toString());
-            // Hopefully this returns the name of the class.
-            jsonItem.put("type", wear.getClass().getSimpleName());
-
-            // Not sure if we need precondition checks. Or we could assume the given arguments are valid.
-            getPutBasicAttributes(jsonItem, wear);
-            getPutEnumAttributed(jsonItem, wear);
-            getPutTags(jsonItem, wear);
-
-            itemsJSONArray.put(jsonItem);
+            jsonItems.put(jsonItem);
         }
-        parentJSONObject.put("items", itemsJSONArray);
 
-        try (FileWriter writer = new FileWriter(FILE_PATH)) {
-            writer.write(parentJSONObject.toString(INDENT_FACTOR));
-        }
-        catch (IOException | JSONException ex) {
+        try (FileWriter writer = new FileWriter(getPath(FILE_NAME).toString())) {
+            writer.write(jsonItems.toString(INDENT_FACTOR));
+        } catch (IOException | JSONException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    // --- fetchWardrobe() HELPER METHODS ---
+
     private static void populateBasicAttributes(JSONObject jsonItem, AbstractWear wear) {
-        if (jsonItem.has(NAME_KEY)) {
-            wear.setName(jsonItem.getString(NAME_KEY));
+        if (jsonItem.has(KEY_NAME)) {
+            wear.setName(jsonItem.getString(KEY_NAME));
         }
-        if (jsonItem.has(BRAND_KEY)) {
-            wear.setBrand(jsonItem.getString(BRAND_KEY));
+        if (jsonItem.has(KEY_BRAND)) {
+            wear.setBrand(jsonItem.getString(KEY_BRAND));
         }
-        if (jsonItem.has(PURCHASE_DATE_KEY)) {
-            wear.setPurchaseDate(LocalDate.parse(jsonItem.getString(PURCHASE_DATE_KEY)));
+        if (jsonItem.has(KEY_PURCHASE_DATE)) {
+            wear.setPurchaseDate(LocalDate.parse(jsonItem.getString(KEY_PURCHASE_DATE)));
         }
-        if (jsonItem.has(FONDNESS_KEY)) {
-            wear.setFondness(jsonItem.getDouble(FONDNESS_KEY));
+        if (jsonItem.has(KEY_FONDNESS)) {
+            wear.setFondness(jsonItem.getDouble(KEY_FONDNESS));
         }
     }
 
     private static void populateEnumAttributes(JSONObject jsonItem, AbstractWear wear) {
-        if (jsonItem.has(COLOR_KEY)) {
-            wear.setColor(WearColor.valueOf(jsonItem.getString(COLOR_KEY).toUpperCase()));
+        if (jsonItem.has(KEY_COLOR)) {
+            wear.setColor(WearColor.valueOf(jsonItem.getString(KEY_COLOR).toUpperCase()));
         }
-        if (jsonItem.has(STYLE_KEY)) {
-            wear.setStyle(WearStyle.valueOf(jsonItem.getString(STYLE_KEY).toUpperCase()));
+        if (jsonItem.has(KEY_STYLE)) {
+            wear.setStyle(WearStyle.valueOf(jsonItem.getString(KEY_STYLE).toUpperCase()));
         }
-        if (jsonItem.has(CONDITION_KEY)) {
-            wear.setCondition(WearCondition.valueOf(jsonItem.getString(CONDITION_KEY).toUpperCase()));
+        if (jsonItem.has(KEY_CONDITION)) {
+            wear.setCondition(WearCondition.valueOf(jsonItem.getString(KEY_CONDITION).toUpperCase()));
         }
     }
 
     private static void populateTags(JSONObject jsonItem, AbstractWear wear) {
-        if (jsonItem.has(TAGS_KEY)) {
-            final JSONArray tagsArray = jsonItem.getJSONArray("tags");
+        if (jsonItem.has(KEY_TAGS)) {
+            final JSONArray tagsArray = jsonItem.getJSONArray(KEY_TAGS);
             final List<String> tagsList = new ArrayList<>();
             for (int j = 0; j < tagsArray.length(); j++) {
                 tagsList.add(tagsArray.getString(j));
@@ -142,29 +142,32 @@ public class WardrobeActorDataAccessObject implements WardrobeActorDataAccessInt
     }
 
     // --- saveWardrobe() HELPER METHODS ---
-    private static void getPutBasicAttributes(JSONObject jsonItem, AbstractWear wear) {
-        jsonItem.put(NAME_KEY, wear.getName());
-
-        jsonItem.put(BRAND_KEY, wear.getBrand());
-
-        jsonItem.put(PURCHASE_DATE_KEY, wear.getPurchaseDate().toString());
-
-        jsonItem.put(FONDNESS_KEY, wear.getFondness());
+    private static void serializeBasicAttributes(JSONObject jsonItem, AbstractWear wear) {
+        jsonItem.put(KEY_NAME, wear.getName());
+        jsonItem.put(KEY_BRAND, wear.getBrand());
+        if (wear.getPurchaseDate() != null) {
+            jsonItem.put(KEY_PURCHASE_DATE, wear.getPurchaseDate().toString());
+        }
+        jsonItem.put(KEY_FONDNESS, wear.getFondness());
     }
 
-    private static void getPutEnumAttributed(JSONObject jsonItem, AbstractWear wear) {
-        jsonItem.put(COLOR_KEY, wear.getColor().name());
-
-        jsonItem.put(STYLE_KEY, wear.getStyle().name());
-
-        jsonItem.put(CONDITION_KEY, wear.getCondition().name());
+    private static void serializeEnumAttributes(JSONObject jsonItem, AbstractWear wear) {
+        if (wear.getColor() != null) {
+            jsonItem.put(KEY_COLOR, wear.getColor().name());
+        }
+        if (wear.getStyle() != null) {
+            jsonItem.put(KEY_STYLE, wear.getStyle().name());
+        }
+        if (wear.getCondition() != null) {
+            jsonItem.put(KEY_CONDITION, wear.getCondition().name());
+        }
     }
 
-    private static void getPutTags(JSONObject jsonItem, AbstractWear wear) {
+    private static void serializeTags(JSONObject jsonItem, AbstractWear wear) {
         final JSONArray tagsArray = new JSONArray();
         for (String tag : wear.getTags()) {
             tagsArray.put(tag);
         }
-        jsonItem.put(TAGS_KEY, tagsArray);
+        jsonItem.put(KEY_TAGS, tagsArray);
     }
 }
