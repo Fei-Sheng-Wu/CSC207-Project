@@ -20,6 +20,7 @@ import entity.Event;
 import entity.Footwear;
 import entity.InnerTopwear;
 import entity.OuterTopwear;
+import entity.Outfit;
 import entity.Wardrobe;
 import entity.WearColor;
 import entity.WearCondition;
@@ -177,6 +178,103 @@ class ContextBasedRecommendationProcessorTest {
         assertEquals("No outfit in the wardrobe is suitable for the current context.", output.errorMessage);
     }
 
+    @Test
+    void filtersWeatherIneligibleItemsBeforeAnalyzingCandidates() {
+        final InnerTopwear firstShirt = wear(
+                new InnerTopwear(RED_SHIRT_ID), WearColor.RED, WearStyle.CASUAL, 1.0);
+        final InnerTopwear secondShirt = wear(
+                new InnerTopwear(BLUE_SHIRT_ID), WearColor.BLUE, WearStyle.CASUAL, 1.0);
+        final OuterTopwear thinJacket = wear(
+                new OuterTopwear(UUID.fromString("00000000-0000-0000-0000-000000000003")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        final OuterTopwear thickCoat = wear(
+                new OuterTopwear(UUID.fromString("00000000-0000-0000-0000-000000000004")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        thickCoat.setIsThick(true);
+        final Bottomwear shorts = wear(
+                new Bottomwear(UUID.fromString("00000000-0000-0000-0000-000000000005")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        final Bottomwear pants = wear(
+                new Bottomwear(UUID.fromString("00000000-0000-0000-0000-000000000006")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        pants.setIsLong(true);
+        final List<Footwear> footwears = new ArrayList<>();
+        for (int index = 0; index < 5; index++) {
+            final Footwear footwear = wear(
+                    new Footwear(new UUID(0L, 7L + index)),
+                    WearColor.BLACK,
+                    WearStyle.CASUAL,
+                    1.0
+            );
+            footwear.setIsWaterproof(index == 0);
+            footwears.add(footwear);
+        }
+        final List<AbstractWear> items = new ArrayList<>(List.of(
+                firstShirt, secondShirt, thinJacket, thickCoat, shorts, pants
+        ));
+        items.addAll(footwears);
+        final CountingAnalyzer analyzer = new CountingAnalyzer();
+        final CapturingOutputBoundary output = new CapturingOutputBoundary();
+        final ContextBasedRecommendationProcessor processor = new ContextBasedRecommendationProcessor(
+                new Wardrobe(items),
+                new FixedContextProvider(weather(-5.0, 2.0), List.of()),
+                output,
+                List.of(analyzer)
+        );
+
+        processor.recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+
+        assertNotNull(output.response);
+        assertEquals(2, analyzer.getInvocationCount());
+        assertSame(thickCoat, output.response.getOutfit().getTopwearOuter());
+        assertSame(pants, output.response.getOutfit().getBottomwear());
+        assertTrue(output.response.getOutfit().getFootwear().isWaterproof());
+    }
+
+    @Test
+    void analyzesSingleCandidateBeforePresentingIt() {
+        final InnerTopwear shirt = wear(
+                new InnerTopwear(RED_SHIRT_ID), WearColor.RED, WearStyle.CASUAL, 1.0);
+        final Bottomwear bottom = wear(
+                new Bottomwear(UUID.fromString("00000000-0000-0000-0000-000000000003")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        bottom.setIsLong(true);
+        final Footwear footwear = wear(
+                new Footwear(UUID.fromString("00000000-0000-0000-0000-000000000004")),
+                WearColor.BLACK,
+                WearStyle.CASUAL,
+                1.0
+        );
+        final CountingAnalyzer analyzer = new CountingAnalyzer();
+        final CapturingOutputBoundary output = new CapturingOutputBoundary();
+        final ContextBasedRecommendationProcessor processor = new ContextBasedRecommendationProcessor(
+                new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
+                new FixedContextProvider(weather(20.0, 0.0), List.of()),
+                output,
+                List.of(analyzer)
+        );
+
+        processor.recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+
+        assertEquals(1, analyzer.getInvocationCount());
+        assertEquals("The candidate was analyzed.", output.response.getReason());
+    }
+
     private static ContextBasedRecommendationProcessor processor(Wardrobe wardrobe,
                                                                  ContextProvider contextProvider,
                                                                  RecommendationOutputBoundary output) {
@@ -240,6 +338,20 @@ class ContextBasedRecommendationProcessorTest {
         @Override
         public void prepareFailView(String message) {
             this.errorMessage = message;
+        }
+    }
+
+    private static final class CountingAnalyzer implements OutfitAnalyzer {
+        private int invocationCount;
+
+        @Override
+        public OutfitAnalysis analyze(Outfit outfit, RecommendationContext context) {
+            invocationCount++;
+            return new OutfitAnalysis(true, 0, 0, 0.0, List.of("The candidate was analyzed."));
+        }
+
+        private int getInvocationCount() {
+            return invocationCount;
         }
     }
 }
