@@ -7,7 +7,7 @@ import entity.Weather;
 /**
  * Defines the interface of a weather repository that provides weather data.
  */
-public interface WeatherRepository {
+public interface WeatherDataAccessObject {
     /**
      * Returns the current weather of the specified location.
      *

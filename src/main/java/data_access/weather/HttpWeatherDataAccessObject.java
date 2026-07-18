@@ -12,13 +12,15 @@ import org.json.JSONObject;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import data_access.AbstractHttpRepositoryImpl;
+import data_access.AbstractHttpDataAccessObject;
 import entity.Weather;
 
 /**
  * Represents an implementation of the weather repository interface.
  */
-public class WeatherRepositoryImpl extends AbstractHttpRepositoryImpl implements WeatherRepository {
+public class HttpWeatherDataAccessObject
+    extends AbstractHttpDataAccessObject
+    implements WeatherDataAccessObject {
     private static final String API_BASE_URL = System.getenv("API_BASE_URL_WEATHER");
     private static final String API_KEY = System.getenv("API_KEY_WEATHER");
 
