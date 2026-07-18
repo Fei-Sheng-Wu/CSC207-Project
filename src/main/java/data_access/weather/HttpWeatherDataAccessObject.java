@@ -14,13 +14,14 @@ import okhttp3.Response;
 
 import data_access.AbstractHttpDataAccessObject;
 import entity.Weather;
+import use_case.context_based_recommendation.WeatherDataAccessInterface;
 
 /**
  * Represents an implementation of the weather repository interface.
  */
 public class HttpWeatherDataAccessObject
     extends AbstractHttpDataAccessObject
-    implements WeatherDataAccessObject {
+    implements WeatherDataAccessInterface {
     private static final String API_BASE_URL = System.getenv("API_BASE_URL_WEATHER");
     private static final String API_KEY = System.getenv("API_KEY_WEATHER");
 

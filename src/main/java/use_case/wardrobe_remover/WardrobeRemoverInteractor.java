@@ -1,16 +1,16 @@
 package use_case.wardrobe_remover;
 
 import entity.Wardrobe;
-import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * Use case interactor for removing a clothing item from the wardrobe.
  */
 public class WardrobeRemoverInteractor implements WardrobeRemoverInputBoundary {
-    private final WardrobeActorDataAccessInterface repository;
+    private final WardrobeDataAccessInterface repository;
     private final WardrobeRemoverOutputBoundary outputBoundary;
 
-    public WardrobeRemoverInteractor(WardrobeActorDataAccessInterface repository,
+    public WardrobeRemoverInteractor(WardrobeDataAccessInterface repository,
                                      WardrobeRemoverOutputBoundary outputBoundary) {
         this.repository = repository;
         this.outputBoundary = outputBoundary;

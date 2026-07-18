@@ -1,4 +1,4 @@
-package data_access.weather;
+package use_case.context_based_recommendation;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import entity.Weather;
 /**
  * Defines the interface of a weather repository that provides weather data.
  */
-public interface WeatherDataAccessObject {
+public interface WeatherDataAccessInterface {
     /**
      * Returns the current weather of the specified location.
      *
