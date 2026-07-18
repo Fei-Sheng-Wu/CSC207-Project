@@ -19,12 +19,12 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearFactory;
 import entity.WearStyle;
-import use_case.wardrobe_reporter.WardrobeReporterDataAccessInterface;
+import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
 
 /**
  * The DAO for the Wardrobe Reporter.
  */
-public class WardrobeReporterDataAccessObject implements WardrobeReporterDataAccessInterface {
+public class WardrobeActorDataAccessObject implements WardrobeActorDataAccessInterface {
     // Should we rename this to WardrobeRepository... since it will be used by other use_cases as well?
     private static final String FILE_PATH = "src/main/resources/wardrobe.json";
     private static final String BRAND_KEY = "brand";
@@ -38,7 +38,7 @@ public class WardrobeReporterDataAccessObject implements WardrobeReporterDataAcc
     private static final int INDENT_FACTOR = 4;
     private final WearFactory wearFactory;
 
-    public WardrobeReporterDataAccessObject(WearFactory wearFactory) {
+    public WardrobeActorDataAccessObject(WearFactory wearFactory) {
         this.wearFactory = wearFactory;
     }
 

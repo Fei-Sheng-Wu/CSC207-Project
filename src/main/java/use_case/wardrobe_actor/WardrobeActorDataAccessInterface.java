@@ -1,12 +1,11 @@
-package use_case.wardrobe_reporter;
+package use_case.wardrobe_actor;
 
 import entity.Wardrobe;
 
 /**
- * DAO for the Wardrobe Reporter Use Case.
+ * Data access interface for the wardrobe.
  */
-public interface WardrobeReporterDataAccessInterface {
-    // Renamed from WardrobeRepositroyDataAccessInterface to WardrobeReporterDataAccessInterface
+public interface WardrobeActorDataAccessInterface {
     /**
      * Retrieves the current wardrobe data from the database.
      *
@@ -20,5 +19,4 @@ public interface WardrobeReporterDataAccessInterface {
      * @param wardrobe the Wardrobe entity to be saved
      */
     void saveWardrobe(Wardrobe wardrobe);
-
 }
