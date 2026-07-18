@@ -1,24 +1,22 @@
 package app;
 
-import data_access.wardrobe.WardrobeReporterDataAccessObject;
-import data_access.weather.WeatherRepository;
-import data_access.weather.WeatherRepositoryImpl;
-import entity.WearFactory;
-import use_case.wardrobe_reporter.WardrobeReporterInteractor;
+import javax.swing.JFrame;
 
 public class Main {
+    /**
+     * Rune the application.
+     *
+     * @param args the unused arguments
+     */
     public static void main(String[] args) {
-        System.out.println("Hello!");
-        // Testing for WeatherAPI.
-        final WeatherRepository weatherRepository = new WeatherRepositoryImpl();
-        weatherRepository.getCurrentByLocation("Toronto");
-        weatherRepository.getForecastByLocation("Toronto");
-
-        // Testing for Wardrobe use_case.
-        final WearFactory factory = new WearFactory();
-        final WardrobeReporterDataAccessObject dao = new WardrobeReporterDataAccessObject(factory);
-        // Passed "null" for the Presenter since we commented it out. It is also not ready yet.
-        final WardrobeReporterInteractor interactor = new WardrobeReporterInteractor(dao, null);
-        interactor.report();
+        final JFrame application = new Application()
+//            .registerView(WardrobeView.class) // @TODO: requires the objects to be implemented
+//            .register(WardrobeViewModel.class)
+//            .register(AddWearController.class)
+//            .registerView(RecommendationView.class)
+//            .register(RecommendationViewModel.class)
+//            .showView(WardrobeView.class)
+            .build();
+        application.setVisible(true);
     }
 }
