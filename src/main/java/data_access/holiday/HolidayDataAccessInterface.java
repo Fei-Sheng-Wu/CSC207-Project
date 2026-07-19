@@ -5,7 +5,7 @@ import java.util.List;
 import entity.Holiday;
 
 /**
- * Defines the interface of a holiday repository that provides calendar holiday data.
+ * Defines the interface of a holiday repository that provides holiday data.
  */
 public interface HolidayDataAccessInterface {
     /**
