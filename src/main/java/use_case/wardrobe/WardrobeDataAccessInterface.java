@@ -1,11 +1,11 @@
-package use_case.wardrobe_actor;
+package use_case.wardrobe;
 
 import entity.Wardrobe;
 
 /**
  * Data access interface for wardrobe-related actions.
  */
-public interface WardrobeActorDataAccessInterface {
+public interface WardrobeDataAccessInterface {
     /**
      * Retrieves the saved wardrobe data.
      *

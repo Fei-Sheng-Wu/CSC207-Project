@@ -1,16 +1,16 @@
 package use_case.wardrobe_updater;
 
 import entity.Wardrobe;
-import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * Use case interactor for updating a clothing item in the wardrobe.
  */
 public class WardrobeUpdaterInteractor implements WardrobeUpdaterInputBoundary {
-    private final WardrobeActorDataAccessInterface repository;
+    private final WardrobeDataAccessInterface repository;
     private final WardrobeUpdaterOutputBoundary outputBoundary;
 
-    public WardrobeUpdaterInteractor(WardrobeActorDataAccessInterface repository,
+    public WardrobeUpdaterInteractor(WardrobeDataAccessInterface repository,
                                      WardrobeUpdaterOutputBoundary outputBoundary) {
         this.repository = repository;
         this.outputBoundary = outputBoundary;

@@ -20,14 +20,14 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearFactory;
 import entity.WearStyle;
-import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * Represents the data access implementation for wardrobe-related actions.
  */
-public class WardrobeActorDataAccessObject
+public class JsonWardrobeDataAccessObject
     extends AbstractFileDataAccessObject
-    implements WardrobeActorDataAccessInterface {
+    implements WardrobeDataAccessInterface {
     private static final String FILE_NAME = "wardrobe.json";
     private static final int INDENT_FACTOR = 4;
 
@@ -41,13 +41,6 @@ public class WardrobeActorDataAccessObject
     private static final String KEY_PURCHASE_DATE = "purchaseDate";
     private static final String KEY_FONDNESS = "fondness";
     private static final String KEY_TAGS = "tags";
-
-    /**
-     * Constructs a new data access object.
-     */
-    public WardrobeActorDataAccessObject() {
-
-    }
 
     @Override
     public Wardrobe fetchWardrobe() {
@@ -95,7 +88,7 @@ public class WardrobeActorDataAccessObject
             jsonItems.put(jsonItem);
         }
 
-        try (FileWriter writer = new FileWriter(getPath(FILE_NAME).toString())) {
+        try (FileWriter writer = new FileWriter(getPath(FILE_NAME).toString(), StandardCharsets.UTF_8)) {
             writer.write(jsonItems.toString(INDENT_FACTOR));
         } catch (IOException | JSONException ex) {
             throw new RuntimeException(ex);

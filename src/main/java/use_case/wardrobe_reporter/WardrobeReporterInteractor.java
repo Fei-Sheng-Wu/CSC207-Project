@@ -6,16 +6,16 @@ import java.util.List;
 import entity.AbstractWear;
 import entity.Wardrobe;
 import entity.WearCondition;
-import use_case.wardrobe_actor.WardrobeActorDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * The Wardrobe Reporter Interactor.
  */
 public class WardrobeReporterInteractor implements WardrobeReporterInputBoundary {
-    private final WardrobeActorDataAccessInterface wardrobeReporterDataAccessObject;
+    private final WardrobeDataAccessInterface wardrobeReporterDataAccessObject;
     private final WardrobeReporterOutputBoundary wardrobeReporterPresenter;
 
-    public WardrobeReporterInteractor(WardrobeActorDataAccessInterface wardrobeReporterDataAccessInterface,
+    public WardrobeReporterInteractor(WardrobeDataAccessInterface wardrobeReporterDataAccessInterface,
                                       WardrobeReporterOutputBoundary wardrobeReporterOutputBoundary) {
         this.wardrobeReporterDataAccessObject = wardrobeReporterDataAccessInterface;
         this.wardrobeReporterPresenter = wardrobeReporterOutputBoundary;
