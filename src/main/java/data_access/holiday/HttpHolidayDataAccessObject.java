@@ -12,14 +12,14 @@ import org.json.JSONObject;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import data_access.AbstractHttpRepositoryImpl;
+import data_access.AbstractHttpDataAccessObject;
 import entity.Holiday;
 
 /**
  * Represents an implementation of the holiday repository interface.
  */
 public class HttpHolidayDataAccessObject
-    extends AbstractHttpRepositoryImpl
+    extends AbstractHttpDataAccessObject
     implements HolidayDataAccessInterface {
     private static final String API_BASE_URL = System.getenv("API_BASE_URL_HOLIDAY");
     private static final String API_KEY = System.getenv("API_KEY_HOLIDAY");

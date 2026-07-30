@@ -1,13 +1,10 @@
-package use_case.item_update;
+package use_case.wardrobe_updater;
 
 import entity.AbstractWear;
 import entity.InnerTopwear;
 import entity.Wardrobe;
 import org.junit.jupiter.api.Test;
-import use_case.item_action.ItemActionOutputBoundary;
-import use_case.item_action.ItemActionRequest;
-import use_case.item_action.ItemActionResponse;
-import use_case.item_action.WardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for the item update use case.
+ * Tests for the wardrobe updater use case.
  */
-class ItemUpdaterTest {
+class WardrobeUpdaterInteractorTest {
     @Test
     void updateExistingItemSucceeds() {
         final UUID itemId = UUID.randomUUID();
@@ -34,16 +31,15 @@ class ItemUpdaterTest {
         final FakeWardrobeRepository repository = new FakeWardrobeRepository(
                 new Wardrobe(new ArrayList<>(List.of(oldItem)))
         );
-        final FakeItemActionPresenter presenter = new FakeItemActionPresenter();
+        final FakeWardrobeUpdaterPresenter presenter = new FakeWardrobeUpdaterPresenter();
 
-        final ItemUpdateInputBoundary updater = new ItemUpdater(repository, presenter);
-        updater.updateItem(new ItemActionRequest(updatedItem));
+        final WardrobeUpdaterInputBoundary interactor = new WardrobeUpdaterInteractor(repository, presenter);
+        interactor.updateItem(new WardrobeUpdaterInputData(updatedItem));
 
         assertTrue(presenter.successCalled);
         assertFalse(presenter.failCalled);
         assertTrue(repository.saveCalled);
         assertEquals("Updated Shirt", repository.wardrobe.getItems().get(0).getName());
-        assertEquals("Clothing item updated successfully.", presenter.response.getMessage());
     }
 
     @Test
@@ -57,19 +53,18 @@ class ItemUpdaterTest {
         final FakeWardrobeRepository repository = new FakeWardrobeRepository(
                 new Wardrobe(new ArrayList<>(List.of(existingItem)))
         );
-        final FakeItemActionPresenter presenter = new FakeItemActionPresenter();
+        final FakeWardrobeUpdaterPresenter presenter = new FakeWardrobeUpdaterPresenter();
 
-        final ItemUpdateInputBoundary updater = new ItemUpdater(repository, presenter);
-        updater.updateItem(new ItemActionRequest(missingItem));
+        final WardrobeUpdaterInputBoundary interactor = new WardrobeUpdaterInteractor(repository, presenter);
+        interactor.updateItem(new WardrobeUpdaterInputData(missingItem));
 
         assertFalse(presenter.successCalled);
         assertTrue(presenter.failCalled);
         assertFalse(repository.saveCalled);
         assertEquals("Existing Shirt", repository.wardrobe.getItems().get(0).getName());
-        assertEquals("Clothing item could not be found.", presenter.response.getMessage());
     }
 
-    private static class FakeWardrobeRepository implements WardrobeRepository {
+    private static class FakeWardrobeRepository implements WardrobeDataAccessInterface {
         private final Wardrobe wardrobe;
         private boolean saveCalled;
 
@@ -88,21 +83,18 @@ class ItemUpdaterTest {
         }
     }
 
-    private static class FakeItemActionPresenter implements ItemActionOutputBoundary {
+    private static class FakeWardrobeUpdaterPresenter implements WardrobeUpdaterOutputBoundary {
         private boolean successCalled;
         private boolean failCalled;
-        private ItemActionResponse response;
 
         @Override
-        public void prepareSuccessView(ItemActionResponse response) {
+        public void prepareSuccessView() {
             successCalled = true;
-            this.response = response;
         }
 
         @Override
-        public void prepareFailView(ItemActionResponse response) {
+        public void prepareFailView() {
             failCalled = true;
-            this.response = response;
         }
     }
 }
