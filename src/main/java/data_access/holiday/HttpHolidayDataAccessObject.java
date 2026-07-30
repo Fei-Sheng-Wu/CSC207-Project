@@ -13,7 +13,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import data_access.AbstractHttpDataAccessObject;
-import entity.Holiday;
+import entity.Event;
+import use_case.context_based_recommendation.HolidayDataAccessInterface;
 
 /**
  * Represents an implementation of the holiday repository interface.
@@ -32,19 +33,18 @@ public class HttpHolidayDataAccessObject
     }
 
     @Override
-    public List<Holiday> getHolidays(String country, int year) {
+    public List<Event> getHolidays(String country, int year) {
         try (Response response = fetch(String.format(
             "holidays?api_key=%s&country=%s&year=%d", API_KEY, country, year))) {
             if (CODE_OK != response.code() || response.body() == null) {
                 throw new RuntimeException(String.format("The holiday API has failed (%d).", response.code()));
             }
 
-            final List<Holiday> result = new ArrayList<>();
+            final List<Event> result = new ArrayList<>();
             final JSONObject responseBody = new JSONObject(response.body().string());
 
             final JSONObject responseObj = responseBody.getJSONObject("response");
             final JSONArray holidaysArray = responseObj.getJSONArray("holidays");
-
             for (int i = 0; i < holidaysArray.length(); i++) {
                 final JSONObject holiday = holidaysArray.getJSONObject(i);
 
@@ -55,11 +55,9 @@ public class HttpHolidayDataAccessObject
                 final String name = holiday.getString("name");
                 final String type = holiday.getString("primary_type");
 
-                // I will leave this as it is for now, and then you can decide whether the Holiday entity should be removed
-                // or if there is a better way to integrate the results into the project. What I did here is similar
-                // to what we did for the Weather API, where we constructed new Weather instances.
-                result.add(new Holiday(date, name, type));
+                // @TODO: Convert holiday API data into Event objects once the Event constructor/logic is finalized.
             }
+
             return result;
         }
         catch (IOException | JSONException ex) {

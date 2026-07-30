@@ -1,8 +1,8 @@
-package data_access.holiday;
+package use_case.context_based_recommendation;
 
 import java.util.List;
 
-import entity.Holiday;
+import entity.Event;
 
 /**
  * Defines the interface of a holiday repository that provides holiday data.
@@ -15,5 +15,5 @@ public interface HolidayDataAccessInterface {
      * @param year the target year (e.g., 2025)
      * @return a collection of holiday data
      */
-    List<Holiday> getHolidays(String country, int year);
+    List<Event> getHolidays(String country, int year);
 }

@@ -5,18 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import data_access.social_crawl.HttpSocialDataAccessObject;
+import data_access.inspiration.HttpInspirationDataAccessObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import entity.OutfitIdea;
 
-public class HttpSocialDataAccessObjectTest {
+public class HttpInspirationDataAccessObjectTest {
     private static List<OutfitIdea> outfitIdeas;
 
     @BeforeAll
     public static void SocialScrawlApiSetUp() {
-        final HttpSocialDataAccessObject httpSocial = new HttpSocialDataAccessObject();
+        final HttpInspirationDataAccessObject httpSocial = new HttpInspirationDataAccessObject();
         outfitIdeas = httpSocial.getOutfitIdeas("Outfit ideas for men today");
     }
 
