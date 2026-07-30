@@ -11,7 +11,7 @@ import interface_adapter.welcome.WelcomeViewModel;
 /**
  * Represents the welcome view.
  */
-public class WelcomeView extends AbstractApplicationView implements PropertyChangeListener {
+public class WelcomeView extends AbstractView implements PropertyChangeListener {
     private final WelcomeViewModel viewModel;
 
     /**

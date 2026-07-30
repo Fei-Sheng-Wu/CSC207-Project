@@ -11,7 +11,7 @@ import interface_adapter.recommendation.RecommendationViewModel;
 /**
  * Represents the recommendation view.
  */
-public class RecommendationView extends AbstractApplicationView implements PropertyChangeListener {
+public class RecommendationView extends AbstractView implements PropertyChangeListener {
     private final RecommendationViewModel viewModel;
 
     /**

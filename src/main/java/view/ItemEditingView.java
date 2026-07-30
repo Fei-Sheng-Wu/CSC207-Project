@@ -12,7 +12,7 @@ import interface_adapter.item_editing.ItemEditingViewModel;
 /**
  * Represents the item editing view.
  */
-public class ItemEditingView extends AbstractApplicationView implements PropertyChangeListener {
+public class ItemEditingView extends AbstractView implements PropertyChangeListener {
     private final ItemEditingViewModel viewModel;
 
     /**

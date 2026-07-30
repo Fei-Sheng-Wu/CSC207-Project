@@ -7,7 +7,7 @@ import interface_adapter.inspiration.InspirationViewModel;
 /**
  * Represents the inspiration view.
  */
-public class InspirationView extends AbstractApplicationView {
+public class InspirationView extends AbstractView {
     /**
      * Constructs a new inspiration view.
      *

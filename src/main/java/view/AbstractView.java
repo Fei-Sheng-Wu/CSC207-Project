@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 /**
  * Represents a view of the application.
  */
-public abstract class AbstractApplicationView extends JPanel {
+public abstract class AbstractView extends JPanel {
     private final ApplicationManager manager;
 
     /**
@@ -13,7 +13,7 @@ public abstract class AbstractApplicationView extends JPanel {
      *
      * @param manager the application manager of the view
      */
-    public AbstractApplicationView(ApplicationManager manager) {
+    public AbstractView(ApplicationManager manager) {
         this.manager = manager;
     }
 

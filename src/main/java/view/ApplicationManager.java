@@ -32,8 +32,8 @@ public class ApplicationManager {
     private static final int NAVIGATIONS_GAP_VER = 4;
 
     private final Map<Class<?>, Object> registry;
-    private final List<Class<? extends AbstractApplicationView>> navigationsTop;
-    private final List<Class<? extends AbstractApplicationView>> navigationsBottom;
+    private final List<Class<? extends AbstractView>> navigationsTop;
+    private final List<Class<? extends AbstractView>> navigationsBottom;
 
     private final JFrame window;
     private final Container navigator;
@@ -48,8 +48,8 @@ public class ApplicationManager {
      */
     public ApplicationManager(
         Map<Class<?>, Object> registry,
-        List<Class<? extends AbstractApplicationView>> navigationsTop,
-        List<Class<? extends AbstractApplicationView>> navigationsBottom
+        List<Class<? extends AbstractView>> navigationsTop,
+        List<Class<? extends AbstractView>> navigationsBottom
     ) {
         this.registry = registry;
         this.navigationsTop = navigationsTop;
@@ -111,9 +111,9 @@ public class ApplicationManager {
      *
      * @param viewClass the class of the view
      */
-    public void showView(Class<? extends AbstractApplicationView> viewClass) {
+    public void showView(Class<? extends AbstractView> viewClass) {
         final String identifier = viewClass.getName();
-        final AbstractApplicationView view = get(viewClass);
+        final AbstractView view = get(viewClass);
         if (!navigator.isAncestorOf(view)) {
             navigator.add(view, identifier);
         }
@@ -146,7 +146,7 @@ public class ApplicationManager {
 
         final JLabel navigationsHeader = new JLabel("NAVIGATION");
         navigations.add(navigationsHeader, navigationsConstraints);
-        for (Class<? extends AbstractApplicationView> navigationClass : navigationsTop) {
+        for (Class<? extends AbstractView> navigationClass : navigationsTop) {
             final JButton navigationsItem = new JButton(get(navigationClass).getTitle());
             navigationsItem.addActionListener(new ActionListener() {
                 @Override
@@ -159,7 +159,7 @@ public class ApplicationManager {
         navigationsConstraints.weighty = 1.0;
         navigations.add(Box.createVerticalGlue(), navigationsConstraints);
         navigationsConstraints.weighty = 0.0;
-        for (Class<? extends AbstractApplicationView> navigationClass : navigationsBottom) {
+        for (Class<? extends AbstractView> navigationClass : navigationsBottom) {
             final JButton navigationsItem = new JButton(get(navigationClass).getTitle());
             navigationsItem.addActionListener(new ActionListener() {
                 @Override

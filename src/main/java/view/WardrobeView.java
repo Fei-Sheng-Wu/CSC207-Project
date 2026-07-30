@@ -13,7 +13,7 @@ import interface_adapter.wardrobe.WardrobeViewModel;
 /**
  * Represents the wardrobe view.
  */
-public class WardrobeView extends AbstractApplicationView implements PropertyChangeListener {
+public class WardrobeView extends AbstractView implements PropertyChangeListener {
     private final WardrobeViewModel viewModel;
 
     /**

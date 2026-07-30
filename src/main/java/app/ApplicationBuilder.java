@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
-import view.AbstractApplicationView;
+import view.AbstractView;
 import view.ApplicationManager;
 
 /**
@@ -16,8 +16,8 @@ import view.ApplicationManager;
  */
 public class ApplicationBuilder {
     private final Map<Class<?>, Object> registry = new HashMap<>();
-    private final List<Class<? extends AbstractApplicationView>> navigationsTop = new ArrayList<>();
-    private final List<Class<? extends AbstractApplicationView>> navigationsBottom = new ArrayList<>();
+    private final List<Class<? extends AbstractView>> navigationsTop = new ArrayList<>();
+    private final List<Class<? extends AbstractView>> navigationsBottom = new ArrayList<>();
     private final ApplicationManager manager = new ApplicationManager(registry, navigationsTop, navigationsBottom);
 
     /**
@@ -28,7 +28,7 @@ public class ApplicationBuilder {
      * @return the current application builder
      * @throws RuntimeException if the view cannot be registered
      */
-    public <T extends AbstractApplicationView> ApplicationBuilder registerView(Class<T> viewClass) {
+    public <T extends AbstractView> ApplicationBuilder registerView(Class<T> viewClass) {
         try {
             manager.register(
                 viewClass,
@@ -50,7 +50,7 @@ public class ApplicationBuilder {
      * @param viewClass the class of the initial view
      * @return the current application builder
      */
-    public ApplicationBuilder setInitialView(Class<? extends AbstractApplicationView> viewClass) {
+    public ApplicationBuilder setInitialView(Class<? extends AbstractView> viewClass) {
         manager.showView(viewClass);
 
         return this;
@@ -62,7 +62,7 @@ public class ApplicationBuilder {
      * @param navigations the collection of classes of the views for the top navigation.
      * @return the current application builder
      */
-    public ApplicationBuilder setTopNavigations(List<Class<? extends AbstractApplicationView>> navigations) {
+    public ApplicationBuilder setTopNavigations(List<Class<? extends AbstractView>> navigations) {
         navigationsTop.clear();
         navigationsTop.addAll(navigations);
 
@@ -75,7 +75,7 @@ public class ApplicationBuilder {
      * @param navigations the collection of classes of the views for the bottom navigation.
      * @return the current application builder
      */
-    public ApplicationBuilder setBottomNavigations(List<Class<? extends AbstractApplicationView>> navigations) {
+    public ApplicationBuilder setBottomNavigations(List<Class<? extends AbstractView>> navigations) {
         navigationsBottom.clear();
         navigationsBottom.addAll(navigations);
 

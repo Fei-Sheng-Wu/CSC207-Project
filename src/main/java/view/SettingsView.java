@@ -16,7 +16,7 @@ import interface_adapter.settings.SettingsViewModel;
 /**
  * Represents the settings view.
  */
-public class SettingsView extends AbstractApplicationView implements PropertyChangeListener {
+public class SettingsView extends AbstractView implements PropertyChangeListener {
     private static final int GRID_GAP_HOR = 12;
     private static final int GRID_GAP_VER = 8;
     private static final int TEXT_FIELD_WIDTH = 192;
