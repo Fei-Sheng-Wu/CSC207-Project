@@ -1,4 +1,4 @@
-package data_access.social_crawl;
+package use_case.inspiration_curator;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import entity.OutfitIdea;
 /**
  * Defines the interface of a holiday repository that provides holiday data.
  */
-public interface SocialDataAccessInterface {
+public interface InspirationDataAccessInterface {
     /**
      * Returns a list of outfit ideas for the specified query.
      *

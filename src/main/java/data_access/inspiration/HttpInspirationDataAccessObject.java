@@ -1,4 +1,4 @@
-package data_access.social_crawl;
+package data_access.inspiration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,13 +13,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import data_access.AbstractHttpDataAccessObject;
+import use_case.inspiration_curator.InspirationDataAccessInterface;
 
 /**
  * Represents an implementation of the Social data access interface.
  */
-public class HttpSocialDataAccessObject
+public class HttpInspirationDataAccessObject
     extends AbstractHttpDataAccessObject
-    implements SocialDataAccessInterface {
+    implements InspirationDataAccessInterface {
     private static final String API_BASE_URL = System.getenv("API_BASE_URL_SOCIAL");
     private static final String API_KEY = System.getenv("API_KEY_SOCIAL");
     private static final String IDEMPOTENCY_KEY = "7a5e1b4c-2d8f-4a3b-9c1e-6e8b4d2a1f3c";
