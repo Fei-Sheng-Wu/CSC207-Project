@@ -17,6 +17,7 @@ import entity.Outfit;
 import entity.Wardrobe;
 import entity.WearCondition;
 import entity.Weather;
+import entity.WeatherSuitability;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
 
@@ -87,10 +88,12 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
 
         final Weather weather = context.getWeather();
         final List<Bottomwear> eligibleBottomwears = bottomwears.stream()
-                .filter(bottomwear -> weather.getTemperature() >= 5.0 || bottomwear.isLong())
+                .filter(bottomwear -> !WeatherSuitability.requiresLongBottomwear(weather.getTemperature())
+                        || bottomwear.isLong())
                 .toList();
         final List<Footwear> eligibleFootwears = footwears.stream()
-                .filter(footwear -> weather.getPrecipitation() <= 0.0 || footwear.isWaterproof())
+                .filter(footwear -> !WeatherSuitability.requiresWaterproofFootwear(weather.getPrecipitation())
+                        || footwear.isWaterproof())
                 .toList();
         final List<OuterTopwear> eligibleOuterTopwears = eligibleOuterTopwears(weather);
         final List<Headwear> headwears = optionalItemsOfType(Headwear.class);
@@ -109,11 +112,12 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
 
     private List<OuterTopwear> eligibleOuterTopwears(Weather weather) {
         final List<OuterTopwear> outerTopwears = itemsOfType(OuterTopwear.class);
-        if (weather.getTemperature() >= 10.0) {
+        if (!WeatherSuitability.requiresOuterTopwear(weather.getTemperature())) {
             return optionalItems(outerTopwears);
         }
         return outerTopwears.stream()
-                .filter(outerTopwear -> weather.getTemperature() >= 0.0 || outerTopwear.isThick())
+                .filter(outerTopwear -> !WeatherSuitability.requiresThickOuterTopwear(weather.getTemperature())
+                        || outerTopwear.isThick())
                 .toList();
     }
 
@@ -354,11 +358,12 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         }
 
         private boolean canBuildOutfit() {
+            // Headwear and accessories are not checked: their pools always carry a null
+            // sentinel for "wear nothing", so they can never be empty.
             return !innerTopwears.isEmpty()
                     && !outerTopwears.isEmpty()
                     && !bottomwears.isEmpty()
-                    && !footwears.isEmpty()
-                    && !headwears.isEmpty();
+                    && !footwears.isEmpty();
         }
     }
 }
