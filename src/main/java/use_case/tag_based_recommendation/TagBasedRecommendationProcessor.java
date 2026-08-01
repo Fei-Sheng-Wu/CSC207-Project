@@ -2,7 +2,7 @@ package use_case.tag_based_recommendation;
 
 import entity.*;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.recommendation.RecommendationResponse;
+import use_case.recommendation.RecommendationOutputData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +130,7 @@ public class TagBasedRecommendationProcessor implements TagBasedRecommendationIn
 
         String response = createResponse(request);
 
-        output.prepareSuccessView(new RecommendationResponse(outfit, response));
+        output.prepareSuccessView(new RecommendationOutputData(outfit, response));
     }
 
     /**

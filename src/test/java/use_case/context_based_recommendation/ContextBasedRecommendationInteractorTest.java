@@ -27,9 +27,9 @@ import entity.WearCondition;
 import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.recommendation.RecommendationResponse;
+import use_case.recommendation.RecommendationOutputData;
 
-class ContextBasedRecommendationProcessorTest {
+class ContextBasedRecommendationInteractorTest {
     private static final UUID RED_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID BLUE_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
@@ -70,28 +70,28 @@ class ContextBasedRecommendationProcessorTest {
                 List.of(WearStyle.CASUAL)
         );
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationProcessor processor = processor(
+        final ContextBasedRecommendationInteractor interactor = interactor(
                 wardrobe,
                 new FixedContextProvider(weather, List.of(canadaDay)),
                 output
         );
 
-        processor.recommend(new ContextBasedRecommendationRequest(
+        interactor.recommend(new ContextBasedRecommendationInputData(
                 207,
                 List.of(WearColor.RED, WearColor.WHITE),
                 List.of(WearStyle.CASUAL)
         ));
 
         assertNull(output.errorMessage);
-        assertNotNull(output.response);
-        assertSame(redShirt, output.response.getOutfit().getTopwearInner());
-        assertSame(coat, output.response.getOutfit().getTopwearOuter());
-        assertSame(jeans, output.response.getOutfit().getBottomwear());
-        assertSame(boots, output.response.getOutfit().getFootwear());
-        assertTrue(output.response.getReason().contains("Thick outerwear"));
-        assertTrue(output.response.getReason().contains("Waterproof footwear"));
-        assertTrue(output.response.getReason().contains("Canada Day"));
-        assertTrue(output.response.getReason().contains("preferences"));
+        assertNotNull(output.outputData);
+        assertSame(redShirt, output.outputData.getOutfit().getTopwearInner());
+        assertSame(coat, output.outputData.getOutfit().getTopwearOuter());
+        assertSame(jeans, output.outputData.getOutfit().getBottomwear());
+        assertSame(boots, output.outputData.getOutfit().getFootwear());
+        assertTrue(output.outputData.getReason().contains("Thick outerwear"));
+        assertTrue(output.outputData.getReason().contains("Waterproof footwear"));
+        assertTrue(output.outputData.getReason().contains("Canada Day"));
+        assertTrue(output.outputData.getReason().contains("preferences"));
     }
 
     @Test
@@ -117,14 +117,14 @@ class ContextBasedRecommendationProcessorTest {
         final CapturingOutputBoundary firstOutput = new CapturingOutputBoundary();
         final CapturingOutputBoundary secondOutput = new CapturingOutputBoundary();
 
-        processor(new Wardrobe(new ArrayList<>(List.of(first, second, bottom, footwear))), context, firstOutput)
-                .recommend(new ContextBasedRecommendationRequest(42, List.of(), List.of()));
-        processor(new Wardrobe(new ArrayList<>(List.of(footwear, bottom, second, first))), context, secondOutput)
-                .recommend(new ContextBasedRecommendationRequest(42, List.of(), List.of()));
+        interactor(new Wardrobe(new ArrayList<>(List.of(first, second, bottom, footwear))), context, firstOutput)
+                .recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
+        interactor(new Wardrobe(new ArrayList<>(List.of(footwear, bottom, second, first))), context, secondOutput)
+                .recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
 
         assertEquals(
-                firstOutput.response.getOutfit().getTopwearInner().getUuid(),
-                secondOutput.response.getOutfit().getTopwearInner().getUuid()
+                firstOutput.outputData.getOutfit().getTopwearInner().getUuid(),
+                secondOutput.outputData.getOutfit().getTopwearInner().getUuid()
         );
     }
 
@@ -140,13 +140,13 @@ class ContextBasedRecommendationProcessorTest {
         );
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
 
-        processor(
+        interactor(
                 new Wardrobe(new ArrayList<>(List.of(shirt, footwear))),
                 new FixedContextProvider(weather(20.0, 0.0), List.of()),
                 output
-        ).recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+        ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
-        assertNull(output.response);
+        assertNull(output.outputData);
         assertTrue(output.errorMessage.contains("inner topwear, bottomwear, and footwear"));
     }
 
@@ -168,13 +168,13 @@ class ContextBasedRecommendationProcessorTest {
         );
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
 
-        processor(
+        interactor(
                 new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
                 new FixedContextProvider(weather(20.0, 1.0), List.of()),
                 output
-        ).recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+        ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
-        assertNull(output.response);
+        assertNull(output.outputData);
         assertEquals("No outfit in the wardrobe is suitable for the current context.", output.errorMessage);
     }
 
@@ -227,20 +227,20 @@ class ContextBasedRecommendationProcessorTest {
         items.addAll(footwears);
         final CountingAnalyzer analyzer = new CountingAnalyzer();
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationProcessor processor = new ContextBasedRecommendationProcessor(
+        final ContextBasedRecommendationInteractor interactor = new ContextBasedRecommendationInteractor(
                 new Wardrobe(items),
                 new FixedContextProvider(weather(-5.0, 2.0), List.of()),
                 output,
                 List.of(analyzer)
         );
 
-        processor.recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+        interactor.recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
-        assertNotNull(output.response);
+        assertNotNull(output.outputData);
         assertEquals(2, analyzer.getInvocationCount());
-        assertSame(thickCoat, output.response.getOutfit().getTopwearOuter());
-        assertSame(pants, output.response.getOutfit().getBottomwear());
-        assertTrue(output.response.getOutfit().getFootwear().isWaterproof());
+        assertSame(thickCoat, output.outputData.getOutfit().getTopwearOuter());
+        assertSame(pants, output.outputData.getOutfit().getBottomwear());
+        assertTrue(output.outputData.getOutfit().getFootwear().isWaterproof());
     }
 
     @Test
@@ -262,23 +262,23 @@ class ContextBasedRecommendationProcessorTest {
         );
         final CountingAnalyzer analyzer = new CountingAnalyzer();
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationProcessor processor = new ContextBasedRecommendationProcessor(
+        final ContextBasedRecommendationInteractor interactor = new ContextBasedRecommendationInteractor(
                 new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
                 new FixedContextProvider(weather(20.0, 0.0), List.of()),
                 output,
                 List.of(analyzer)
         );
 
-        processor.recommend(new ContextBasedRecommendationRequest(0, List.of(), List.of()));
+        interactor.recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
         assertEquals(1, analyzer.getInvocationCount());
-        assertEquals("The candidate was analyzed.", output.response.getReason());
+        assertEquals("The candidate was analyzed.", output.outputData.getReason());
     }
 
-    private static ContextBasedRecommendationProcessor processor(Wardrobe wardrobe,
-                                                                 ContextProvider contextProvider,
-                                                                 RecommendationOutputBoundary output) {
-        return new ContextBasedRecommendationProcessor(
+    private static ContextBasedRecommendationInteractor interactor(Wardrobe wardrobe,
+                                                                   ContextProvider contextProvider,
+                                                                   RecommendationOutputBoundary output) {
+        return new ContextBasedRecommendationInteractor(
                 wardrobe,
                 contextProvider,
                 output,
@@ -327,12 +327,12 @@ class ContextBasedRecommendationProcessorTest {
     }
 
     private static final class CapturingOutputBoundary implements RecommendationOutputBoundary {
-        private RecommendationResponse response;
+        private RecommendationOutputData outputData;
         private String errorMessage;
 
         @Override
-        public void prepareSuccessView(RecommendationResponse recommendationResponse) {
-            this.response = recommendationResponse;
+        public void prepareSuccessView(RecommendationOutputData recommendationOutputData) {
+            this.outputData = recommendationOutputData;
         }
 
         @Override

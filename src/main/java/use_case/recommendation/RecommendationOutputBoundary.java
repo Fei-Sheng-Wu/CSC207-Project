@@ -7,9 +7,9 @@ public interface RecommendationOutputBoundary {
     /**
      * Presents a successful recommendation.
      *
-     * @param response the recommendation output data
+     * @param outputData the recommendation output data
      */
-    void prepareSuccessView(RecommendationResponse response);
+    void prepareSuccessView(RecommendationOutputData outputData);
 
     /**
      * Presents a failed recommendation.
