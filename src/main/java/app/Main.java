@@ -55,6 +55,7 @@ import view.InspirationView;
 import view.ItemView;
 import view.RecommendationView;
 import view.SettingsView;
+import view.WardrobeDetailsView;
 import view.WardrobeOverviewView;
 
 public class Main {
@@ -178,6 +179,7 @@ public class Main {
             )
             // Register the views.
             .registerView(WardrobeOverviewView.class)
+            .registerView(WardrobeDetailsView.class)
             .registerView(ItemView.class)
             .registerView(InspirationView.class)
             .registerView(RecommendationView.class)
