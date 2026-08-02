@@ -28,7 +28,8 @@ import use_case.wardrobe.WardrobeDataAccessInterface;
 public class JsonWardrobeDataAccessObject
     extends AbstractFileDataAccessObject
     implements WardrobeDataAccessInterface {
-    private static final String FILE_NAME = "wardrobe.json";
+    private final String fileName;
+
     private static final int INDENT_FACTOR = 4;
 
     private static final String KEY_TYPE = "type";
@@ -42,12 +43,16 @@ public class JsonWardrobeDataAccessObject
     private static final String KEY_FONDNESS = "fondness";
     private static final String KEY_TAGS = "tags";
 
+    public JsonWardrobeDataAccessObject(String fileName) {
+        this.fileName = fileName;
+    } // depeendency injection ( more flexibility)
+
     @Override
     public Wardrobe fetchWardrobe() {
         final List<AbstractWear> result = new ArrayList<>();
 
         try {
-            final String jsonContent = Files.readString(getPath(FILE_NAME), StandardCharsets.UTF_8);
+            final String jsonContent = Files.readString(getPath(fileName), StandardCharsets.UTF_8);
             final JSONArray jsonItems;
             if (jsonContent.isEmpty()) {
                 jsonItems = new JSONArray();
@@ -88,7 +93,7 @@ public class JsonWardrobeDataAccessObject
             jsonItems.put(jsonItem);
         }
 
-        try (FileWriter writer = new FileWriter(getPath(FILE_NAME).toString(), StandardCharsets.UTF_8)) {
+        try (FileWriter writer = new FileWriter(getPath(fileName).toString(), StandardCharsets.UTF_8)) {
             writer.write(jsonItems.toString(INDENT_FACTOR));
         } catch (IOException | JSONException ex) {
             throw new RuntimeException(ex);
