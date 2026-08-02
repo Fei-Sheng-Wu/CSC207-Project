@@ -25,7 +25,7 @@ import entity.WearCondition;
 import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.recommendation.RecommendationResponse;
+import use_case.recommendation.RecommendationOutputData;
 
 /** Exercises the complete use case from its input boundary to its success output boundary. */
 class ContextBasedRecommendationIntegrationTest {
@@ -64,7 +64,7 @@ class ContextBasedRecommendationIntegrationTest {
                 new InMemoryContextProvider(weather, List.of(event));
         final SuccessPresenter presenter = new SuccessPresenter();
         final ContextBasedRecommendationInputBoundary inputBoundary =
-                new ContextBasedRecommendationProcessor(
+                new ContextBasedRecommendationInteractor(
                         wardrobe,
                         contextProvider,
                         presenter,
@@ -76,23 +76,23 @@ class ContextBasedRecommendationIntegrationTest {
                         )
                 );
 
-        inputBoundary.recommend(new ContextBasedRecommendationRequest(
+        inputBoundary.recommend(new ContextBasedRecommendationInputData(
                 207,
                 List.of(WearColor.RED, WearColor.WHITE),
                 List.of(WearStyle.CASUAL)
         ));
 
         assertEquals(1, presenter.getSuccessCount());
-        assertNotNull(presenter.getResponse());
-        assertSame(redShirt, presenter.getResponse().getOutfit().getTopwearInner());
-        assertSame(winterCoat, presenter.getResponse().getOutfit().getTopwearOuter());
-        assertSame(longJeans, presenter.getResponse().getOutfit().getBottomwear());
-        assertSame(waterproofBoots, presenter.getResponse().getOutfit().getFootwear());
-        assertTrue(presenter.getResponse().getReason().contains("cold temperature"));
-        assertTrue(presenter.getResponse().getReason().contains("Waterproof footwear"));
-        assertTrue(presenter.getResponse().getReason().contains("Casual team meeting"));
-        assertTrue(presenter.getResponse().getReason().contains("preferences"));
-        assertTrue(presenter.getResponse().getReason().contains("average fondness"));
+        assertNotNull(presenter.getOutputData());
+        assertSame(redShirt, presenter.getOutputData().getOutfit().getTopwearInner());
+        assertSame(winterCoat, presenter.getOutputData().getOutfit().getTopwearOuter());
+        assertSame(longJeans, presenter.getOutputData().getOutfit().getBottomwear());
+        assertSame(waterproofBoots, presenter.getOutputData().getOutfit().getFootwear());
+        assertTrue(presenter.getOutputData().getReason().contains("cold temperature"));
+        assertTrue(presenter.getOutputData().getReason().contains("Waterproof footwear"));
+        assertTrue(presenter.getOutputData().getReason().contains("Casual team meeting"));
+        assertTrue(presenter.getOutputData().getReason().contains("preferences"));
+        assertTrue(presenter.getOutputData().getReason().contains("average fondness"));
     }
 
     private static UUID id(long value) {
@@ -131,12 +131,12 @@ class ContextBasedRecommendationIntegrationTest {
     }
 
     private static final class SuccessPresenter implements RecommendationOutputBoundary {
-        private RecommendationResponse response;
+        private RecommendationOutputData outputData;
         private int successCount;
 
         @Override
-        public void prepareSuccessView(RecommendationResponse recommendationResponse) {
-            response = recommendationResponse;
+        public void prepareSuccessView(RecommendationOutputData recommendationOutputData) {
+            outputData = recommendationOutputData;
             successCount++;
         }
 
@@ -145,8 +145,8 @@ class ContextBasedRecommendationIntegrationTest {
             throw new AssertionError("Expected success but received: " + errorMessage);
         }
 
-        private RecommendationResponse getResponse() {
-            return response;
+        private RecommendationOutputData getOutputData() {
+            return outputData;
         }
 
         private int getSuccessCount() {
