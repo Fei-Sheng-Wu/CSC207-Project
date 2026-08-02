@@ -1,5 +1,6 @@
 package interface_adapter.item;
 
+import entity.AbstractWear;
 import org.jetbrains.annotations.Nullable;
 
 import interface_adapter.AbstractViewModel;
@@ -9,6 +10,7 @@ import interface_adapter.AbstractViewModel;
  */
 public class ItemViewModel extends AbstractViewModel {
     private String error;
+    private AbstractWear currentItem;
 
     /**
      * Returns the error.
@@ -28,5 +30,25 @@ public class ItemViewModel extends AbstractViewModel {
     public void setError(@Nullable String error) {
         this.error = error;
         firePropertyChange("error", this.error);
+    }
+
+    /**
+     * Returns the current item.
+     *
+     * @return the current item
+     */
+    @Nullable
+    public AbstractWear getCurrentItem() {
+        return currentItem;
+    }
+
+    /**
+     * Updates the current item.
+     *
+     * @param item the current item
+     */
+    public void setCurrentItem(@Nullable AbstractWear item) {
+        currentItem = item;
+        firePropertyChange("currentItem", currentItem);
     }
 }

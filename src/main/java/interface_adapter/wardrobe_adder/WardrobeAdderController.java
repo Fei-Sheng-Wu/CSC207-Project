@@ -25,12 +25,10 @@ public class WardrobeAdderController {
     /**
      * Executes the add item use case.
      *
-     * @param uuidText the UUID text
-     * @param type     the clothing item type
+     * @param type the clothing item type
      */
-    public void addItem(String uuidText, String type) {
-        final UUID uuid = UUID.fromString(uuidText.trim());
-        final AbstractWear item = WearFactory.constructWear(type, uuid);
+    public void addItem(String type) {
+        final AbstractWear item = WearFactory.constructWear(type, UUID.randomUUID());
 
         interactor.addItem(new WardrobeAdderInputData(item));
     }
