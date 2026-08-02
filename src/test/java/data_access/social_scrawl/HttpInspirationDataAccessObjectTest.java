@@ -8,9 +8,19 @@ import java.util.List;
 import data_access.inspiration.HttpInspirationDataAccessObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import entity.OutfitIdea;
 
+/**
+ * Tests for the social API data access object.
+ *
+ * <p>This is a live integration test: it calls the real API and therefore needs credentials.
+ * It runs when {@code API_BASE_URL_SOCIAL} and {@code API_KEY_SOCIAL} are set, and is skipped
+ * otherwise so that a developer without credentials still gets a green build.
+ */
+@EnabledIfEnvironmentVariable(named = "API_BASE_URL_SOCIAL", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "API_KEY_SOCIAL", matches = ".+")
 public class HttpInspirationDataAccessObjectTest {
     private static List<OutfitIdea> outfitIdeas;
 

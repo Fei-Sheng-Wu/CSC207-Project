@@ -8,14 +8,14 @@ import entity.WearStyle;
 /**
  * Input data for a context-based outfit recommendation.
  */
-public final class ContextBasedRecommendationRequest {
+public final class ContextBasedRecommendationInputData {
     private final int seed;
     private final List<WearColor> preferredColors;
     private final List<WearStyle> preferredStyles;
 
-    public ContextBasedRecommendationRequest(int seed,
-                                             List<WearColor> preferredColors,
-                                             List<WearStyle> preferredStyles) {
+    public ContextBasedRecommendationInputData(int seed,
+                                               List<WearColor> preferredColors,
+                                               List<WearStyle> preferredStyles) {
         this.seed = seed;
         this.preferredColors = List.copyOf(preferredColors);
         this.preferredStyles = List.copyOf(preferredStyles);

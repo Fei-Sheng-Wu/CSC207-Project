@@ -7,7 +7,7 @@ public interface ContextBasedRecommendationInputBoundary {
     /**
      * Recommends an outfit for the supplied preferences and current context.
      *
-     * @param request the recommendation input data
+     * @param inputData the recommendation input data
      */
-    void recommend(ContextBasedRecommendationRequest request);
+    void recommend(ContextBasedRecommendationInputData inputData);
 }

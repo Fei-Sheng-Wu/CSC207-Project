@@ -17,13 +17,14 @@ import entity.Outfit;
 import entity.Wardrobe;
 import entity.WearCondition;
 import entity.Weather;
+import entity.WeatherSuitability;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.recommendation.RecommendationResponse;
+import use_case.recommendation.RecommendationOutputData;
 
 /**
  * Use case interactor for deterministic, context-based outfit recommendations.
  */
-public final class ContextBasedRecommendationProcessor implements ContextBasedRecommendationInputBoundary {
+public final class ContextBasedRecommendationInteractor implements ContextBasedRecommendationInputBoundary {
     private static final String MISSING_REQUIRED_ITEMS =
             "A recommendation requires at least one inner topwear, bottomwear, and footwear.";
     private static final String NO_SUITABLE_OUTFIT =
@@ -34,10 +35,10 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
     private final RecommendationOutputBoundary outputBoundary;
     private final List<OutfitAnalyzer> analyzers;
 
-    public ContextBasedRecommendationProcessor(Wardrobe wardrobe,
-                                               ContextProvider contextProvider,
-                                               RecommendationOutputBoundary outputBoundary,
-                                               List<OutfitAnalyzer> analyzers) {
+    public ContextBasedRecommendationInteractor(Wardrobe wardrobe,
+                                                ContextProvider contextProvider,
+                                                RecommendationOutputBoundary outputBoundary,
+                                                List<OutfitAnalyzer> analyzers) {
         this.wardrobe = wardrobe;
         this.contextProvider = contextProvider;
         this.outputBoundary = outputBoundary;
@@ -45,12 +46,12 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
     }
 
     @Override
-    public void recommend(ContextBasedRecommendationRequest request) {
+    public void recommend(ContextBasedRecommendationInputData inputData) {
         final RecommendationContext context = new RecommendationContext(
                 contextProvider.getCurrentWeather(),
                 contextProvider.getCurrentEvents(),
-                request.getPreferredColors(),
-                request.getPreferredStyles()
+                inputData.getPreferredColors(),
+                inputData.getPreferredStyles()
         );
         final CandidatePools candidatePools = buildCandidatePools(context);
         if (candidatePools.isMissingRequiredItems()) {
@@ -69,9 +70,9 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
         }
 
         bestOutfits.sort(Comparator.comparing(analyzed -> signature(analyzed.outfit)));
-        final Random random = new Random(request.getSeed());
+        final Random random = new Random(inputData.getSeed());
         final AnalyzedOutfit selected = bestOutfits.get(random.nextInt(bestOutfits.size()));
-        outputBoundary.prepareSuccessView(new RecommendationResponse(
+        outputBoundary.prepareSuccessView(new RecommendationOutputData(
                 selected.outfit,
                 buildReason(selected.analysis)
         ));
@@ -87,10 +88,12 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
 
         final Weather weather = context.getWeather();
         final List<Bottomwear> eligibleBottomwears = bottomwears.stream()
-                .filter(bottomwear -> weather.getTemperature() >= 5.0 || bottomwear.isLong())
+                .filter(bottomwear -> !WeatherSuitability.requiresLongBottomwear(weather.getTemperature())
+                        || bottomwear.isLong())
                 .toList();
         final List<Footwear> eligibleFootwears = footwears.stream()
-                .filter(footwear -> weather.getPrecipitation() <= 0.0 || footwear.isWaterproof())
+                .filter(footwear -> !WeatherSuitability.requiresWaterproofFootwear(weather.getPrecipitation())
+                        || footwear.isWaterproof())
                 .toList();
         final List<OuterTopwear> eligibleOuterTopwears = eligibleOuterTopwears(weather);
         final List<Headwear> headwears = optionalItemsOfType(Headwear.class);
@@ -109,11 +112,12 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
 
     private List<OuterTopwear> eligibleOuterTopwears(Weather weather) {
         final List<OuterTopwear> outerTopwears = itemsOfType(OuterTopwear.class);
-        if (weather.getTemperature() >= 10.0) {
+        if (!WeatherSuitability.requiresOuterTopwear(weather.getTemperature())) {
             return optionalItems(outerTopwears);
         }
         return outerTopwears.stream()
-                .filter(outerTopwear -> weather.getTemperature() >= 0.0 || outerTopwear.isThick())
+                .filter(outerTopwear -> !WeatherSuitability.requiresThickOuterTopwear(weather.getTemperature())
+                        || outerTopwear.isThick())
                 .toList();
     }
 
@@ -354,11 +358,12 @@ public final class ContextBasedRecommendationProcessor implements ContextBasedRe
         }
 
         private boolean canBuildOutfit() {
+            // Headwear and accessories are not checked: their pools always carry a null
+            // sentinel for "wear nothing", so they can never be empty.
             return !innerTopwears.isEmpty()
                     && !outerTopwears.isEmpty()
                     && !bottomwears.isEmpty()
-                    && !footwears.isEmpty()
-                    && !headwears.isEmpty();
+                    && !footwears.isEmpty();
         }
     }
 }

@@ -5,11 +5,11 @@ import entity.Outfit;
 /**
  * Output data produced by an outfit recommendation use case.
  */
-public final class RecommendationResponse {
+public final class RecommendationOutputData {
     private final Outfit outfit;
     private final String reason;
 
-    public RecommendationResponse(Outfit outfit, String reason) {
+    public RecommendationOutputData(Outfit outfit, String reason) {
         this.outfit = outfit;
         this.reason = reason;
     }

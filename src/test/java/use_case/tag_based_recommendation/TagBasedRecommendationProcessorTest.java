@@ -20,7 +20,7 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearStyle;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.recommendation.RecommendationResponse;
+import use_case.recommendation.RecommendationOutputData;
 
 class TagBasedRecommendationProcessorTest {
     private static final UUID RED_SHIRT_ID =
@@ -223,12 +223,12 @@ class TagBasedRecommendationProcessorTest {
     private static final class CapturingOutputBoundary
         implements RecommendationOutputBoundary {
 
-        private RecommendationResponse response;
+        private RecommendationOutputData response;
         private String errorMessage;
 
         @Override
         public void prepareSuccessView(
-            RecommendationResponse recommendationResponse) {
+            RecommendationOutputData recommendationResponse) {
 
             this.response = recommendationResponse;
         }
