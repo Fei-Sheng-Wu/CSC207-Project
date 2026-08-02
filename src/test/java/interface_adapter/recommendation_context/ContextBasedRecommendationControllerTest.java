@@ -1,4 +1,4 @@
-package interface_adapter.recommendation;
+package interface_adapter.recommendation_context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Random;
 
-import interface_adapter.recommendation_context.ContextBasedRecommendationController;
 import org.junit.jupiter.api.Test;
 
 import entity.WearColor;
@@ -18,14 +17,14 @@ import use_case.recommendation_context.ContextBasedRecommendationInputData;
 /**
  * Tests for the recommendation controller.
  */
-class RecommendationControllerTest {
+class ContextBasedRecommendationControllerTest {
     @Test
     void packagesPreferencesIntoInputDataAndCallsTheBoundary() {
         final CapturingInputBoundary inputBoundary = new CapturingInputBoundary();
         final ContextBasedRecommendationController controller =
                 new ContextBasedRecommendationController(inputBoundary, new Random(1));
 
-        controller.recommend(List.of(WearColor.RED), List.of(WearStyle.FORMAL));
+        controller.recommend(List.of(WearColor.RED.name()), List.of(WearStyle.FORMAL.name()));
 
         assertNotNull(inputBoundary.received);
         assertEquals(List.of(WearColor.RED), inputBoundary.received.getPreferredColors());

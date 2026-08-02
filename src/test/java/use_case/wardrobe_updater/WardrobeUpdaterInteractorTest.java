@@ -93,7 +93,7 @@ class WardrobeUpdaterInteractorTest {
         }
 
         @Override
-        public void prepareFailView() {
+        public void prepareFailView(String message) {
             failCalled = true;
         }
     }

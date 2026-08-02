@@ -38,6 +38,15 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
     private final RecommendationOutputBoundary outputBoundary;
     private final List<OutfitAnalyzer> analyzers;
 
+    /**
+     * Constructs an interactor that scores outfits with the default analyzers.
+     *
+     * @param wardrobe        the wardrobe repository
+     * @param settingsProvider the repository of the user's location settings
+     * @param eventProvider   the repository of the events happening today
+     * @param weatherProvider the weather repository
+     * @param outputBoundary  the presenter of the result
+     */
     public ContextBasedRecommendationInteractor(
         WardrobeDataAccessInterface wardrobe,
         SettingsDataAccessInterface settingsProvider,
@@ -45,17 +54,38 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         WeatherDataAccessInterface weatherProvider,
         RecommendationOutputBoundary outputBoundary
     ) {
+        this(wardrobe, settingsProvider, eventProvider, weatherProvider, outputBoundary,
+            OutfitAnalyzers.standard());
+    }
+
+    /**
+     * Constructs an interactor that scores outfits with the supplied analyzers.
+     *
+     * <p>The interactor never decides which criteria apply; it is told. A test can therefore
+     * score outfits with a single analyzer, and a new criterion can be introduced without
+     * touching this class or any existing analyzer.
+     *
+     * @param wardrobe        the wardrobe repository
+     * @param settingsProvider the repository of the user's location settings
+     * @param eventProvider   the repository of the events happening today
+     * @param weatherProvider the weather repository
+     * @param outputBoundary  the presenter of the result
+     * @param analyzers       the criteria to score outfits against
+     */
+    public ContextBasedRecommendationInteractor(
+        WardrobeDataAccessInterface wardrobe,
+        SettingsDataAccessInterface settingsProvider,
+        EventDataAccessInterface eventProvider,
+        WeatherDataAccessInterface weatherProvider,
+        RecommendationOutputBoundary outputBoundary,
+        List<OutfitAnalyzer> analyzers
+    ) {
         this.wardrobe = wardrobe;
         this.settingsProvider = settingsProvider;
         this.eventProvider = eventProvider;
         this.weatherProvider = weatherProvider;
         this.outputBoundary = outputBoundary;
-        this.analyzers = List.of(
-            new PreferenceOutfitAnalyzer(),
-            new FondnessOutfitAnalyzer(),
-            new WeatherOutfitAnalyzer(),
-            new EventOutfitAnalyzer()
-        );
+        this.analyzers = List.copyOf(analyzers);
     }
 
     @Override
@@ -100,14 +130,22 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         }
 
         final Weather weather = context.getWeather();
-        final List<Bottomwear> eligibleBottomwears = bottomwears.stream()
-                .filter(bottomwear -> !WeatherSuitability.requiresLongBottomwear(weather.getTemperature())
-                        || bottomwear.isLong())
-                .toList();
-        final List<Footwear> eligibleFootwears = footwears.stream()
-                .filter(footwear -> !WeatherSuitability.requiresWaterproofFootwear(weather.getPrecipitation())
-                        || footwear.isWaterproof())
-                .toList();
+
+        final List<Bottomwear> eligibleBottomwears = new ArrayList<>();
+        for (Bottomwear bottomwear : bottomwears) {
+            if (!WeatherSuitability.requiresLongBottomwear(weather.getTemperature()) || bottomwear.isLong()) {
+                eligibleBottomwears.add(bottomwear);
+            }
+        }
+
+        final List<Footwear> eligibleFootwears = new ArrayList<>();
+        for (Footwear footwear : footwears) {
+            if (!WeatherSuitability.requiresWaterproofFootwear(weather.getPrecipitation())
+                    || footwear.isWaterproof()) {
+                eligibleFootwears.add(footwear);
+            }
+        }
+
         final List<OuterTopwear> eligibleOuterTopwears = eligibleOuterTopwears(weather);
         final List<Headwear> headwears = optionalItemsOfType(Headwear.class);
         final List<Accessory> accessories = itemsOfType(Accessory.class);
@@ -128,10 +166,15 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         if (!WeatherSuitability.requiresOuterTopwear(weather.getTemperature())) {
             return optionalItems(outerTopwears);
         }
-        return outerTopwears.stream()
-                .filter(outerTopwear -> !WeatherSuitability.requiresThickOuterTopwear(weather.getTemperature())
-                        || outerTopwear.isThick())
-                .toList();
+
+        final List<OuterTopwear> eligible = new ArrayList<>();
+        for (OuterTopwear outerTopwear : outerTopwears) {
+            if (!WeatherSuitability.requiresThickOuterTopwear(weather.getTemperature())
+                    || outerTopwear.isThick()) {
+                eligible.add(outerTopwear);
+            }
+        }
+        return eligible;
     }
 
     private List<AnalyzedOutfit> findBestOutfits(CandidatePools pools,
@@ -274,7 +317,11 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
     }
 
     private static String identifier(AbstractWear item) {
-        return item == null ? "" : item.getUuid().toString();
+        String result = "";
+        if (item != null) {
+            result = item.getUuid().toString();
+        }
+        return result;
     }
 
     private static final class AnalyzedOutfit {
@@ -292,7 +339,10 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         private OutfitAnalysis bestAnalysis;
 
         private void consider(Outfit outfit, OutfitAnalysis analysis) {
-            final int comparison = bestAnalysis == null ? 1 : compare(analysis, bestAnalysis);
+            int comparison = 1;
+            if (bestAnalysis != null) {
+                comparison = compare(analysis, bestAnalysis);
+            }
             if (comparison > 0) {
                 outfits.clear();
                 outfits.add(new AnalyzedOutfit(outfit, analysis));
