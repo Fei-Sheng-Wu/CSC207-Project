@@ -10,8 +10,10 @@ public class WardrobeRemoverInteractor implements WardrobeRemoverInputBoundary {
     private final WardrobeDataAccessInterface repository;
     private final WardrobeRemoverOutputBoundary outputBoundary;
 
-    public WardrobeRemoverInteractor(WardrobeDataAccessInterface repository,
-                                     WardrobeRemoverOutputBoundary outputBoundary) {
+    public WardrobeRemoverInteractor(
+        WardrobeDataAccessInterface repository,
+        WardrobeRemoverOutputBoundary outputBoundary
+    ) {
         this.repository = repository;
         this.outputBoundary = outputBoundary;
     }
@@ -19,14 +21,13 @@ public class WardrobeRemoverInteractor implements WardrobeRemoverInputBoundary {
     @Override
     public void removeItem(WardrobeRemoverInputData request) {
         final Wardrobe wardrobe = repository.fetchWardrobe();
-        final boolean successful = wardrobe.removeItem(request.getItem());
+        final boolean isSuccessful = wardrobe.removeItem(request.getItem());
 
-        if (successful) {
+        if (isSuccessful) {
             repository.saveWardrobe(wardrobe);
             outputBoundary.prepareSuccessView();
-        }
-        else {
-            outputBoundary.prepareFailView();
+        } else {
+            outputBoundary.prepareFailView("The item cannot be removed.");
         }
     }
 }

@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -135,5 +136,26 @@ public final class Outfit {
     public boolean isPrecipitationAppropriate(Weather weather) {
         return !WeatherSuitability.requiresWaterproofFootwear(weather.getPrecipitation())
             || footwear != null && footwear.isWaterproof();
+    }
+
+    /**
+     * Converts the outfit to a collection of clothing items.
+     *
+     * @return the clothing of clothing items
+     */
+    public List<AbstractWear> toList() {
+        final List<AbstractWear> items = new ArrayList<>();
+        items.add(topwearInner);
+        if (topwearOuter != null) {
+            items.add(topwearOuter);
+        }
+        items.add(bottomwear);
+        items.add(footwear);
+        if (headwear != null) {
+            items.add(headwear);
+        }
+        items.addAll(accessories);
+
+        return items;
     }
 }

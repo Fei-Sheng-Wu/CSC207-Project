@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import data_access.event.HttpEventDataAccessObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,8 +36,8 @@ public class HttpHolidayDataAccessObjectTest {
 
     @BeforeAll
     public static void holidayApiSetUp() {
-        final HttpHolidayDataAccessObject httpHoliday = new HttpHolidayDataAccessObject();
-        holidays = httpHoliday.getHolidays("CA", 2025);
+        final HttpEventDataAccessObject httpHoliday = new HttpEventDataAccessObject();
+        holidays = httpHoliday.getEvents("CA", 2025);
     }
 
     @Test

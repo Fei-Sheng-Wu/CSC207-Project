@@ -11,7 +11,7 @@ public class OutfitIdea {
      * Constructs a new outfit idea.
      *
      * @param description the description of the outfit idea
-     * @param url the url of this outfit idea
+     * @param url         the url of this outfit idea
      */
     public OutfitIdea(String description, String url) {
         this.description = description;

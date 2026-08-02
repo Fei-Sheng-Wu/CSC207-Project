@@ -10,21 +10,19 @@ import entity.AbstractWear;
 public class WardrobeReporterOutputData {
     private final List<AbstractWear> wearsAll;
     private final List<AbstractWear> wearsOld;
-    private final List<AbstractWear> wearsLaundryNeeded;
 
     /**
      * Constructs a new wardrobe reporter output data.
      *
      * @param wearsAll a list of all clothing items in the wardrobe.
      * @param wearsOld a list of clothing items categorized as old.
-     * @param wearsLaundryNeeded a list of clothing items that require laundry.
      */
-    public WardrobeReporterOutputData(List<AbstractWear> wearsAll,
-                                      List<AbstractWear> wearsOld,
-                                      List<AbstractWear> wearsLaundryNeeded) {
+    public WardrobeReporterOutputData(
+        List<AbstractWear> wearsAll,
+        List<AbstractWear> wearsOld
+    ) {
         this.wearsAll = wearsAll;
         this.wearsOld = wearsOld;
-        this.wearsLaundryNeeded = wearsLaundryNeeded;
     }
 
     /**
@@ -44,14 +42,4 @@ public class WardrobeReporterOutputData {
     public List<AbstractWear> getWearsOld() {
         return wearsOld;
     }
-
-    /**
-     * Returns the list of clothing items that need laundry.
-     *
-     * @return a list of items that require laundry
-     */
-    public List<AbstractWear> getWearsLaundryNeeded() {
-        return wearsLaundryNeeded;
-    }
-
 }

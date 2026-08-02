@@ -13,8 +13,10 @@ public class InspirationCuratorInteractor implements InspirationCuratorInputBoun
      * @param repository     the data access object of the interactor
      * @param outputBoundary the output boundary of the interactor
      */
-    public InspirationCuratorInteractor(InspirationDataAccessInterface repository,
-                                        InspirationCuratorOutputBoundary outputBoundary) {
+    public InspirationCuratorInteractor(
+        InspirationDataAccessInterface repository,
+        InspirationCuratorOutputBoundary outputBoundary
+    ) {
         this.repository = repository;
         this.outputBoundary = outputBoundary;
     }

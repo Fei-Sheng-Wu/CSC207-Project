@@ -28,6 +28,15 @@ import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
+import use_case.recommendation_context.ContextBasedRecommendationInputData;
+import use_case.recommendation_context.ContextBasedRecommendationInteractor;
+import use_case.recommendation_context.EventOutfitAnalyzer;
+import use_case.recommendation_context.FondnessOutfitAnalyzer;
+import use_case.recommendation_context.OutfitAnalysis;
+import use_case.recommendation_context.OutfitAnalyzer;
+import use_case.recommendation_context.PreferenceOutfitAnalyzer;
+import use_case.recommendation_context.RecommendationContext;
+import use_case.recommendation_context.WeatherOutfitAnalyzer;
 
 class ContextBasedRecommendationInteractorTest {
     private static final UUID RED_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");

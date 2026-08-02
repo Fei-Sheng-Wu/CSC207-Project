@@ -1,26 +1,30 @@
 package interface_adapter.wardrobe_updater;
 
-import java.util.function.Consumer;
-
+import interface_adapter.item.ItemViewModel;
 import use_case.wardrobe_updater.WardrobeUpdaterOutputBoundary;
 
 /**
  * Presenter for the wardrobe updater use case.
  */
 public class WardrobeUpdaterPresenter implements WardrobeUpdaterOutputBoundary {
-    private final Consumer<String> messageDisplayer;
+    private final ItemViewModel viewModel;
 
-    public WardrobeUpdaterPresenter(Consumer<String> messageDisplayer) {
-        this.messageDisplayer = messageDisplayer;
+    /**
+     * Constructs a new presenter.
+     *
+     * @param viewModel the view model of the presenter
+     */
+    public WardrobeUpdaterPresenter(ItemViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
     public void prepareSuccessView() {
-        messageDisplayer.accept("Clothing item updated successfully.");
+        viewModel.setError(null);
     }
 
     @Override
-    public void prepareFailView() {
-        messageDisplayer.accept("Could not update clothing item. Please check that the UUID exists.");
+    public void prepareFailView(String message) {
+        viewModel.setError(message);
     }
 }

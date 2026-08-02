@@ -1,0 +1,21 @@
+[
+    {
+        "name": "Christmas Day",
+        "colors": [
+            "RED",
+            "GREEN"
+        ],
+        "styles": [
+            "CASUAL"
+        ]
+    },
+    {
+        "name": "Canada Day",
+        "colors": [
+            "RED"
+        ],
+        "styles": [
+            "CASUAL"
+        ]
+    }
+]

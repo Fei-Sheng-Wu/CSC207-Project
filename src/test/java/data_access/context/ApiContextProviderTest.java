@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -14,8 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import entity.Event;
 import entity.Weather;
-import use_case.context_based_recommendation.HolidayDataAccessInterface;
-import use_case.context_based_recommendation.WeatherDataAccessInterface;
+import use_case.recommendation_context.EventDataAccessInterface;
+import use_case.recommendation_context.WeatherDataAccessInterface;
 
 /**
  * Tests for the context provider adapter.
@@ -136,7 +135,7 @@ class ApiContextProviderTest {
         }
     }
 
-    private static final class StubHolidayDataAccess implements HolidayDataAccessInterface {
+    private static final class StubHolidayDataAccess implements EventDataAccessInterface {
         private final List<Event> holidays;
         private String requestedCountry;
         private int requestedYear;

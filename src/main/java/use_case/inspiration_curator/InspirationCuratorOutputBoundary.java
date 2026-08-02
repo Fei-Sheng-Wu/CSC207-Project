@@ -6,8 +6,10 @@ package use_case.inspiration_curator;
 public interface InspirationCuratorOutputBoundary {
     /**
      * Outputs a successful response.
+     *
+     * @param output the output data of the response
      */
-    void prepareSuccessView();
+    void prepareSuccessView(InspirationCuratorOutputData output);
 
     /**
      * Outputs a failed response.

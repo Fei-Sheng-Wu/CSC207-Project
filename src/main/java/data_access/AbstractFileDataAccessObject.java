@@ -9,7 +9,7 @@ import java.nio.file.Paths;
  * Represents a file-based data access object implementation.
  */
 public abstract class AbstractFileDataAccessObject {
-    protected static final String DIRECTORY_SUITABLE = "suitable";
+    protected static final Path DIRECTORY_SUITABLE = Paths.get(System.getProperty("user.home"), "suitable");
 
     /**
      * Returns the resolved path of the specified file in the OS's user data directory and ensures the file exists.
@@ -19,8 +19,11 @@ public abstract class AbstractFileDataAccessObject {
      * @throws RuntimeException if the file cannot be created
      */
     protected Path getPath(String file) {
-        final Path path = Paths.get(System.getProperty("user.home"), DIRECTORY_SUITABLE, file);
+        final Path path = DIRECTORY_SUITABLE.resolve(file);
         try {
+            if (!Files.exists(DIRECTORY_SUITABLE)) {
+                Files.createDirectories(DIRECTORY_SUITABLE);
+            }
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }

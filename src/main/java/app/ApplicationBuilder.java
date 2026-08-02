@@ -21,6 +21,138 @@ public class ApplicationBuilder {
     private final ApplicationManager manager = new ApplicationManager(registry, navigationsTop, navigationsBottom);
 
     /**
+     * Registers an object.
+     *
+     * @param objectClass      the class of the object
+     * @param parameterClasses the classes of the parameters of the service
+     * @param <T>              the type of the object
+     * @return the current application builder
+     * @throws RuntimeException if the object cannot be registered
+     */
+    public <T> ApplicationBuilder registerSimple(Class<T> objectClass, Class<?>... parameterClasses) {
+        try {
+            final Object[] parameters = new Object[parameterClasses.length];
+            for (int i = 0; i < parameterClasses.length; i++) {
+                parameters[i] = manager.get(parameterClasses[i]);
+            }
+
+            manager.register(
+                objectClass,
+                objectClass.getDeclaredConstructor(parameterClasses).newInstance(parameters)
+            );
+        } catch (NoSuchMethodException
+                 | InstantiationException
+                 | IllegalAccessException
+                 | InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return this;
+    }
+
+    /**
+     * Registers an object.
+     *
+     * @param objectClass      the class of the object
+     * @param parameters    the parameters of the service
+     * @param <T>              the type of the object
+     * @return the current application builder
+     * @throws RuntimeException if the object cannot be registered
+     */
+    public <T> ApplicationBuilder registerSimple(Class<T> objectClass, Object... parameters) {
+        try {
+            final Class<?>[] parameterClasses = new Class<?>[parameters.length];
+            for (int i = 0; i < parameters.length; i++) {
+                parameterClasses[i] = parameters[i].getClass();
+            }
+
+            manager.register(
+                objectClass,
+                objectClass.getDeclaredConstructor(parameterClasses).newInstance(parameters)
+            );
+        } catch (NoSuchMethodException
+                 | InstantiationException
+                 | IllegalAccessException
+                 | InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return this;
+    }
+
+    /**
+     * Registers a service.
+     *
+     * @param abstractClass    the abstract class of the service
+     * @param concreteClass    the class of the service
+     * @param parameterClasses the classes of the parameters of the service
+     * @param <T>              the type of the abstract service
+     * @param <S>              the type of the concrete service
+     * @return the current application builder
+     * @throws RuntimeException if the object is unregistered or invalid
+     */
+    public <T, S extends T> ApplicationBuilder registerImplementation(
+        Class<T> abstractClass,
+        Class<S> concreteClass,
+        Class<?>... parameterClasses
+    ) {
+        try {
+            final Object[] parameters = new Object[parameterClasses.length];
+            for (int i = 0; i < parameterClasses.length; i++) {
+                parameters[i] = manager.get(parameterClasses[i]);
+            }
+
+            manager.register(
+                abstractClass,
+                concreteClass.getDeclaredConstructor(parameterClasses).newInstance(parameters)
+            );
+        } catch (NoSuchMethodException
+                 | InstantiationException
+                 | IllegalAccessException
+                 | InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return this;
+    }
+
+    /**
+     * Registers a service.
+     *
+     * @param abstractClass the abstract class of the service
+     * @param concreteClass the class of the service
+     * @param parameters    the parameters of the service
+     * @param <T>           the type of the abstract service
+     * @param <S>           the type of the concrete service
+     * @return the current application builder
+     * @throws RuntimeException if the object is unregistered or invalid
+     */
+    public <T, S extends T> ApplicationBuilder registerImplementation(
+        Class<T> abstractClass,
+        Class<S> concreteClass,
+        Object... parameters
+    ) {
+        try {
+            final Class<?>[] parameterClasses = new Class<?>[parameters.length];
+            for (int i = 0; i < parameters.length; i++) {
+                parameterClasses[i] = parameters[i].getClass();
+            }
+
+            manager.register(
+                abstractClass,
+                concreteClass.getDeclaredConstructor(parameterClasses).newInstance(parameters)
+            );
+        } catch (NoSuchMethodException
+                 | InstantiationException
+                 | IllegalAccessException
+                 | InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return this;
+    }
+
+    /**
      * Registers a view.
      *
      * @param viewClass the class of the view

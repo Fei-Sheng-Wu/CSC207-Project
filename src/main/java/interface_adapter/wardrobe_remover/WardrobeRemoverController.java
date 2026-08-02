@@ -13,6 +13,11 @@ import use_case.wardrobe_remover.WardrobeRemoverInputData;
 public class WardrobeRemoverController {
     private final WardrobeRemoverInputBoundary interactor;
 
+    /**
+     * Constructs a new controller.
+     *
+     * @param interactor the interactor of the controller
+     */
     public WardrobeRemoverController(WardrobeRemoverInputBoundary interactor) {
         this.interactor = interactor;
     }
@@ -21,7 +26,7 @@ public class WardrobeRemoverController {
      * Executes the remove item use case.
      *
      * @param uuidText the UUID text
-     * @param type the clothing item type
+     * @param type     the clothing item type
      */
     public void removeItem(String uuidText, String type) {
         final UUID uuid = UUID.fromString(uuidText.trim());

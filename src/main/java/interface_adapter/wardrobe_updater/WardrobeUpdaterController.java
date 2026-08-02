@@ -16,6 +16,11 @@ import use_case.wardrobe_updater.WardrobeUpdaterInputData;
 public class WardrobeUpdaterController {
     private final WardrobeUpdaterInputBoundary interactor;
 
+    /**
+     * Constructs a new controller.
+     *
+     * @param interactor the interactor of the controller
+     */
     public WardrobeUpdaterController(WardrobeUpdaterInputBoundary interactor) {
         this.interactor = interactor;
     }
@@ -23,21 +28,23 @@ public class WardrobeUpdaterController {
     /**
      * Executes the update item use case.
      *
-     * @param uuidText the UUID text
-     * @param type the clothing item type
-     * @param name the clothing item name
-     * @param brand the clothing item brand
-     * @param colorText the clothing item color
-     * @param styleText the clothing item style
+     * @param uuidText      the UUID text
+     * @param type          the clothing item type
+     * @param name          the clothing item name
+     * @param brand         the clothing item brand
+     * @param colorText     the clothing item color
+     * @param styleText     the clothing item style
      * @param conditionText the clothing item condition
      */
-    public void updateItem(String uuidText,
-                           String type,
-                           String name,
-                           String brand,
-                           String colorText,
-                           String styleText,
-                           String conditionText) {
+    public void updateItem(
+        String uuidText,
+        String type,
+        String name,
+        String brand,
+        String colorText,
+        String styleText,
+        String conditionText
+    ) {
         final UUID uuid = UUID.fromString(uuidText.trim());
         final AbstractWear item = WearFactory.constructWear(type, uuid);
 
@@ -53,6 +60,8 @@ public class WardrobeUpdaterController {
         if (!conditionText.isBlank()) {
             item.setCondition(WearCondition.valueOf(conditionText.trim().toUpperCase()));
         }
+
+        // @TODO: more fields regarding clothing item properties
 
         interactor.updateItem(new WardrobeUpdaterInputData(item));
     }
