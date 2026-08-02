@@ -1,4 +1,4 @@
-package use_case.context_based_recommendation;
+package use_case.recommendation_context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,16 +28,15 @@ import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
-import use_case.recommendation_context.ContextBasedRecommendationInputData;
-import use_case.recommendation_context.ContextBasedRecommendationInteractor;
-import use_case.recommendation_context.EventOutfitAnalyzer;
-import use_case.recommendation_context.FondnessOutfitAnalyzer;
-import use_case.recommendation_context.OutfitAnalysis;
-import use_case.recommendation_context.OutfitAnalyzer;
-import use_case.recommendation_context.PreferenceOutfitAnalyzer;
-import use_case.recommendation_context.RecommendationContext;
-import use_case.recommendation_context.WeatherOutfitAnalyzer;
+import use_case.settings.SettingsDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
+/**
+ * Tests for the context-based recommendation interactor.
+ *
+ * <p>Every repository the interactor depends on is stubbed here, so the whole use case runs with
+ * no network access, no API credentials, and no user interface.
+ */
 class ContextBasedRecommendationInteractorTest {
     private static final UUID RED_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID BLUE_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
@@ -70,7 +69,6 @@ class ContextBasedRecommendationInteractorTest {
         boots.setIsWaterproof(true);
 
         final Wardrobe wardrobe = new Wardrobe(new ArrayList<>(List.of(redShirt, blueShirt, coat, jeans, boots)));
-        final Weather weather = weather(-5.0, 2.0);
         final Event canadaDay = new Event(
                 "Canada Day",
                 OffsetDateTime.parse("2026-07-01T00:00:00-04:00"),
@@ -79,17 +77,13 @@ class ContextBasedRecommendationInteractorTest {
                 List.of(WearStyle.CASUAL)
         );
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationInteractor interactor = interactor(
-                wardrobe,
-                new FixedContextProvider(weather, List.of(canadaDay)),
-                output
-        );
 
-        interactor.recommend(new ContextBasedRecommendationInputData(
-                207,
-                List.of(WearColor.RED, WearColor.WHITE),
-                List.of(WearStyle.CASUAL)
-        ));
+        interactor(wardrobe, weather(-5.0, 2.0), List.of(canadaDay), output)
+                .recommend(new ContextBasedRecommendationInputData(
+                        207,
+                        List.of(WearColor.RED, WearColor.WHITE),
+                        List.of(WearStyle.CASUAL)
+                ));
 
         assertNull(output.errorMessage);
         assertNotNull(output.outputData);
@@ -122,14 +116,17 @@ class ContextBasedRecommendationInteractorTest {
                 1.0
         );
         final Weather weather = weather(20.0, 0.0);
-        final ContextProvider context = new FixedContextProvider(weather, List.of());
         final CapturingOutputBoundary firstOutput = new CapturingOutputBoundary();
         final CapturingOutputBoundary secondOutput = new CapturingOutputBoundary();
 
-        interactor(new Wardrobe(new ArrayList<>(List.of(first, second, bottom, footwear))), context, firstOutput)
-                .recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
-        interactor(new Wardrobe(new ArrayList<>(List.of(footwear, bottom, second, first))), context, secondOutput)
-                .recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
+        interactor(
+                new Wardrobe(new ArrayList<>(List.of(first, second, bottom, footwear))),
+                weather, List.of(), firstOutput
+        ).recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
+        interactor(
+                new Wardrobe(new ArrayList<>(List.of(footwear, bottom, second, first))),
+                weather, List.of(), secondOutput
+        ).recommend(new ContextBasedRecommendationInputData(42, List.of(), List.of()));
 
         assertEquals(
                 firstOutput.outputData.getOutfit().getTopwearInner().getUuid(),
@@ -151,8 +148,7 @@ class ContextBasedRecommendationInteractorTest {
 
         interactor(
                 new Wardrobe(new ArrayList<>(List.of(shirt, footwear))),
-                new FixedContextProvider(weather(20.0, 0.0), List.of()),
-                output
+                weather(20.0, 0.0), List.of(), output
         ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
         assertNull(output.outputData);
@@ -179,8 +175,7 @@ class ContextBasedRecommendationInteractorTest {
 
         interactor(
                 new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
-                new FixedContextProvider(weather(20.0, 1.0), List.of()),
-                output
+                weather(20.0, 1.0), List.of(), output
         ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
         assertNull(output.outputData);
@@ -236,14 +231,9 @@ class ContextBasedRecommendationInteractorTest {
         items.addAll(footwears);
         final CountingAnalyzer analyzer = new CountingAnalyzer();
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationInteractor interactor = new ContextBasedRecommendationInteractor(
-                new Wardrobe(items),
-                new FixedContextProvider(weather(-5.0, 2.0), List.of()),
-                output,
-                List.of(analyzer)
-        );
 
-        interactor.recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
+        interactor(new Wardrobe(items), weather(-5.0, 2.0), List.of(), output, List.of(analyzer))
+                .recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
         assertNotNull(output.outputData);
         assertEquals(2, analyzer.getInvocationCount());
@@ -271,32 +261,41 @@ class ContextBasedRecommendationInteractorTest {
         );
         final CountingAnalyzer analyzer = new CountingAnalyzer();
         final CapturingOutputBoundary output = new CapturingOutputBoundary();
-        final ContextBasedRecommendationInteractor interactor = new ContextBasedRecommendationInteractor(
-                new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
-                new FixedContextProvider(weather(20.0, 0.0), List.of()),
-                output,
-                List.of(analyzer)
-        );
 
-        interactor.recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
+        interactor(
+                new Wardrobe(new ArrayList<>(List.of(shirt, bottom, footwear))),
+                weather(20.0, 0.0), List.of(), output, List.of(analyzer)
+        ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
 
         assertEquals(1, analyzer.getInvocationCount());
         assertEquals("The candidate was analyzed.", output.outputData.getReason());
     }
 
     private static ContextBasedRecommendationInteractor interactor(Wardrobe wardrobe,
-                                                                   ContextProvider contextProvider,
+                                                                   Weather weather,
+                                                                   List<Event> events,
                                                                    RecommendationOutputBoundary output) {
         return new ContextBasedRecommendationInteractor(
-                wardrobe,
-                contextProvider,
+                new StubWardrobeRepository(wardrobe),
+                new StubSettingsRepository(),
+                new StubEventRepository(events),
+                new StubWeatherRepository(weather),
+                output
+        );
+    }
+
+    private static ContextBasedRecommendationInteractor interactor(Wardrobe wardrobe,
+                                                                   Weather weather,
+                                                                   List<Event> events,
+                                                                   RecommendationOutputBoundary output,
+                                                                   List<OutfitAnalyzer> analyzers) {
+        return new ContextBasedRecommendationInteractor(
+                new StubWardrobeRepository(wardrobe),
+                new StubSettingsRepository(),
+                new StubEventRepository(events),
+                new StubWeatherRepository(weather),
                 output,
-                List.of(
-                        new WeatherOutfitAnalyzer(),
-                        new EventOutfitAnalyzer(),
-                        new PreferenceOutfitAnalyzer(),
-                        new FondnessOutfitAnalyzer()
-                )
+                analyzers
         );
     }
 
@@ -315,23 +314,71 @@ class ContextBasedRecommendationInteractorTest {
         return item;
     }
 
-    private static final class FixedContextProvider implements ContextProvider {
-        private final Weather weather;
+    private static final class StubWardrobeRepository implements WardrobeDataAccessInterface {
+        private final Wardrobe wardrobe;
+
+        private StubWardrobeRepository(Wardrobe wardrobe) {
+            this.wardrobe = wardrobe;
+        }
+
+        @Override
+        public Wardrobe fetchWardrobe() {
+            return wardrobe;
+        }
+
+        @Override
+        public void saveWardrobe(Wardrobe updated) {
+        }
+    }
+
+    private static final class StubSettingsRepository implements SettingsDataAccessInterface {
+        @Override
+        public String getLocationCityOrDefault() {
+            return "Toronto";
+        }
+
+        @Override
+        public void setLocationCity(String city) {
+        }
+
+        @Override
+        public String getLocationCountryCodeOrDefault() {
+            return "CA";
+        }
+
+        @Override
+        public void setLocationCountryCode(String countryCode) {
+        }
+    }
+
+    private static final class StubEventRepository implements EventDataAccessInterface {
         private final List<Event> events;
 
-        private FixedContextProvider(Weather weather, List<Event> events) {
-            this.weather = weather;
+        private StubEventRepository(List<Event> events) {
             this.events = events;
         }
 
         @Override
-        public Weather getCurrentWeather() {
+        public List<Event> getEvents(String country) {
+            return events;
+        }
+    }
+
+    private static final class StubWeatherRepository implements WeatherDataAccessInterface {
+        private final Weather weather;
+
+        private StubWeatherRepository(Weather weather) {
+            this.weather = weather;
+        }
+
+        @Override
+        public Weather getCurrentByLocation(String location) {
             return weather;
         }
 
         @Override
-        public List<Event> getCurrentEvents() {
-            return events;
+        public List<Weather> getForecastByLocation(String location) {
+            return List.of(weather);
         }
     }
 

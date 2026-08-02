@@ -1,4 +1,4 @@
-package use_case.context_based_recommendation;
+package use_case.recommendation_context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,13 +26,8 @@ import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
-import use_case.recommendation_context.ContextBasedRecommendationInputBoundary;
-import use_case.recommendation_context.ContextBasedRecommendationInputData;
-import use_case.recommendation_context.ContextBasedRecommendationInteractor;
-import use_case.recommendation_context.EventOutfitAnalyzer;
-import use_case.recommendation_context.FondnessOutfitAnalyzer;
-import use_case.recommendation_context.PreferenceOutfitAnalyzer;
-import use_case.recommendation_context.WeatherOutfitAnalyzer;
+import use_case.settings.SettingsDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /** Exercises the complete use case from its input boundary to its success output boundary. */
 class ContextBasedRecommendationIntegrationTest {
@@ -67,20 +62,15 @@ class ContextBasedRecommendationIntegrationTest {
                 List.of(WearColor.RED, WearColor.WHITE),
                 List.of(WearStyle.CASUAL)
         );
-        final InMemoryContextProvider contextProvider =
-                new InMemoryContextProvider(weather, List.of(event));
         final SuccessPresenter presenter = new SuccessPresenter();
         final ContextBasedRecommendationInputBoundary inputBoundary =
                 new ContextBasedRecommendationInteractor(
-                        wardrobe,
-                        contextProvider,
+                        new StubWardrobeRepository(wardrobe),
+                        new StubSettingsRepository(),
+                        new StubEventRepository(List.of(event)),
+                        new StubWeatherRepository(weather),
                         presenter,
-                        List.of(
-                                new WeatherOutfitAnalyzer(),
-                                new EventOutfitAnalyzer(),
-                                new PreferenceOutfitAnalyzer(),
-                                new FondnessOutfitAnalyzer()
-                        )
+                        OutfitAnalyzers.standard()
                 );
 
         inputBoundary.recommend(new ContextBasedRecommendationInputData(
@@ -117,23 +107,71 @@ class ContextBasedRecommendationIntegrationTest {
         return item;
     }
 
-    private static final class InMemoryContextProvider implements ContextProvider {
-        private final Weather weather;
+    private static final class StubWardrobeRepository implements WardrobeDataAccessInterface {
+        private final Wardrobe wardrobe;
+
+        private StubWardrobeRepository(Wardrobe wardrobe) {
+            this.wardrobe = wardrobe;
+        }
+
+        @Override
+        public Wardrobe fetchWardrobe() {
+            return wardrobe;
+        }
+
+        @Override
+        public void saveWardrobe(Wardrobe updated) {
+        }
+    }
+
+    private static final class StubSettingsRepository implements SettingsDataAccessInterface {
+        @Override
+        public String getLocationCityOrDefault() {
+            return "Toronto";
+        }
+
+        @Override
+        public void setLocationCity(String city) {
+        }
+
+        @Override
+        public String getLocationCountryCodeOrDefault() {
+            return "CA";
+        }
+
+        @Override
+        public void setLocationCountryCode(String countryCode) {
+        }
+    }
+
+    private static final class StubEventRepository implements EventDataAccessInterface {
         private final List<Event> events;
 
-        private InMemoryContextProvider(Weather weather, List<Event> events) {
-            this.weather = weather;
+        private StubEventRepository(List<Event> events) {
             this.events = List.copyOf(events);
         }
 
         @Override
-        public Weather getCurrentWeather() {
+        public List<Event> getEvents(String country) {
+            return events;
+        }
+    }
+
+    private static final class StubWeatherRepository implements WeatherDataAccessInterface {
+        private final Weather weather;
+
+        private StubWeatherRepository(Weather weather) {
+            this.weather = weather;
+        }
+
+        @Override
+        public Weather getCurrentByLocation(String location) {
             return weather;
         }
 
         @Override
-        public List<Event> getCurrentEvents() {
-            return events;
+        public List<Weather> getForecastByLocation(String location) {
+            return List.of(weather);
         }
     }
 

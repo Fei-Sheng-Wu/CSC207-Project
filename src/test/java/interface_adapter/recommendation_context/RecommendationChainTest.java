@@ -1,4 +1,4 @@
-package interface_adapter.recommendation;
+package interface_adapter.recommendation_context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import interface_adapter.recommendation_context.ContextBasedRecommendationController;
 import org.junit.jupiter.api.Test;
 
 import entity.AbstractWear;
@@ -24,12 +23,13 @@ import entity.Wardrobe;
 import entity.WearColor;
 import entity.WearStyle;
 import entity.Weather;
+import interface_adapter.recommendation.RecommendationPresenter;
+import interface_adapter.recommendation.RecommendationViewModel;
 import use_case.recommendation_context.ContextBasedRecommendationInteractor;
-import use_case.context_based_recommendation.ContextProvider;
-import use_case.recommendation_context.EventOutfitAnalyzer;
-import use_case.recommendation_context.FondnessOutfitAnalyzer;
-import use_case.recommendation_context.PreferenceOutfitAnalyzer;
-import use_case.recommendation_context.WeatherOutfitAnalyzer;
+import use_case.settings.SettingsDataAccessInterface;
+import use_case.recommendation_context.EventDataAccessInterface;
+import use_case.recommendation_context.WeatherDataAccessInterface;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * Exercises the whole recommendation chain: controller to input boundary, the real interactor
@@ -45,7 +45,7 @@ class RecommendationChainTest {
         final RecommendationViewModel viewModel = new RecommendationViewModel();
         final ContextBasedRecommendationController controller = chain(viewModel, warmWardrobe());
 
-        controller.recommend(List.of(WearColor.RED), List.of(WearStyle.CASUAL));
+        controller.recommend(List.of(WearColor.RED.name()), List.of(WearStyle.CASUAL.name()));
 
         assertNotNull(viewModel.getOutfit());
         assertFalse(viewModel.getReason().isEmpty());
@@ -83,15 +83,11 @@ class RecommendationChainTest {
         final RecommendationPresenter presenter = new RecommendationPresenter(viewModel);
         final ContextBasedRecommendationInteractor interactor =
                 new ContextBasedRecommendationInteractor(
-                        wardrobe,
-                        new StubContextProvider(),
-                        presenter,
-                        List.of(
-                                new WeatherOutfitAnalyzer(),
-                                new EventOutfitAnalyzer(),
-                                new PreferenceOutfitAnalyzer(),
-                                new FondnessOutfitAnalyzer()
-                        )
+                        new StubWardrobeRepository(wardrobe),
+                        new StubSettingsRepository(),
+                        new StubEventRepository(),
+                        new StubWeatherRepository(),
+                        presenter
                 );
         return new ContextBasedRecommendationController(interactor, new Random(7));
     }
@@ -120,18 +116,61 @@ class RecommendationChainTest {
         return new Wardrobe(items);
     }
 
-    /**
-     * A mild, dry day with no events, so a minimal wardrobe is always sufficient.
-     */
-    private static final class StubContextProvider implements ContextProvider {
+    private static final class StubWardrobeRepository implements WardrobeDataAccessInterface {
+        private final Wardrobe wardrobe;
+
+        private StubWardrobeRepository(Wardrobe wardrobe) {
+            this.wardrobe = wardrobe;
+        }
+
         @Override
-        public Weather getCurrentWeather() {
+        public Wardrobe fetchWardrobe() {
+            return wardrobe;
+        }
+
+        @Override
+        public void saveWardrobe(Wardrobe updated) {
+        }
+    }
+
+    private static final class StubSettingsRepository implements SettingsDataAccessInterface {
+        @Override
+        public String getLocationCityOrDefault() {
+            return "Toronto";
+        }
+
+        @Override
+        public void setLocationCity(String city) {
+        }
+
+        @Override
+        public String getLocationCountryCodeOrDefault() {
+            return "CA";
+        }
+
+        @Override
+        public void setLocationCountryCode(String countryCode) {
+        }
+    }
+
+    /** No events today, so the event analyzer stays neutral. */
+    private static final class StubEventRepository implements EventDataAccessInterface {
+        @Override
+        public List<Event> getEvents(String country) {
+            return List.of();
+        }
+    }
+
+    /** A mild, dry day, so a minimal wardrobe is always sufficient. */
+    private static final class StubWeatherRepository implements WeatherDataAccessInterface {
+        @Override
+        public Weather getCurrentByLocation(String location) {
             return new Weather(LocalDate.of(2026, 7, 1), "Clear", 22.0, 0.0, 4.0, 40.0, 3);
         }
 
         @Override
-        public List<Event> getCurrentEvents() {
-            return List.of();
+        public List<Weather> getForecastByLocation(String location) {
+            return List.of(getCurrentByLocation(location));
         }
     }
 }
