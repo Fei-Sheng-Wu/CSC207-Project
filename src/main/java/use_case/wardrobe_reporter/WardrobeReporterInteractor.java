@@ -27,33 +27,29 @@ public class WardrobeReporterInteractor implements WardrobeReporterInputBoundary
      */
     @Override
     public void report() {
-        final Wardrobe wardrobe = wardrobeReporterDataAccessObject.fetchWardrobe();
+        try {
+            final Wardrobe wardrobe = wardrobeReporterDataAccessObject.fetchWardrobe();
 
-        final List<AbstractWear> wearsAll = wardrobe.getItems();
-        final List<AbstractWear> wearsOld = new ArrayList<>();
-        final List<AbstractWear> wearsLaundryNeeded = new ArrayList<>();
+            final List<AbstractWear> wearsAll = wardrobe.getItems();
+            final List<AbstractWear> wearsOld = new ArrayList<>();
+            final List<AbstractWear> wearsLaundryNeeded = new ArrayList<>();
 
-        for (AbstractWear wear : wearsAll) {
+            for (AbstractWear wear : wearsAll) {
 
-            if (wear.getPurchaseDate() != null && wear.getAge().getYears() >= 1) {
-                wearsOld.add(wear);
+                if (wear.getPurchaseDate() != null && wear.getAge().getYears() >= 1) {
+                    wearsOld.add(wear);
+                }
+
+                if (wear.getCondition() != WearCondition.NEW) {
+                    wearsLaundryNeeded.add(wear); // Later on we need to update WearCondition to add DIRTY
+                }
             }
-
-            if (wear.getCondition() != WearCondition.NEW) {
-                wearsLaundryNeeded.add(wear); // Later on we need to update WearCondition to add DIRTY
-            }
+            final WardrobeReporterOutputData outputData = new WardrobeReporterOutputData(wearsAll, wearsOld,
+                wearsLaundryNeeded);
+            wardrobeReporterPresenter.prepareSuccessView(outputData);
+        } catch (Exception e) {
+            System.out.println("SOMETHING IS WRONG IN INTERACTOR OR DAO!");
+            wardrobeReporterPresenter.prepareFailView("Data Error: " + e.getMessage());
         }
-
-        final WardrobeReporterOutputData outputData = new WardrobeReporterOutputData(
-            wearsAll, wearsOld, wearsLaundryNeeded);
-        // wardrobeReporterPresenter.prepareSuccessView(outputData);
-        // Later on we need also to add prepare fail view. Java nw is preventing me from placing it inside a catch block
-
-        // TEMPORARY: Print results to test functionality
-        System.out.println("--- WARDROBE REPORT ---");
-        System.out.println("Total clothes: " + outputData.getWearsAll().size());
-        System.out.println("Old clothes (>= 1 year): " + outputData.getWearsOld().size());
-        System.out.println("Clothes needing laundry: " + outputData.getWearsLaundryNeeded().size());
-        System.out.println("-----------------------");
     }
 }
