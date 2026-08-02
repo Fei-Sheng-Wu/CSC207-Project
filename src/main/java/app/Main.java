@@ -35,6 +35,7 @@ public class Main {
             ))
             .setInitialView(WelcomeView.class)
             .build();
+
         application.setVisible(true);
     }
 }

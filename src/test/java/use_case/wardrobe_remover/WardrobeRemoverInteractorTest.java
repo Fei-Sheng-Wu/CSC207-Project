@@ -1,13 +1,10 @@
-package use_case.item_removal;
+package use_case.wardrobe_remover;
 
 import entity.AbstractWear;
 import entity.InnerTopwear;
 import entity.Wardrobe;
 import org.junit.jupiter.api.Test;
-import use_case.item_action.ItemActionOutputBoundary;
-import use_case.item_action.ItemActionRequest;
-import use_case.item_action.ItemActionResponse;
-import use_case.item_action.WardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for the item removal use case.
+ * Tests for the wardrobe remover use case.
  */
-class ItemRemoverTest {
+class WardrobeRemoverInteractorTest {
     @Test
     void removeExistingItemSucceeds() {
         final UUID itemId = UUID.randomUUID();
@@ -34,16 +31,15 @@ class ItemRemoverTest {
         final FakeWardrobeRepository repository = new FakeWardrobeRepository(
                 new Wardrobe(new ArrayList<>(List.of(storedItem)))
         );
-        final FakeItemActionPresenter presenter = new FakeItemActionPresenter();
+        final FakeWardrobeRemoverPresenter presenter = new FakeWardrobeRemoverPresenter();
 
-        final ItemRemovalInputBoundary remover = new ItemRemover(repository, presenter);
-        remover.removeItem(new ItemActionRequest(itemToRemove));
+        final WardrobeRemoverInputBoundary interactor = new WardrobeRemoverInteractor(repository, presenter);
+        interactor.removeItem(new WardrobeRemoverInputData(itemToRemove));
 
         assertTrue(presenter.successCalled);
         assertFalse(presenter.failCalled);
         assertTrue(repository.saveCalled);
         assertEquals(0, repository.wardrobe.getItems().size());
-        assertEquals("Clothing item removed successfully.", presenter.response.getMessage());
     }
 
     @Test
@@ -57,19 +53,18 @@ class ItemRemoverTest {
         final FakeWardrobeRepository repository = new FakeWardrobeRepository(
                 new Wardrobe(new ArrayList<>(List.of(existingItem)))
         );
-        final FakeItemActionPresenter presenter = new FakeItemActionPresenter();
+        final FakeWardrobeRemoverPresenter presenter = new FakeWardrobeRemoverPresenter();
 
-        final ItemRemovalInputBoundary remover = new ItemRemover(repository, presenter);
-        remover.removeItem(new ItemActionRequest(missingItem));
+        final WardrobeRemoverInputBoundary interactor = new WardrobeRemoverInteractor(repository, presenter);
+        interactor.removeItem(new WardrobeRemoverInputData(missingItem));
 
         assertFalse(presenter.successCalled);
         assertTrue(presenter.failCalled);
         assertFalse(repository.saveCalled);
         assertEquals(1, repository.wardrobe.getItems().size());
-        assertEquals("Clothing item could not be found.", presenter.response.getMessage());
     }
 
-    private static class FakeWardrobeRepository implements WardrobeRepository {
+    private static class FakeWardrobeRepository implements WardrobeDataAccessInterface {
         private final Wardrobe wardrobe;
         private boolean saveCalled;
 
@@ -88,21 +83,18 @@ class ItemRemoverTest {
         }
     }
 
-    private static class FakeItemActionPresenter implements ItemActionOutputBoundary {
+    private static class FakeWardrobeRemoverPresenter implements WardrobeRemoverOutputBoundary {
         private boolean successCalled;
         private boolean failCalled;
-        private ItemActionResponse response;
 
         @Override
-        public void prepareSuccessView(ItemActionResponse response) {
+        public void prepareSuccessView() {
             successCalled = true;
-            this.response = response;
         }
 
         @Override
-        public void prepareFailView(ItemActionResponse response) {
+        public void prepareFailView() {
             failCalled = true;
-            this.response = response;
         }
     }
 }

@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import entity.Holiday;
+import entity.Event;
 
 public class HttpHolidayDataAccessObjectTest {
-    private static List<Holiday> holidays;
+    private static List<Event> holidays;
 
     @BeforeAll
     public static void HolidayApiSetUp() {
@@ -26,21 +26,23 @@ public class HttpHolidayDataAccessObjectTest {
         assertNotNull(holidays);
         assertFalse(holidays.isEmpty());
 
-        final Holiday firstHoliday = holidays.get(0);
-        assertNotNull(firstHoliday.getDate());
+        final Event firstHoliday = holidays.get(0);
+        assertNotNull(firstHoliday.getDateStart());
+        assertNotNull(firstHoliday.getDateEnd());
         assertNotNull(firstHoliday.getName());
-        assertNotNull(firstHoliday.getType());
+        assertNotNull(firstHoliday.getWearColors());
+        assertNotNull(firstHoliday.getWearStyles());
     }
 
     @Test
     public void testGetHolidaysReturnsValidListElement() {
-        for (Holiday holiday : holidays) {
+        for (Event holiday : holidays) {
             if (holiday.getName().equals("New Year's Day")) {
-                assertEquals(LocalDate.of(2025, 1, 1), holiday.getDate());
+                assertEquals(LocalDate.of(2025, 1, 1), holiday.getDateStart().toLocalDate());
             }
 
             if (holiday.getName().equals("Canada Day")) {
-                assertEquals(LocalDate.of(2025, 7, 1), holiday.getDate());
+                assertEquals(LocalDate.of(2025, 7, 1), holiday.getDateStart().toLocalDate());
             }
         }
     }

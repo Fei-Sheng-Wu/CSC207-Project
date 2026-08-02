@@ -25,7 +25,7 @@ public class WearFactory {
     public static AbstractWear constructWear(String type, UUID uuid) throws IllegalArgumentException {
         AbstractWear wear = null;
         for (Class<?> targetType : TYPES) {
-            if (!targetType.getSimpleName().equals(type.toLowerCase())) {
+            if (!targetType.getSimpleName().equalsIgnoreCase(type)) {
                 continue;
             }
 

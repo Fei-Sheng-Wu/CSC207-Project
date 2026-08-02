@@ -55,11 +55,7 @@ public class HttpHolidayDataAccessObject
                 final String name = holiday.getString("name");
                 final String type = holiday.getString("primary_type");
 
-                // I will leave this as it is for now, and then you can decide whether the Holiday entity should be removed
-                // or if there is a better way to integrate the results into the project. What I did here is similar
-                // to what we did for the Weather API, where we constructed new Weather instances.
-                // @TODO: I am working on this atm - Jet
-                // result.add(new Holiday(date, name, type));
+                // @TODO: Convert holiday API data into Event objects once the Event constructor/logic is finalized.
             }
 
             return result;
