@@ -20,6 +20,7 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearStyle;
 import use_case.recommendation.RecommendationOutputBoundary;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 import use_case.recommendation.RecommendationOutputData;
 import use_case.recommendation_tag.TagBasedRecommendationInteractor;
 import use_case.recommendation_tag.TagBasedRecommendationInputData;
@@ -73,7 +74,7 @@ class TagBasedRecommendationProcessorTest {
             new CapturingOutputBoundary();
 
         final TagBasedRecommendationInteractor processor =
-            new TagBasedRecommendationInteractor(wardrobe, output);
+            new TagBasedRecommendationInteractor(new StubWardrobeRepository(wardrobe), output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -127,7 +128,7 @@ class TagBasedRecommendationProcessorTest {
             new CapturingOutputBoundary();
 
         final TagBasedRecommendationInteractor processor =
-            new TagBasedRecommendationInteractor(wardrobe, output);
+            new TagBasedRecommendationInteractor(new StubWardrobeRepository(wardrobe), output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -177,7 +178,7 @@ class TagBasedRecommendationProcessorTest {
             new CapturingOutputBoundary();
 
         final TagBasedRecommendationInteractor processor =
-            new TagBasedRecommendationInteractor(wardrobe, output);
+            new TagBasedRecommendationInteractor(new StubWardrobeRepository(wardrobe), output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -199,15 +200,7 @@ class TagBasedRecommendationProcessorTest {
         List<WearStyle> styles,
         List<String> tags) {
 
-        final TagBasedRecommendationInputData request =
-            new TagBasedRecommendationInputData();
-
-        request.setSeed(0);
-        request.setPreferredColors(colors);
-        request.setPreferredStyles(styles);
-        request.setPreferredTags(tags);
-
-        return request;
+        return new TagBasedRecommendationInputData(0, colors, styles, tags);
     }
 
     private static <T extends AbstractWear> T wear(
@@ -220,6 +213,23 @@ class TagBasedRecommendationProcessorTest {
         item.setCondition(WearCondition.NEW);
 
         return item;
+    }
+
+    private static final class StubWardrobeRepository implements WardrobeDataAccessInterface {
+        private final Wardrobe wardrobe;
+
+        private StubWardrobeRepository(Wardrobe wardrobe) {
+            this.wardrobe = wardrobe;
+        }
+
+        @Override
+        public Wardrobe fetchWardrobe() {
+            return wardrobe;
+        }
+
+        @Override
+        public void saveWardrobe(Wardrobe updated) {
+        }
     }
 
     private static final class CapturingOutputBoundary

@@ -4,11 +4,22 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import entity.Weather;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for the weather API data access object.
+ *
+ * <p>A live integration test: it calls the real API and needs credentials. It runs when
+ * {@code API_BASE_URL_WEATHER} and {@code API_KEY_WEATHER} are set, and is skipped otherwise so
+ * that a developer without credentials still gets a green build. This mirrors the gate already
+ * used by {@code HttpInspirationDataAccessObjectTest}.
+ */
+@EnabledIfEnvironmentVariable(named = "API_BASE_URL_WEATHER", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "API_KEY_WEATHER", matches = ".+")
 public class HttpWeatherDataAccessObjectTest {
     private static Weather currentWeatherByLocation;
     private static List<Weather> forecastByLocation;
