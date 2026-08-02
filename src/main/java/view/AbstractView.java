@@ -19,6 +19,7 @@ public abstract class AbstractView extends JPanel {
     protected static final int SIZE_HEIGHT_MD = 24;
     protected static final int SIZE_HEIGHT_LG = 36;
     protected static final int SIZE_HEIGHT_XL = 48;
+    protected static final int SIZE_HEIGHT_XXL = 72;
 
     private final ApplicationManager manager;
 

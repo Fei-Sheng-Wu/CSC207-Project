@@ -24,6 +24,6 @@ public class WardrobeAdderInteractor implements WardrobeAdderInputBoundary {
         wardrobe.addItem(request.getItem());
 
         repository.saveWardrobe(wardrobe);
-        outputBoundary.prepareSuccessView();
+        outputBoundary.prepareSuccessView(request.getItem());
     }
 }

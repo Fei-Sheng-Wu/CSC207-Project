@@ -25,11 +25,10 @@ public class WardrobeRemoverController {
     /**
      * Executes the remove item use case.
      *
-     * @param uuidText the UUID text
-     * @param type     the clothing item type
+     * @param uuid the UUID
+     * @param type the clothing item type
      */
-    public void removeItem(String uuidText, String type) {
-        final UUID uuid = UUID.fromString(uuidText.trim());
+    public void removeItem(UUID uuid, String type) {
         final AbstractWear item = WearFactory.constructWear(type, uuid);
 
         interactor.removeItem(new WardrobeRemoverInputData(item));

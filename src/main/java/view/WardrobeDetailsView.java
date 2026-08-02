@@ -37,7 +37,7 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
 
     @Override
     public String getTitle() {
-        return "My Wardrobe";
+        return "Wardrobe Details";
     }
 
     @Override

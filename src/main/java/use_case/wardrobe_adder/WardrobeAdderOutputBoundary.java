@@ -1,13 +1,17 @@
 package use_case.wardrobe_adder;
 
+import entity.AbstractWear;
+
 /**
  * Defines the output boundary for adding an item to the wardrobe.
  */
 public interface WardrobeAdderOutputBoundary {
     /**
      * Outputs a successful response.
+     *
+     * @param wear the added clothing item
      */
-    void prepareSuccessView();
+    void prepareSuccessView(AbstractWear wear);
 
     /**
      * Outputs a failed response.

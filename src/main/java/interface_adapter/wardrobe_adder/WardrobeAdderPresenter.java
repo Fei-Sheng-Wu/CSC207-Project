@@ -1,5 +1,6 @@
 package interface_adapter.wardrobe_adder;
 
+import entity.AbstractWear;
 import interface_adapter.item.ItemViewModel;
 import use_case.wardrobe_adder.WardrobeAdderOutputBoundary;
 
@@ -19,12 +20,14 @@ public class WardrobeAdderPresenter implements WardrobeAdderOutputBoundary {
     }
 
     @Override
-    public void prepareSuccessView() {
+    public void prepareSuccessView(AbstractWear wear) {
+        viewModel.setCurrentItem(wear);
         viewModel.setError(null);
     }
 
     @Override
     public void prepareFailView(String message) {
+        viewModel.setCurrentItem(null);
         viewModel.setError(message);
     }
 }
