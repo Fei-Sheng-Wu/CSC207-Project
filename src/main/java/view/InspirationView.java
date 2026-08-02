@@ -8,6 +8,8 @@ import interface_adapter.inspiration.InspirationViewModel;
  * Represents the inspiration view.
  */
 public class InspirationView extends AbstractView {
+    private final InspirationViewModel viewModel;
+
     /**
      * Constructs a new inspiration view.
      *
@@ -16,7 +18,9 @@ public class InspirationView extends AbstractView {
     public InspirationView(ApplicationManager manager) {
         super(manager);
 
-        manager.register(InspirationViewModel.class);
+        // Retrieve the shared resources.
+        this.viewModel = manager.get(InspirationViewModel.class);
+        //this.viewModel.addPropertyChangeListener(this);
 
         add(new JLabel("@TODO: inspiration view"));
     }

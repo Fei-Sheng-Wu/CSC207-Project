@@ -21,6 +21,8 @@ import entity.WearCondition;
 import entity.WearStyle;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
+import use_case.recommendation_tag.TagBasedRecommendationInteractor;
+import use_case.recommendation_tag.TagBasedRecommendationInputData;
 
 class TagBasedRecommendationProcessorTest {
     private static final UUID RED_SHIRT_ID =
@@ -70,8 +72,8 @@ class TagBasedRecommendationProcessorTest {
         final CapturingOutputBoundary output =
             new CapturingOutputBoundary();
 
-        final TagBasedRecommendationProcessor processor =
-            new TagBasedRecommendationProcessor(wardrobe, output);
+        final TagBasedRecommendationInteractor processor =
+            new TagBasedRecommendationInteractor(wardrobe, output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -124,8 +126,8 @@ class TagBasedRecommendationProcessorTest {
         final CapturingOutputBoundary output =
             new CapturingOutputBoundary();
 
-        final TagBasedRecommendationProcessor processor =
-            new TagBasedRecommendationProcessor(wardrobe, output);
+        final TagBasedRecommendationInteractor processor =
+            new TagBasedRecommendationInteractor(wardrobe, output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -174,8 +176,8 @@ class TagBasedRecommendationProcessorTest {
         final CapturingOutputBoundary output =
             new CapturingOutputBoundary();
 
-        final TagBasedRecommendationProcessor processor =
-            new TagBasedRecommendationProcessor(wardrobe, output);
+        final TagBasedRecommendationInteractor processor =
+            new TagBasedRecommendationInteractor(wardrobe, output);
 
         processor.recommend(request(
             List.of(WearColor.RED),
@@ -192,13 +194,13 @@ class TagBasedRecommendationProcessorTest {
         );
     }
 
-    private static TagBasedRecommendationRequest request(
+    private static TagBasedRecommendationInputData request(
         List<WearColor> colors,
         List<WearStyle> styles,
         List<String> tags) {
 
-        final TagBasedRecommendationRequest request =
-            new TagBasedRecommendationRequest();
+        final TagBasedRecommendationInputData request =
+            new TagBasedRecommendationInputData();
 
         request.setSeed(0);
         request.setPreferredColors(colors);

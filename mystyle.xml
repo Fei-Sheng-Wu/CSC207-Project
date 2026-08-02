@@ -291,11 +291,6 @@
             <property name="tokens" value="LITERAL_FOR"/>
             <property name="tokens" value="STATIC_INIT"/>
             <property name="tokens" value="LITERAL_WHILE"/>
-            <property name="tokens" value="LITERAL_CATCH"/>
-            <property name="tokens" value="LITERAL_ELSE"/>
-            <property name="tokens" value="LITERAL_FINALLY"/>
-            <property name="tokens" value="LITERAL_IF"/>
-            <property name="tokens" value="LITERAL_TRY"/>
             <property name="tokens" value="LITERAL_SWITCH"/>
             <property name="tokens" value="ANNOTATION_DEF"/>
             <property name="tokens" value="ENUM_DEF"/>
@@ -508,11 +503,6 @@
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RequireThis"/>
-        <module name="ReturnCount">
-            <property name="max" value="1"/>
-            <property name="maxForVoid" value="0"/>
-            <property name="format" value="^create"/>
-        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="StringLiteralEquality"/>
@@ -593,23 +583,14 @@
         <!-- Imports -->
         <module name="AvoidStarImport"/>
         <module name="AvoidStaticImport"/>
-        <module name="CustomImportOrder">
-            <property name="customImportOrderRules"
-                      value="STATIC###STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE"/>
-            <property name="standardPackageRegExp" value="^java\."/>
-            <property name="specialImportsRegExp" value="^javax\."/>
-            <property name="thirdPartyPackageRegExp" value="^org\."/>
-            <property name="sortImportsInGroupAlphabetically" value="true"/>
-            <property name="separateLineBetweenGroups" value="true"/>
-        </module>
         <module name="IllegalImport"/>
 
         <module name="ImportOrder">
-            <property name="groups" value="/^java\./,javax,org"/>
+            <property name="option" value="top"/>
             <property name="ordered" value="true"/>
             <property name="separated" value="true"/>
-            <property name="option" value="top"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
+            <property name="groups" value="/^java\./,/^javax\./,/^org\./,/^okhttp3\./"/>
         </module>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>

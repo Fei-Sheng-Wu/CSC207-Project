@@ -197,6 +197,10 @@ public abstract class AbstractWear {
      * @return the age of the clothing item
      */
     public Period getAge() {
+        if (purchaseDate == null) {
+            return null;
+        }
+
         return Period.between(purchaseDate, LocalDate.now());
     }
 }

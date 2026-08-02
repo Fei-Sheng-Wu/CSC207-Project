@@ -22,6 +22,11 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearStyle;
 import entity.Weather;
+import use_case.recommendation_context.EventOutfitAnalyzer;
+import use_case.recommendation_context.OutfitAnalysis;
+import use_case.recommendation_context.PreferenceOutfitAnalyzer;
+import use_case.recommendation_context.RecommendationContext;
+import use_case.recommendation_context.WeatherOutfitAnalyzer;
 
 class OutfitAnalyzerTest {
     @Test

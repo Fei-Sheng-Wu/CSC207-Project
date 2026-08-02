@@ -22,10 +22,11 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     public RecommendationView(ApplicationManager manager) {
         super(manager);
 
-        this.viewModel = new RecommendationViewModel();
+        // Retrieve the shared resources.
+        this.viewModel = manager.get(RecommendationViewModel.class);
         this.viewModel.addPropertyChangeListener(this);
-        manager.register(RecommendationViewModel.class, this.viewModel);
 
+        // Initialize the layout.
         setLayout(new GridBagLayout());
 
         add(new JLabel("@TODO: recommendation view"));

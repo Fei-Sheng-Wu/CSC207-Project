@@ -17,15 +17,10 @@ import interface_adapter.settings.SettingsViewModel;
  * Represents the settings view.
  */
 public class SettingsView extends AbstractView implements PropertyChangeListener {
-    private static final int GRID_GAP_HOR = 12;
-    private static final int GRID_GAP_VER = 8;
-    private static final int TEXT_FIELD_WIDTH = 192;
-    private static final int TEXT_FIELD_HEIGHT = 24;
-
     private final SettingsViewModel viewModel;
 
-    private final JTextField locationCity;
-    private final JTextField locationCountryCode;
+    private final JTextField locationCity = createInputText();
+    private final JTextField locationCountryCode = createInputText();
 
     /**
      * Constructs a new settings view.
@@ -35,34 +30,40 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
     public SettingsView(ApplicationManager manager) {
         super(manager);
 
-        this.viewModel = new SettingsViewModel();
+        // Retrieve the shared resources.
+        this.viewModel = manager.get(SettingsViewModel.class);
         this.viewModel.addPropertyChangeListener(this);
-        manager.register(SettingsViewModel.class, this.viewModel);
 
+        // Initialize the layout.
         setLayout(new GridBagLayout());
 
-        this.locationCity = new JTextField();
-        this.locationCity.setPreferredSize(new Dimension(TEXT_FIELD_WIDTH, TEXT_FIELD_HEIGHT));
-        this.locationCountryCode = new JTextField();
-        this.locationCountryCode.setPreferredSize(new Dimension(TEXT_FIELD_WIDTH, TEXT_FIELD_HEIGHT));
-        final Component[][] gridItems = {
+        // Add the settings items.
+        final Component[][] gridRows = {
             {new JLabel("Your city:"), this.locationCity},
             {new JLabel("Your 2-digit country code:"), this.locationCountryCode},
         };
-
         final JPanel grid = new JPanel(new GridLayout(
-            gridItems.length,
-            gridItems[0].length,
-            GRID_GAP_HOR,
-            GRID_GAP_VER
+            gridRows.length,
+            gridRows[0].length,
+            SIZE_SPACING_MD,
+            SIZE_SPACING_MD
         ));
         add(grid);
 
-        for (Component[] gridItemRow : gridItems) {
-            for (Component gridItem : gridItemRow) {
+        for (Component[] gridRow : gridRows) {
+            for (Component gridItem : gridRow) {
                 grid.add(gridItem);
             }
         }
+
+        // @TODO: add a save button to update settings
+    }
+
+    private JTextField createInputText() {
+        final JTextField input = new JTextField();
+        input.setPreferredSize(new Dimension(SIZE_WIDTH_XL, SIZE_HEIGHT_MD));
+
+        return input;
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import interface_adapter.recommendation_context.ContextBasedRecommendationController;
 import org.junit.jupiter.api.Test;
 
 import entity.AbstractWear;
@@ -23,12 +24,12 @@ import entity.Wardrobe;
 import entity.WearColor;
 import entity.WearStyle;
 import entity.Weather;
-import use_case.context_based_recommendation.ContextBasedRecommendationInteractor;
+import use_case.recommendation_context.ContextBasedRecommendationInteractor;
 import use_case.context_based_recommendation.ContextProvider;
-import use_case.context_based_recommendation.EventOutfitAnalyzer;
-import use_case.context_based_recommendation.FondnessOutfitAnalyzer;
-import use_case.context_based_recommendation.PreferenceOutfitAnalyzer;
-import use_case.context_based_recommendation.WeatherOutfitAnalyzer;
+import use_case.recommendation_context.EventOutfitAnalyzer;
+import use_case.recommendation_context.FondnessOutfitAnalyzer;
+import use_case.recommendation_context.PreferenceOutfitAnalyzer;
+import use_case.recommendation_context.WeatherOutfitAnalyzer;
 
 /**
  * Exercises the whole recommendation chain: controller to input boundary, the real interactor
@@ -42,7 +43,7 @@ class RecommendationChainTest {
     @Test
     void aRequestTravelsFromControllerToViewModel() {
         final RecommendationViewModel viewModel = new RecommendationViewModel();
-        final RecommendationController controller = chain(viewModel, warmWardrobe());
+        final ContextBasedRecommendationController controller = chain(viewModel, warmWardrobe());
 
         controller.recommend(List.of(WearColor.RED), List.of(WearStyle.CASUAL));
 
@@ -54,7 +55,7 @@ class RecommendationChainTest {
     @Test
     void aFailureAlsoTravelsAllTheWayToTheViewModel() {
         final RecommendationViewModel viewModel = new RecommendationViewModel();
-        final RecommendationController controller =
+        final ContextBasedRecommendationController controller =
                 chain(viewModel, new Wardrobe(new ArrayList<>()));
 
         controller.recommend(List.of(), List.of());
@@ -77,8 +78,8 @@ class RecommendationChainTest {
         assertEquals(first.getReason(), second.getReason());
     }
 
-    private static RecommendationController chain(RecommendationViewModel viewModel,
-                                                  Wardrobe wardrobe) {
+    private static ContextBasedRecommendationController chain(RecommendationViewModel viewModel,
+                                                              Wardrobe wardrobe) {
         final RecommendationPresenter presenter = new RecommendationPresenter(viewModel);
         final ContextBasedRecommendationInteractor interactor =
                 new ContextBasedRecommendationInteractor(
@@ -92,7 +93,7 @@ class RecommendationChainTest {
                                 new FondnessOutfitAnalyzer()
                         )
                 );
-        return new RecommendationController(interactor, new Random(7));
+        return new ContextBasedRecommendationController(interactor, new Random(7));
     }
 
     private static Wardrobe warmWardrobe() {

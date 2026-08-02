@@ -26,6 +26,13 @@ import entity.WearStyle;
 import entity.Weather;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
+import use_case.recommendation_context.ContextBasedRecommendationInputBoundary;
+import use_case.recommendation_context.ContextBasedRecommendationInputData;
+import use_case.recommendation_context.ContextBasedRecommendationInteractor;
+import use_case.recommendation_context.EventOutfitAnalyzer;
+import use_case.recommendation_context.FondnessOutfitAnalyzer;
+import use_case.recommendation_context.PreferenceOutfitAnalyzer;
+import use_case.recommendation_context.WeatherOutfitAnalyzer;
 
 /** Exercises the complete use case from its input boundary to its success output boundary. */
 class ContextBasedRecommendationIntegrationTest {

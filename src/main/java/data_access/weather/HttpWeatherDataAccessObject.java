@@ -14,7 +14,7 @@ import okhttp3.Response;
 
 import data_access.AbstractHttpDataAccessObject;
 import entity.Weather;
-import use_case.context_based_recommendation.WeatherDataAccessInterface;
+import use_case.recommendation_context.WeatherDataAccessInterface;
 
 /**
  * Represents an implementation of the weather repository interface.

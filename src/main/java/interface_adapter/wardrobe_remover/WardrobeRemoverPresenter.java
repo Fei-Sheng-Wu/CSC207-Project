@@ -1,26 +1,30 @@
 package interface_adapter.wardrobe_remover;
 
-import java.util.function.Consumer;
-
+import interface_adapter.item.ItemViewModel;
 import use_case.wardrobe_remover.WardrobeRemoverOutputBoundary;
 
 /**
  * Presenter for the wardrobe remover use case.
  */
 public class WardrobeRemoverPresenter implements WardrobeRemoverOutputBoundary {
-    private final Consumer<String> messageDisplayer;
+    private final ItemViewModel viewModel;
 
-    public WardrobeRemoverPresenter(Consumer<String> messageDisplayer) {
-        this.messageDisplayer = messageDisplayer;
+    /**
+     * Constructs a new presenter.
+     *
+     * @param viewModel the view model of the presenter
+     */
+    public WardrobeRemoverPresenter(ItemViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
     public void prepareSuccessView() {
-        messageDisplayer.accept("Clothing item removed successfully.");
+        viewModel.setError(null);
     }
 
     @Override
-    public void prepareFailView() {
-        messageDisplayer.accept("Could not remove clothing item. Please check that the UUID exists.");
+    public void prepareFailView(String message) {
+        viewModel.setError(message);
     }
 }

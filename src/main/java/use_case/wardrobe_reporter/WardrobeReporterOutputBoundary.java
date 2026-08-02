@@ -6,13 +6,15 @@ package use_case.wardrobe_reporter;
 public interface WardrobeReporterOutputBoundary {
     /**
      * Prepares the success view for the Wardrobe Reporter Use Case.
+     *
      * @param outputData the output data
      */
     void prepareSuccessView(WardrobeReporterOutputData outputData);
 
     /**
      * Prepares the failure view for the Wardrobe Reporter Use Case.
-     * @param errorMessage the explanation of the failure
+     *
+     * @param message the explanation of the failure
      */
-    void prepareFailView(String errorMessage);
+    void prepareFailView(String message);
 }

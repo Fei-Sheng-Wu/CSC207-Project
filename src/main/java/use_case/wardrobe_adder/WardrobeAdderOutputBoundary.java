@@ -11,6 +11,8 @@ public interface WardrobeAdderOutputBoundary {
 
     /**
      * Outputs a failed response.
+     *
+     * @param message the message of the failed response
      */
-    void prepareFailView();
+    void prepareFailView(String message);
 }
