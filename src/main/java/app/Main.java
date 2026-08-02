@@ -1,6 +1,7 @@
 package app;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -15,6 +16,7 @@ import interface_adapter.inspiration_curator.InspirationCuratorPresenter;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.recommendation.RecommendationPresenter;
 import interface_adapter.recommendation.RecommendationViewModel;
+import interface_adapter.recommendation_context.ContextBasedRecommendationController;
 import interface_adapter.recommendation_tag.TagBasedRecommendationController;
 import interface_adapter.settings.SettingsViewModel;
 import interface_adapter.wardrobe.WardrobeViewModel;
@@ -66,6 +68,7 @@ public class Main {
      */
     public static void main(String[] args) {
         final JFrame application = new ApplicationBuilder()
+            .registerSimple(Random.class)
             // Register the data access objects.
             .registerImplementation(
                 WardrobeDataAccessInterface.class,
@@ -170,12 +173,14 @@ public class Main {
             .registerSimple(WardrobeRemoverController.class, WardrobeRemoverInputBoundary.class)
             .registerSimple(InspirationCuratorController.class, InspirationCuratorInputBoundary.class)
             .registerSimple(
+                ContextBasedRecommendationController.class,
                 ContextBasedRecommendationInputBoundary.class,
-                ContextBasedRecommendationInputBoundary.class
+                Random.class
             )
             .registerSimple(
                 TagBasedRecommendationController.class,
-                TagBasedRecommendationInputBoundary.class
+                TagBasedRecommendationInputBoundary.class,
+                Random.class
             )
             // Register the views.
             .registerView(WardrobeOverviewView.class)

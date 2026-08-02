@@ -55,6 +55,8 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
+            case "error":
+                // @TODO: update error
             case "items":
                 // @TODO: update list collection
             default:
