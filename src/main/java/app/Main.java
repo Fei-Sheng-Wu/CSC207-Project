@@ -20,6 +20,10 @@ import interface_adapter.recommendation.RecommendationViewModel;
 import interface_adapter.recommendation_context.ContextBasedRecommendationController;
 import interface_adapter.recommendation_tag.TagBasedRecommendationController;
 import interface_adapter.settings.SettingsViewModel;
+import interface_adapter.settings_retriever.SettingsRetrieverController;
+import interface_adapter.settings_retriever.SettingsRetrieverPresenter;
+import interface_adapter.settings_updater.SettingsUpdaterController;
+import interface_adapter.settings_updater.SettingsUpdaterPresenter;
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_adder.WardrobeAdderController;
 import interface_adapter.wardrobe_adder.WardrobeAdderPresenter;
@@ -41,6 +45,12 @@ import use_case.recommendation_context.WeatherDataAccessInterface;
 import use_case.recommendation_tag.TagBasedRecommendationInputBoundary;
 import use_case.recommendation_tag.TagBasedRecommendationInteractor;
 import use_case.settings.SettingsDataAccessInterface;
+import use_case.settings_retriever.SettingsRetrieverInputBoundary;
+import use_case.settings_retriever.SettingsRetrieverInteractor;
+import use_case.settings_retriever.SettingsRetrieverOutputBoundary;
+import use_case.settings_updater.SettingsUpdaterInputBoundary;
+import use_case.settings_updater.SettingsUpdaterInteractor;
+import use_case.settings_updater.SettingsUpdaterOutputBoundary;
 import use_case.wardrobe.WardrobeDataAccessInterface;
 import use_case.wardrobe_adder.WardrobeAdderInputBoundary;
 import use_case.wardrobe_adder.WardrobeAdderInteractor;
@@ -77,16 +87,14 @@ public class Main {
             .registerSimple(Random.class)
             // Register the data access objects.
             .registerImplementation(
-                WardrobeDataAccessInterface.class,
-                JsonWardrobeDataAccessObject.class,
+                WardrobeDataAccessInterface.class, JsonWardrobeDataAccessObject.class,
                 "wardrobe.json"
             )
             .registerImplementation(WeatherDataAccessInterface.class, HttpWeatherDataAccessObject.class)
             .registerImplementation(EventDataAccessInterface.class, HttpEventDataAccessObject.class)
             .registerImplementation(InspirationDataAccessInterface.class, HttpInspirationDataAccessObject.class)
             .registerImplementation(
-                SettingsDataAccessInterface.class,
-                LocalSettingsDataAccessObject.class,
+                SettingsDataAccessInterface.class, LocalSettingsDataAccessObject.class,
                 "user.properties"
             )
             // Register the view models.
@@ -97,69 +105,65 @@ public class Main {
             .registerSimple(SettingsViewModel.class)
             // Register the output boundaries.
             .registerImplementation(
-                WardrobeReporterOutputBoundary.class,
-                WardrobeReporterPresenter.class,
+                WardrobeReporterOutputBoundary.class, WardrobeReporterPresenter.class,
                 WardrobeViewModel.class
             )
             .registerImplementation(
-                WardrobeAdderOutputBoundary.class,
-                WardrobeAdderPresenter.class,
+                WardrobeAdderOutputBoundary.class, WardrobeAdderPresenter.class,
                 ItemViewModel.class
             )
             .registerImplementation(
-                WardrobeUpdaterOutputBoundary.class,
-                WardrobeUpdaterPresenter.class,
+                WardrobeUpdaterOutputBoundary.class, WardrobeUpdaterPresenter.class,
                 ItemViewModel.class
             )
             .registerImplementation(
-                WardrobeRemoverOutputBoundary.class,
-                WardrobeRemoverPresenter.class,
+                WardrobeRemoverOutputBoundary.class, WardrobeRemoverPresenter.class,
                 ItemViewModel.class
             )
             .registerImplementation(
-                InspirationCuratorOutputBoundary.class,
-                InspirationCuratorPresenter.class,
+                InspirationCuratorOutputBoundary.class, InspirationCuratorPresenter.class,
                 InspirationViewModel.class
             )
             .registerImplementation(
-                RecommendationOutputBoundary.class,
-                RecommendationPresenter.class,
+                RecommendationOutputBoundary.class, RecommendationPresenter.class,
                 RecommendationViewModel.class
+            )
+            .registerImplementation(
+                SettingsRetrieverOutputBoundary.class, SettingsRetrieverPresenter.class,
+                SettingsViewModel.class
+            )
+            .registerImplementation(
+                SettingsUpdaterOutputBoundary.class, SettingsUpdaterPresenter.class,
+                SettingsViewModel.class
             )
             // Register the input boundaries.
             .registerImplementation(
-                WardrobeReporterInputBoundary.class,
-                WardrobeReporterInteractor.class,
+                WardrobeReporterInputBoundary.class, WardrobeReporterInteractor.class,
                 WardrobeDataAccessInterface.class,
                 WardrobeReporterOutputBoundary.class
             )
             .registerImplementation(
-                WardrobeAdderInputBoundary.class,
-                WardrobeAdderInteractor.class,
+                WardrobeAdderInputBoundary.class, WardrobeAdderInteractor.class,
                 WardrobeDataAccessInterface.class,
                 WardrobeAdderOutputBoundary.class
             )
             .registerImplementation(
-                WardrobeUpdaterInputBoundary.class,
-                WardrobeUpdaterInteractor.class,
+                WardrobeUpdaterInputBoundary.class, WardrobeUpdaterInteractor.class,
                 WardrobeDataAccessInterface.class,
                 WardrobeUpdaterOutputBoundary.class
             )
             .registerImplementation(
-                WardrobeRemoverInputBoundary.class,
-                WardrobeRemoverInteractor.class,
+                WardrobeRemoverInputBoundary.class, WardrobeRemoverInteractor.class,
                 WardrobeDataAccessInterface.class,
                 WardrobeRemoverOutputBoundary.class
             )
             .registerImplementation(
-                InspirationCuratorInputBoundary.class,
-                InspirationCuratorInteractor.class,
+                InspirationCuratorInputBoundary.class, InspirationCuratorInteractor.class,
                 InspirationDataAccessInterface.class,
                 InspirationCuratorOutputBoundary.class
             )
             .registerImplementation(
-                ContextBasedRecommendationInputBoundary.class,
-                ContextBasedRecommendationInteractor.class,
+                ContextBasedRecommendationInputBoundary.class, ContextBasedRecommendationInteractor.class,
                 WardrobeDataAccessInterface.class,
                 SettingsDataAccessInterface.class,
                 EventDataAccessInterface.class,
@@ -167,10 +171,19 @@ public class Main {
                 RecommendationOutputBoundary.class
             )
             .registerImplementation(
-                TagBasedRecommendationInputBoundary.class,
-                TagBasedRecommendationInteractor.class,
+                TagBasedRecommendationInputBoundary.class, TagBasedRecommendationInteractor.class,
                 WardrobeDataAccessInterface.class,
                 RecommendationOutputBoundary.class
+            )
+            .registerImplementation(
+                SettingsRetrieverInputBoundary.class, SettingsRetrieverInteractor.class,
+                SettingsDataAccessInterface.class,
+                SettingsRetrieverOutputBoundary.class
+            )
+            .registerImplementation(
+                SettingsUpdaterInputBoundary.class, SettingsUpdaterInteractor.class,
+                SettingsDataAccessInterface.class,
+                SettingsUpdaterOutputBoundary.class
             )
             // Register the controllers.
             .registerSimple(WardrobeReporterController.class, WardrobeReporterInputBoundary.class)
@@ -188,6 +201,8 @@ public class Main {
                 TagBasedRecommendationInputBoundary.class,
                 Random.class
             )
+            .registerSimple(SettingsRetrieverController.class, SettingsRetrieverInputBoundary.class)
+            .registerSimple(SettingsUpdaterController.class, SettingsUpdaterInputBoundary.class)
             // Register the views.
             .registerView(WardrobeOverviewView.class)
             .registerView(WardrobeDetailsView.class)

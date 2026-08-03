@@ -4,20 +4,27 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import interface_adapter.settings.SettingsViewModel;
+import interface_adapter.settings_retriever.SettingsRetrieverController;
+import interface_adapter.settings_updater.SettingsUpdaterController;
 
 /**
  * Represents the settings view.
  */
 public class SettingsView extends AbstractView implements PropertyChangeListener {
     private final SettingsViewModel viewModel;
+    private final SettingsRetrieverController retrieverController;
+    private final SettingsUpdaterController updaterController;
 
     private final JTextField locationCity = createInputText();
     private final JTextField locationCountryCode = createInputText();
@@ -33,6 +40,8 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         // Retrieve the shared resources.
         this.viewModel = manager.get(SettingsViewModel.class);
         this.viewModel.addPropertyChangeListener(this);
+        this.retrieverController = manager.get(SettingsRetrieverController.class);
+        this.updaterController = manager.get(SettingsUpdaterController.class);
 
         // Initialize the layout.
         setLayout(new GridBagLayout());
@@ -43,8 +52,8 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
             {new JLabel("Your 2-digit country code:"), this.locationCountryCode},
         };
         final JPanel grid = new JPanel(new GridLayout(
-            gridRows.length,
-            gridRows[0].length,
+            gridRows.length + 1,
+            2,
             SIZE_SPACING_MD,
             SIZE_SPACING_MD
         ));
@@ -56,7 +65,17 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
             }
         }
 
-        // @TODO: add a save button to update settings
+        grid.add(new JPanel());
+        final JButton saveButton = new JButton("Save Settings");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updaterController.update(locationCity.getText(), locationCountryCode.getText());
+            }
+        });
+        grid.add(saveButton);
+
+        this.retrieverController.retrieve();
     }
 
     private JTextField createInputText() {
