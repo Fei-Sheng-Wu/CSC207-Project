@@ -1,10 +1,8 @@
 package interface_adapter.inspiration_curator;
 
 import interface_adapter.inspiration.InspirationViewModel;
-import interface_adapter.item.ItemViewModel;
 import use_case.inspiration_curator.InspirationCuratorOutputBoundary;
 import use_case.inspiration_curator.InspirationCuratorOutputData;
-import use_case.wardrobe_remover.WardrobeRemoverOutputBoundary;
 
 /**
  * Presenter for the wardrobe remover use case.

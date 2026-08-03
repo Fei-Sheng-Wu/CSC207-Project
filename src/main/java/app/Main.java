@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import data_access.event.HttpEventDataAccessObject;
 import data_access.inspiration.HttpInspirationDataAccessObject;
@@ -67,6 +68,11 @@ public class Main {
      * @param args the arguments
      */
     public static void main(String[] args) {
+        // Swing components may only be built and shown on the event dispatch thread.
+        SwingUtilities.invokeLater(Main::start);
+    }
+
+    private static void start() {
         final JFrame application = new ApplicationBuilder()
             .registerSimple(Random.class)
             // Register the data access objects.

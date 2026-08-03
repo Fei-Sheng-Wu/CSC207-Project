@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import entity.AbstractWear;
 import entity.Outfit;
@@ -39,6 +40,8 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     private static final String ANY_OPTION = "No preference";
     private static final String EMPTY_SLOT = "\u2014";
     private static final String PROMPT = "Choose optional preferences, then press Get recommendation.";
+    private static final String WORKING = "Looking for an outfit...";
+    private static final String UNEXPECTED_FAILURE = "Something went wrong while looking for an outfit.";
     private static final String[] SLOT_LABELS = {
         "Inner top", "Outer top", "Bottom", "Footwear", "Headwear", "Accessories",
     };
@@ -121,9 +124,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         recommend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                controller.recommend(
-                    selected(colorChoice, WearColor.values()),
-                    selected(styleChoice, WearStyle.values()));
+                requestRecommendation(recommend);
             }
         });
 
@@ -274,9 +275,58 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         return "Recommendation";
     }
 
+    /**
+     * Asks for a recommendation without occupying the event dispatch thread.
+     *
+     * <p>The use case reads today's weather and events over the network before it so much as looks
+     * at the wardrobe. Doing that on the event dispatch thread would freeze the window for as long
+     * as those services take to answer, and would leave no thread free to paint a notice saying so
+     * — the progress message below only appears because this returns immediately.
+     *
+     * @param trigger the button that asked for the recommendation
+     */
+    private void requestRecommendation(JButton trigger) {
+        final List<String> colors = selected(colorChoice, WearColor.values());
+        final List<String> styles = selected(styleChoice, WearStyle.values());
+
+        trigger.setEnabled(false);
+        reason.setForeground(COLOR_MUTED);
+        reason.setText(WORKING);
+
+        BackgroundRequest.run(
+            () -> controller.recommend(colors, styles),
+            succeeded -> finishRecommendation(trigger, succeeded));
+    }
+
+    /**
+     * Re-admits further requests, and reports a failure the use case could not present itself.
+     *
+     * @param trigger   the button that asked for the recommendation
+     * @param succeeded whether the request completed without throwing
+     */
+    private void finishRecommendation(JButton trigger, boolean succeeded) {
+        trigger.setEnabled(true);
+        if (!succeeded) {
+            reason.setForeground(COLOR_ERROR);
+            reason.setText(UNEXPECTED_FAILURE);
+        }
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent e) {
-        switch (e.getPropertyName()) {
+        // The request runs off the event dispatch thread, so the presenter's notification arrives
+        // on whichever thread produced it. Swing may only be touched on the event dispatch thread,
+        // so the update is handed back to it here, at the last moment before it is applied.
+        if (SwingUtilities.isEventDispatchThread()) {
+            render(e.getPropertyName());
+        }
+        else {
+            SwingUtilities.invokeLater(() -> render(e.getPropertyName()));
+        }
+    }
+
+    private void render(String propertyName) {
+        switch (propertyName) {
             case RecommendationViewModel.PROPERTY_RECOMMENDATION:
                 showOutfit(viewModel.getOutfit());
                 reason.setForeground(COLOR_MUTED);

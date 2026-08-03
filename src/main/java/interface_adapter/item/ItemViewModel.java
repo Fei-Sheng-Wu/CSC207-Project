@@ -1,8 +1,8 @@
 package interface_adapter.item;
 
-import entity.AbstractWear;
 import org.jetbrains.annotations.Nullable;
 
+import entity.AbstractWear;
 import interface_adapter.AbstractViewModel;
 
 /**

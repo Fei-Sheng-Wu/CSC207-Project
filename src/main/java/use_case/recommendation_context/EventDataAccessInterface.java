@@ -13,6 +13,7 @@ public interface EventDataAccessInterface {
      *
      * @param country the country as a 2-digit code (e.g., "CA")
      * @return a collection of events
+     * @throws ContextUnavailableException if the events cannot be obtained
      */
     List<Event> getEvents(String country);
 }

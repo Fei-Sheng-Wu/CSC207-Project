@@ -13,6 +13,7 @@ public interface WeatherDataAccessInterface {
      *
      * @param location the location as a city name
      * @return the current weather
+     * @throws ContextUnavailableException if the weather cannot be obtained
      */
     Weather getCurrentByLocation(String location);
 
@@ -21,6 +22,7 @@ public interface WeatherDataAccessInterface {
      *
      * @param location the location as a city name
      * @return a collection of weather data, each representing a day in the 7-day forecast
+     * @throws ContextUnavailableException if the forecast cannot be obtained
      */
     List<Weather> getForecastByLocation(String location);
 }
