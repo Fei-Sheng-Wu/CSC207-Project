@@ -1,48 +1,43 @@
 package use_case.recommendation_context;
 
-import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import entity.AbstractWear;
 import entity.Event;
 import entity.Outfit;
-import entity.WearColor;
-import entity.WearStyle;
 
 /**
  * Scores outfit attributes that match current events.
+ *
+ * <p>The rule itself lives in {@link EventItemAnalyzer}; this class only sums that rule over the
+ * outfit's garments and names the events responsible. Narrowing and final scoring therefore ask
+ * the same object what an event match is, and cannot drift apart.
  */
 public final class EventOutfitAnalyzer implements OutfitAnalyzer {
+    private final ItemAnalyzer itemAnalyzer = new EventItemAnalyzer();
+
     @Override
     public OutfitAnalysis analyze(Outfit outfit, RecommendationContext context) {
-        final Set<WearColor> eventColors = EnumSet.noneOf(WearColor.class);
-        final Set<WearStyle> eventStyles = EnumSet.noneOf(WearStyle.class);
-        final Set<String> eventNames = new TreeSet<>();
-        for (Event event : context.getEvents()) {
-            eventColors.addAll(event.getWearColors());
-            eventStyles.addAll(event.getWearStyles());
-            eventNames.add(event.getName());
-        }
-
         int matches = 0;
         for (AbstractWear item : outfit.toList()) {
-            if (eventColors.contains(item.getColor())) {
-                matches++;
-            }
-            if (eventStyles.contains(item.getStyle())) {
-                matches++;
-            }
+            matches += itemAnalyzer.analyze(item, context).getEventMatches();
         }
 
         if (matches == 0) {
             return OutfitAnalysis.neutral();
+        }
+
+        final Set<String> eventNames = new TreeSet<>();
+        for (Event event : context.getEvents()) {
+            eventNames.add(event.getName());
         }
         final String reason = String.format(
                 "%d clothing attributes match the current event context: %s.",
                 matches,
                 String.join(", ", eventNames)
         );
-        return new OutfitAnalysis(true, matches, 0, 0.0, java.util.List.of(reason));
+        return new OutfitAnalysis(true, matches, 0, 0.0, List.of(reason));
     }
 }

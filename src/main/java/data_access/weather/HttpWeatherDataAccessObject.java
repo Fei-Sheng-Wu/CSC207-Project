@@ -14,6 +14,7 @@ import okhttp3.Response;
 
 import data_access.AbstractHttpDataAccessObject;
 import entity.Weather;
+import use_case.recommendation_context.ContextUnavailableException;
 import use_case.recommendation_context.WeatherDataAccessInterface;
 
 /**
@@ -36,7 +37,8 @@ public class HttpWeatherDataAccessObject
     public Weather getCurrentByLocation(String location) {
         try (Response response = fetch(String.format("current.json?key=%s&q=%s", API_KEY, location))) {
             if (CODE_OK != response.code() || response.body() == null) {
-                throw new RuntimeException(String.format("The weather API has failed (%d).", response.code()));
+                throw new ContextUnavailableException(
+                    String.format("The weather service refused the request (%d).", response.code()));
             }
 
             final JSONObject current = new JSONObject(response.body().string())
@@ -50,8 +52,8 @@ public class HttpWeatherDataAccessObject
                 current.getDouble("humidity"),
                 current.getInt("uv")
             );
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException(ex);
+        } catch (IOException | JSONException | IllegalArgumentException ex) {
+            throw new ContextUnavailableException("The weather service is unavailable.", ex);
         }
     }
 
@@ -59,7 +61,8 @@ public class HttpWeatherDataAccessObject
     public List<Weather> getForecastByLocation(String location) {
         try (Response response = fetch(String.format("forecast.json?key=%s&q=%s&days=7", API_KEY, location))) {
             if (CODE_OK != response.code() || response.body() == null) {
-                throw new RuntimeException(String.format("The weather API has failed (%d).", response.code()));
+                throw new ContextUnavailableException(
+                    String.format("The weather service refused the request (%d).", response.code()));
             }
 
             final List<Weather> result = new ArrayList<>();
@@ -80,8 +83,8 @@ public class HttpWeatherDataAccessObject
             }
 
             return result;
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException(ex);
+        } catch (IOException | JSONException | IllegalArgumentException ex) {
+            throw new ContextUnavailableException("The weather service is unavailable.", ex);
         }
     }
 }

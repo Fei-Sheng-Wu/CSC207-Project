@@ -22,6 +22,7 @@ import data_access.AbstractHttpDataAccessObject;
 import entity.Event;
 import entity.WearColor;
 import entity.WearStyle;
+import use_case.recommendation_context.ContextUnavailableException;
 import use_case.recommendation_context.EventDataAccessInterface;
 
 /**
@@ -91,7 +92,8 @@ public class HttpEventDataAccessObject
             now.getDayOfMonth()
         ))) {
             if (CODE_OK != response.code() || response.body() == null) {
-                throw new RuntimeException(String.format("The holiday API has failed (%d).", response.code()));
+                throw new ContextUnavailableException(
+                    String.format("The events service refused the request (%d).", response.code()));
             }
 
             final List<Event> result = new ArrayList<>();
@@ -115,8 +117,8 @@ public class HttpEventDataAccessObject
             }
 
             return result;
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException(ex);
+        } catch (IOException | JSONException | IllegalArgumentException ex) {
+            throw new ContextUnavailableException("The events service is unavailable.", ex);
         }
     }
 }

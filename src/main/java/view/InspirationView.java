@@ -20,7 +20,7 @@ public class InspirationView extends AbstractView {
 
         // Retrieve the shared resources.
         this.viewModel = manager.get(InspirationViewModel.class);
-        //this.viewModel.addPropertyChangeListener(this);
+        // this.viewModel.addPropertyChangeListener(this);
 
         add(new JLabel("@TODO: inspiration view"));
     }
