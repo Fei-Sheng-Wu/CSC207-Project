@@ -1,14 +1,16 @@
 package view;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,8 +28,8 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
     private final SettingsRetrieverController retrieverController;
     private final SettingsUpdaterController updaterController;
 
-    private final JTextField locationCity = createInputText();
-    private final JTextField locationCountryCode = createInputText();
+    private final JTextField fieldLocationCity = new JTextField();
+    private final JTextField fieldLocationCountryCode = new JTextField();
 
     /**
      * Constructs a new settings view.
@@ -47,42 +49,34 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         setLayout(new GridBagLayout());
 
         // Add the settings items.
-        final Component[][] gridRows = {
-            {new JLabel("Your city:"), this.locationCity},
-            {new JLabel("Your 2-digit country code:"), this.locationCountryCode},
-        };
-        final JPanel grid = new JPanel(new GridLayout(
-            gridRows.length + 1,
-            2,
-            SIZE_SPACING_MD,
-            SIZE_SPACING_MD
-        ));
-        add(grid);
-
-        for (Component[] gridRow : gridRows) {
-            for (Component gridItem : gridRow) {
-                grid.add(gridItem);
-            }
-        }
-
-        grid.add(new JPanel());
-        final JButton saveButton = new JButton("Save Settings");
-        saveButton.addActionListener(new ActionListener() {
+        final JButton save = new JButton("Save Settings");
+        save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updaterController.update(locationCity.getText(), locationCountryCode.getText());
+                updaterController.update(fieldLocationCity.getText(), fieldLocationCountryCode.getText());
             }
         });
-        grid.add(saveButton);
 
-        this.retrieverController.retrieve();
-    }
+        final Component[] components = {
+            new JLabel("Your city:"), this.fieldLocationCity,
+            new JLabel("Your 2-digit country code:"), this.fieldLocationCountryCode,
+            Box.createHorizontalGlue(), save,
+        };
+        final JPanel fields = new JPanel(new GridLayout(
+            components.length / 2, 2, SIZE_SPACING_MD, SIZE_SPACING_MD
+        ));
+        fields.setOpaque(false);
+        for (Component component : components) {
+            fields.add(component);
+        }
+        add(fields);
 
-    private JTextField createInputText() {
-        final JTextField input = new JTextField();
-        input.setPreferredSize(new Dimension(SIZE_WIDTH_XL, SIZE_HEIGHT_MD));
-
-        return input;
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                retrieverController.retrieve();
+            }
+        });
     }
 
     @Override
@@ -93,11 +87,11 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
-            case "locationCity":
-                locationCity.setText(viewModel.getLocationCity());
+            case SettingsViewModel.PROPERTY_LOCATION_CITY:
+                fieldLocationCity.setText(viewModel.getLocationCity());
                 break;
-            case "locationCountryCode":
-                locationCountryCode.setText(viewModel.getLocationCountryCode());
+            case SettingsViewModel.PROPERTY_LOCATION_COUNTRY_CODE:
+                fieldLocationCountryCode.setText(viewModel.getLocationCountryCode());
                 break;
             default:
                 break;

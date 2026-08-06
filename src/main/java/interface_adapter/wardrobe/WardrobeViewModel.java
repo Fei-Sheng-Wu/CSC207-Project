@@ -12,6 +12,10 @@ import interface_adapter.AbstractViewModel;
  * Represents the wardrobe view model.
  */
 public class WardrobeViewModel extends AbstractViewModel {
+    public static final String PROPERTY_ERROR = "error";
+    public static final String PROPERTY_ITEMS = "items";
+    public static final String PROPERTY_ITEMS_OLD = "itemsOld";
+
     private String error;
     private List<AbstractWear> items = new ArrayList<>();
     private List<AbstractWear> itemsOld = new ArrayList<>();
@@ -33,7 +37,7 @@ public class WardrobeViewModel extends AbstractViewModel {
      */
     public void setError(@Nullable String error) {
         this.error = error;
-        firePropertyChange("error", this.error);
+        firePropertyChange(PROPERTY_ERROR, this.error);
     }
 
     /**
@@ -52,7 +56,7 @@ public class WardrobeViewModel extends AbstractViewModel {
      */
     public void setItems(List<AbstractWear> items) {
         this.items = items;
-        firePropertyChange("items", this.items);
+        firePropertyChange(PROPERTY_ITEMS, this.items);
     }
 
     /**
@@ -71,6 +75,6 @@ public class WardrobeViewModel extends AbstractViewModel {
      */
     public void setOldItems(List<AbstractWear> oldItems) {
         this.itemsOld = oldItems;
-        firePropertyChange("itemsOld", this.itemsOld);
+        firePropertyChange(PROPERTY_ITEMS_OLD, this.itemsOld);
     }
 }

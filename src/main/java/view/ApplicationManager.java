@@ -2,8 +2,6 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,18 +24,15 @@ import javax.swing.WindowConstants;
  * Represents an application manager.
  */
 public class ApplicationManager {
-    private static final int WINDOW_WIDTH_MIN = 800;
-    private static final int WINDOW_HEIGHT_MIN = 500;
-    private static final int NAVIGATIONS_WIDTH = 200;
-    private static final int NAVIGATIONS_GAP_HOR = 8;
-    private static final int NAVIGATIONS_GAP_VER = 4;
+    private static final int WINDOW_WIDTH_MIN = 960;
+    private static final int WINDOW_HEIGHT_MIN = 580;
 
     private final Map<Class<?>, Object> registry;
     private final List<Class<? extends AbstractView>> navigationsTop;
     private final List<Class<? extends AbstractView>> navigationsBottom;
 
     private final JFrame window;
-    private final Container navigator;
+    private final JPanel navigator;
     private final CardLayout navigatorLayout;
 
     /**
@@ -58,6 +54,7 @@ public class ApplicationManager {
         this.window = new JFrame();
         this.navigatorLayout = new CardLayout();
         this.navigator = new JPanel(this.navigatorLayout);
+        this.navigator.setOpaque(false);
     }
 
     /**
@@ -129,22 +126,21 @@ public class ApplicationManager {
      */
     public JFrame buildWindow() {
         final JPanel navigations = new JPanel(new GridBagLayout());
-        navigations.setPreferredSize(new Dimension(NAVIGATIONS_WIDTH, 0));
-        navigations.setMaximumSize(new Dimension(NAVIGATIONS_WIDTH, 0));
-        navigations.setBackground(Color.LIGHT_GRAY);
+        navigations.setPreferredSize(new Dimension(AbstractView.SIZE_WIDTH_XXL, 0));
+        navigations.setBackground(AbstractView.COLOR_AREA);
+        navigations.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AbstractView.COLOR_BORDER));
 
         final GridBagConstraints navigationsConstraints = new GridBagConstraints();
         navigationsConstraints.gridx = 0;
         navigationsConstraints.weightx = 1.0;
         navigationsConstraints.fill = GridBagConstraints.HORIZONTAL;
         navigationsConstraints.insets = new Insets(
-            NAVIGATIONS_GAP_VER,
-            NAVIGATIONS_GAP_HOR,
-            NAVIGATIONS_GAP_VER,
-            NAVIGATIONS_GAP_HOR
+            AbstractView.SIZE_SPACING_XS, AbstractView.SIZE_SPACING_SM,
+            AbstractView.SIZE_SPACING_XS, AbstractView.SIZE_SPACING_SM
         );
 
-        final JLabel navigationsHeader = new JLabel("NAVIGATION");
+        final JLabel navigationsHeader = new JLabel("Navigations");
+        navigationsHeader.setForeground(AbstractView.COLOR_MUTED);
         navigations.add(navigationsHeader, navigationsConstraints);
         for (Class<? extends AbstractView> navigationClass : navigationsTop) {
             final JButton navigationsItem = new JButton(get(navigationClass).getTitle());
@@ -172,8 +168,9 @@ public class ApplicationManager {
 
         window.setLayout(new BorderLayout());
         window.setMinimumSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
+        window.setSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window.add(navigations, BorderLayout.WEST);
+        window.add(navigations, BorderLayout.LINE_START);
         window.add(navigator, BorderLayout.CENTER);
         window.pack();
 

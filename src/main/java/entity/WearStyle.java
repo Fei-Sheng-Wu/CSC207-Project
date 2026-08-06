@@ -4,9 +4,9 @@ package entity;
  * Represents the style of a clothing item.
  */
 public enum WearStyle {
-    PROFESSIONAL("Professional / Business"),
+    PROFESSIONAL("Professional"),
     CASUAL("Casual"),
-    SPORTY("Sporty / Athletic"),
+    SPORTY("Athletic"),
     ROMANTIC("Romantic"),
     FORMAL("Formal"),
     INDOOR("Indoor");

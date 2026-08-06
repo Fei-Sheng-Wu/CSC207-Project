@@ -1,8 +1,6 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -13,23 +11,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.EmptyBorder;
 
 import entity.AbstractWear;
 import entity.InnerTopwear;
+import entity.WearFactory;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_adder.WardrobeAdderController;
 import interface_adapter.wardrobe_remover.WardrobeRemoverController;
 import interface_adapter.wardrobe_reporter.WardrobeReporterController;
-import interface_adapter.wardrobe_updater.WardrobeUpdaterController;
 
 /**
  * Represents the wardrobe view.
@@ -37,15 +33,14 @@ import interface_adapter.wardrobe_updater.WardrobeUpdaterController;
 public class WardrobeOverviewView extends AbstractView implements PropertyChangeListener {
     private static final String DEFAULT_ITEM_TYPE = InnerTopwear.class.getSimpleName();
 
+    private final ApplicationManager manager;
     private final WardrobeViewModel wardrobeViewModel;
     private final ItemViewModel itemViewModel;
     private final WardrobeReporterController reporterController;
     private final WardrobeAdderController adderController;
-    private final WardrobeUpdaterController updaterController;
     private final WardrobeRemoverController removerController;
 
     private final JPanel list;
-    private final ApplicationManager manager;
 
     /**
      * Constructs a new wardrobe view.
@@ -63,44 +58,23 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         this.itemViewModel.addPropertyChangeListener(this);
         this.reporterController = manager.get(WardrobeReporterController.class);
         this.adderController = manager.get(WardrobeAdderController.class);
-        this.updaterController = manager.get(WardrobeUpdaterController.class);
         this.removerController = manager.get(WardrobeRemoverController.class);
 
         // Initialize the layout.
         setLayout(new BorderLayout(SIZE_SPACING_MD, SIZE_SPACING_MD));
-        setBorder(new EmptyBorder(SIZE_SPACING_MD, SIZE_SPACING_MD, SIZE_SPACING_MD, SIZE_SPACING_MD));
 
         // Add the header bar.
-        final JPanel header = new JPanel(new BorderLayout());
-        add(header, BorderLayout.NORTH);
-
-        header.add(new JLabel("Wardrobe"), BorderLayout.WEST);
-        final JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        header.add(headerButtons, BorderLayout.EAST);
-
-        final JButton reportButton = new JButton("Report");
-        reportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                manager.showView(WardrobeDetailsView.class);
-            }
-        });
-        headerButtons.add(reportButton);
-        final JButton addItemButton = new JButton("Add Item");
-        addItemButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adderController.addItem(DEFAULT_ITEM_TYPE);
-                manager.showView(ItemView.class);
-            }
-        });
-        headerButtons.add(addItemButton);
+        add(createHeader(), BorderLayout.PAGE_START);
 
         // Add the list.
         this.list = new JPanel();
-        this.list.setLayout(new BoxLayout(this.list, BoxLayout.Y_AXIS));
+        this.list.setOpaque(false);
+        this.list.setLayout(new BoxLayout(this.list, BoxLayout.PAGE_AXIS));
 
         final JScrollPane scroll = new JScrollPane(this.list);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scroll, BorderLayout.CENTER);
@@ -110,58 +84,84 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             public void componentShown(ComponentEvent e) {
                 reporterController.reportWardrobe();
             }
+        });
+    }
 
+    private JPanel createHeader() {
+        final JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+
+        final JLabel headerTitle = new JLabel("Wardrobe");
+        headerTitle.setFont(FONT_TITLE);
+        header.add(headerTitle, BorderLayout.LINE_START);
+        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, SIZE_SPACING_SM, 0));
+        right.setOpaque(false);
+        right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
+        header.add(right, BorderLayout.LINE_END);
+
+        final JButton report = new JButton("Report");
+        report.addActionListener(new ActionListener() {
             @Override
-            public void componentHidden(ComponentEvent e) {
-                // Do nothing.
+            public void actionPerformed(ActionEvent e) {
+                manager.showView(WardrobeDetailsView.class);
             }
         });
+        right.add(report);
+        final JButton add = new JButton("Add Item");
+        add.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adderController.addItem(DEFAULT_ITEM_TYPE);
+                manager.showView(ItemView.class);
+            }
+        });
+        right.add(add);
+
+        return header;
     }
 
     private void addCard(AbstractWear wear) {
         final JPanel card = new JPanel(new BorderLayout());
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, SIZE_HEIGHT_XXL));
-        card.setPreferredSize(new Dimension(0, SIZE_HEIGHT_XL));
-        card.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.setOpaque(false);
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, SIZE_HEIGHT_XL));
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray),
-            new EmptyBorder(SIZE_SPACING_MD, SIZE_SPACING_MD, SIZE_SPACING_MD, SIZE_SPACING_MD)
+            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
+            BorderFactory.createEmptyBorder(SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM)
         ));
 
-        final JPanel left = new JPanel();
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        card.add(left, BorderLayout.WEST);
+        final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        left.setOpaque(false);
+        left.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_XS, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
+        card.add(left, BorderLayout.LINE_START);
+        final JLabel icon = new JLabel(WearFactory.getIcon(wear.getClass()));
+        icon.setFont(FONT_EMOJI);
+        left.add(icon);
+        left.add(new JLabel(wear.getDisplayString()));
 
-        if (wear.getBrand().isBlank()) {
-            left.add(new JLabel(wear.getName()));
-        } else {
-            left.add(new JLabel(String.format("%s (%s)", wear.getName(), wear.getBrand())));
-        }
-        left.add(Box.createVerticalStrut(SIZE_SPACING_XS));
-        left.add(new JLabel(wear.getClass().getSimpleName()));
+        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, SIZE_SPACING_SM, 0));
+        right.setOpaque(false);
+        right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
+        card.add(right, BorderLayout.LINE_END);
 
-        final JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, SIZE_SPACING_SM, 0));
-        card.add(right, BorderLayout.EAST);
-
-        final JButton editButton = new JButton("Edit Item");
-        editButton.addActionListener(new ActionListener() {
+        final JButton update = new JButton("Edit Item");
+        update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 itemViewModel.setCurrentItem(wear);
                 manager.showView(ItemView.class);
             }
         });
-        final JButton removeButton = new JButton("Remove Item");
-        removeButton.addActionListener(new ActionListener() {
+        right.add(update);
+
+        final JButton remove = new JButton("Remove Item");
+        remove.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                removerController.removeItem(wear.getUuid(), wear.getClass().getSimpleName());
+                removerController.removeItem(wear);
                 reporterController.reportWardrobe();
             }
         });
-
-        right.add(editButton);
-        right.add(removeButton);
+        right.add(remove);
 
         list.add(card);
     }
@@ -174,12 +174,12 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
-            case "error":
-                if (e.getNewValue() != null) {
+            case WardrobeViewModel.PROPERTY_ERROR:
+                if (e.getNewValue() != null && isVisible()) {
                     JOptionPane.showMessageDialog(this, e.getNewValue());
                 }
                 break;
-            case "items":
+            case WardrobeViewModel.PROPERTY_ITEMS:
                 list.removeAll();
                 for (AbstractWear wear : wardrobeViewModel.getItems()) {
                     addCard(wear);

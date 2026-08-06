@@ -1,9 +1,6 @@
 package interface_adapter.wardrobe_remover;
 
-import java.util.UUID;
-
 import entity.AbstractWear;
-import entity.WearFactory;
 import use_case.wardrobe_remover.WardrobeRemoverInputBoundary;
 import use_case.wardrobe_remover.WardrobeRemoverInputData;
 
@@ -25,12 +22,9 @@ public class WardrobeRemoverController {
     /**
      * Executes the remove item use case.
      *
-     * @param uuid the UUID
-     * @param type the clothing item type
+     * @param item the clothing item
      */
-    public void removeItem(UUID uuid, String type) {
-        final AbstractWear item = WearFactory.constructWear(type, uuid);
-
+    public void removeItem(AbstractWear item) {
         interactor.removeItem(new WardrobeRemoverInputData(item));
     }
 }

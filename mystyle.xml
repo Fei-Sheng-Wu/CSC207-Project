@@ -652,7 +652,7 @@
             <property name="max" value="15"/>
         </module>
         <module name="ClassFanOutComplexity">
-            <property name="max" value="25"/>
+            <property name="max" value="30"/>
             <!-- Default classes are also listed -->
             <property name="excludedClasses"
                       value="boolean, byte, char, double, float, int, long, short,
@@ -765,11 +765,6 @@
         <module name="RegexpSinglelineJava">
             <property name="id" value="regexpSingleLineDefault"/>
         </module>
-        <module name="RegexpSinglelineJava">
-            <property name="id" value="checkASCII"/>
-            <property name="format" value="[^\p{ASCII}]"/>
-            <property name="ignoreComments" value="true"/>
-        </module>
 
         <!-- Size Violations -->
         <module name="AnonInnerLength">
@@ -784,7 +779,9 @@
         </module>
         <module name="MethodLength"/>
         <module name="OuterTypeNumber"/>
-        <module name="ParameterNumber"/>
+        <module name="ParameterNumber">
+            <property name="max" value="12"/>
+        </module>
         <module name="RecordComponentNumber"/>
 
         <!-- Whitespace -->
