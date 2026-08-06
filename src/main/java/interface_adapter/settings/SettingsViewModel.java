@@ -6,6 +6,9 @@ import interface_adapter.AbstractViewModel;
  * Represents the settings view model.
  */
 public class SettingsViewModel extends AbstractViewModel {
+    public static final String PROPERTY_LOCATION_CITY = "locationCity";
+    public static final String PROPERTY_LOCATION_COUNTRY_CODE = "locationCountryCode";
+
     private String locationCity = "";
     private String locationCountryCode = "";
 
@@ -25,7 +28,7 @@ public class SettingsViewModel extends AbstractViewModel {
      */
     public void setLocationCity(String city) {
         locationCity = city;
-        firePropertyChange("locationCity", locationCity);
+        firePropertyChange(PROPERTY_LOCATION_CITY, locationCity);
     }
 
     /**
@@ -44,6 +47,6 @@ public class SettingsViewModel extends AbstractViewModel {
      */
     public void setLocationCountryCode(String countryCode) {
         locationCountryCode = countryCode;
-        firePropertyChange("locationCountryCode", locationCountryCode);
+        firePropertyChange(PROPERTY_LOCATION_COUNTRY_CODE, locationCountryCode);
     }
 }

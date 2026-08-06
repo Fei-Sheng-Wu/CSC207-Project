@@ -203,4 +203,24 @@ public abstract class AbstractWear {
 
         return Period.between(purchaseDate, LocalDate.now());
     }
+
+    /**
+     * Returns the formatted display string of the clothing item.
+     *
+     * @return the formatted display string of the clothing item
+     */
+    public String getDisplayString() {
+        final String first;
+        if (name.isBlank()) {
+            first = "[unnamed]";
+        } else {
+            first = name;
+        }
+
+        if (brand.isBlank()) {
+            return first;
+        } else {
+            return String.format("%s (%s)", first, brand);
+        }
+    }
 }

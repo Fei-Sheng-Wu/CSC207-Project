@@ -9,6 +9,9 @@ import interface_adapter.AbstractViewModel;
  * Represents the item editing view model.
  */
 public class ItemViewModel extends AbstractViewModel {
+    public static final String PROPERTY_ERROR = "error";
+    public static final String PROPERTY_CURRENT_ITEM = "currentItem";
+
     private String error;
     private AbstractWear currentItem;
 
@@ -29,7 +32,7 @@ public class ItemViewModel extends AbstractViewModel {
      */
     public void setError(@Nullable String error) {
         this.error = error;
-        firePropertyChange("error", this.error);
+        firePropertyChange(PROPERTY_ERROR, this.error);
     }
 
     /**
@@ -49,6 +52,6 @@ public class ItemViewModel extends AbstractViewModel {
      */
     public void setCurrentItem(@Nullable AbstractWear item) {
         currentItem = item;
-        firePropertyChange("currentItem", currentItem);
+        firePropertyChange(PROPERTY_CURRENT_ITEM, currentItem);
     }
 }

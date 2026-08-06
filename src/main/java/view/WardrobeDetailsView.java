@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_reporter.WardrobeReporterController;
 
@@ -33,6 +36,7 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         this.reporterController.reportWardrobe();
 
         // @TODO: reporter view for Aiman
+        add(new JLabel("@TODO: Aiman's wardrobe reporting view (old items and other stats)"));
     }
 
     @Override
@@ -43,11 +47,14 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
+            case WardrobeViewModel.PROPERTY_ERROR:
+                if (viewModel.getError() != null && isVisible()) {
+                    JOptionPane.showMessageDialog(this, viewModel.getError());
+                }
+                break;
             case "items":
                 // @TODO: update content
             case "itemsOld":
-                // @TODO: update content
-            case "error":
                 // @TODO: update content
             default:
                 break;

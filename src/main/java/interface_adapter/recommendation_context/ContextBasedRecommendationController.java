@@ -44,12 +44,12 @@ public class ContextBasedRecommendationController {
     public void recommend(List<String> preferredColors, List<String> preferredStyles) {
         final List<WearColor> colors = new ArrayList<>();
         for (String text : preferredColors) {
-            colors.add(WearColor.valueOf(text.toUpperCase()));
+            colors.add(WearColor.valueOf(text.strip().toUpperCase()));
         }
 
         final List<WearStyle> styles = new ArrayList<>();
         for (String text : preferredStyles) {
-            styles.add(WearStyle.valueOf(text.toUpperCase()));
+            styles.add(WearStyle.valueOf(text.strip().toUpperCase()));
         }
 
         interactor.recommend(new ContextBasedRecommendationInputData(random.nextInt(), colors, styles));

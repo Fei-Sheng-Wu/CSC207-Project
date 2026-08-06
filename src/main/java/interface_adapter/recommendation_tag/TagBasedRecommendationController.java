@@ -45,14 +45,19 @@ public class TagBasedRecommendationController {
     public void recommend(List<String> preferredColors, List<String> preferredStyles, List<String> preferredTags) {
         final List<WearColor> colors = new ArrayList<>();
         for (String text : preferredColors) {
-            colors.add(WearColor.valueOf(text.toUpperCase()));
+            colors.add(WearColor.valueOf(text.strip().toUpperCase()));
         }
 
         final List<WearStyle> styles = new ArrayList<>();
         for (String text : preferredStyles) {
-            styles.add(WearStyle.valueOf(text.toUpperCase()));
+            styles.add(WearStyle.valueOf(text.strip().toUpperCase()));
         }
 
-        interactor.recommend(new TagBasedRecommendationInputData(random.nextInt(), colors, styles, preferredTags));
+        final List<String> tags = new ArrayList<>();
+        for (String text : preferredTags) {
+            tags.add(text.strip());
+        }
+
+        interactor.recommend(new TagBasedRecommendationInputData(random.nextInt(), colors, styles, tags));
     }
 }

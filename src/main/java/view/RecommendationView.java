@@ -1,10 +1,9 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import entity.AbstractWear;
@@ -28,6 +28,7 @@ import entity.WearColor;
 import entity.WearStyle;
 import interface_adapter.recommendation.RecommendationViewModel;
 import interface_adapter.recommendation_context.ContextBasedRecommendationController;
+import interface_adapter.recommendation_tag.TagBasedRecommendationController;
 
 /**
  * Represents the recommendation view.
@@ -37,28 +38,24 @@ import interface_adapter.recommendation_context.ContextBasedRecommendationContro
  * two properties the presenter writes into the view model.
  */
 public class RecommendationView extends AbstractView implements PropertyChangeListener {
-    private static final String ANY_OPTION = "No preference";
-    private static final String EMPTY_SLOT = "\u2014";
-    private static final String PROMPT = "Choose optional preferences, then press Get recommendation.";
-    private static final String WORKING = "Looking for an outfit...";
-    private static final String UNEXPECTED_FAILURE = "Something went wrong while looking for an outfit.";
+    private static final String OPTION_NONE = "(No Preference)";
+    private static final String OPTION_CONTEXT_BASED = "Use Current Weather & Events";
+    private static final String OPTION_TAG_BASED = "Use My Custom Tags";
+    private static final String SLOT_EMPTY = "—";
+    private static final String OUTPUT_WORKING = "Looking for an outfit...";
+    private static final String OUTPUT_FAILURE = "Something went wrong while looking for an outfit!";
     private static final String[] SLOT_LABELS = {
-        "Inner top", "Outer top", "Bottom", "Footwear", "Headwear", "Accessories",
+        "Inner Topwear", "Outer Topwear", "Bottomwear", "Footwear", "Headwear", "Accessories",
     };
 
-    private static final Color COLOR_MUTED = new Color(110, 116, 128);
-    private static final Color COLOR_LINE = new Color(214, 216, 220);
-    private static final Color COLOR_ERROR = new Color(163, 44, 32);
-    private static final float FONT_SIZE_TITLE = 22f;
-    private static final float FONT_SIZE_SECTION = 13f;
-    private static final int REASON_ROWS = 8;
-    private static final int REASON_COLUMNS = 24;
-
     private final RecommendationViewModel viewModel;
-    private final ContextBasedRecommendationController controller;
+    private final ContextBasedRecommendationController contextBasedController;
+    private final TagBasedRecommendationController tagBasedController;
 
-    private final JComboBox<String> colorChoice = createChoice(WearColor.values());
-    private final JComboBox<String> styleChoice = createChoice(WearStyle.values());
+    private final JComboBox<String> choiceColor = createChoice(WearColor.values());
+    private final JComboBox<String> choiceStyle = createChoice(WearStyle.values());
+    private final JComboBox<String> choiceMode = new JComboBox<>(new String[]{OPTION_CONTEXT_BASED, OPTION_TAG_BASED});
+    private final JTextField fieldTags = new JTextField();
     private final JLabel[] slotValues = new JLabel[SLOT_LABELS.length];
     private final JTextArea reason = createReason();
 
@@ -73,70 +70,96 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         // Retrieve the shared resources.
         this.viewModel = manager.get(RecommendationViewModel.class);
         this.viewModel.addPropertyChangeListener(this);
-        this.controller = manager.get(ContextBasedRecommendationController.class);
+        this.contextBasedController = manager.get(ContextBasedRecommendationController.class);
+        this.tagBasedController = manager.get(TagBasedRecommendationController.class);
 
         // Initialize the layout.
-        setLayout(new BorderLayout(SIZE_SPACING_LG, SIZE_SPACING_LG));
-        setBorder(BorderFactory.createEmptyBorder(
-            SIZE_SPACING_LG, SIZE_SPACING_LG, SIZE_SPACING_LG, SIZE_SPACING_LG));
+        setLayout(new BorderLayout(SIZE_SPACING_MD, SIZE_SPACING_MD));
 
-        add(createHeader(), BorderLayout.NORTH);
+        add(createHeader(), BorderLayout.PAGE_START);
         add(createResults(), BorderLayout.CENTER);
     }
 
     private JPanel createHeader() {
-        final JPanel header = new JPanel();
-        header.setOpaque(false);
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        final JPanel header = new JPanel(new BorderLayout());
         header.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_LINE),
-            BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)));
+            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
+            BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)
+        ));
 
-        final JLabel title = new JLabel(getTitle());
-        title.setFont(title.getFont().deriveFont(Font.BOLD, FONT_SIZE_TITLE));
-        title.setAlignmentX(LEFT_ALIGNMENT);
+        final JPanel texts = new JPanel();
+        texts.setLayout(new BoxLayout(texts, BoxLayout.PAGE_AXIS));
+        header.add(texts, BorderLayout.PAGE_START);
 
-        final JLabel subtitle = new JLabel("An outfit from your wardrobe for today's weather and events.");
+        final JLabel title = new JLabel("Recommendation");
+        title.setFont(FONT_TITLE);
+        texts.add(title);
+        final JLabel subtitle = new JLabel("Let Suitable curate a perfect outfit for you!");
         subtitle.setForeground(COLOR_MUTED);
-        subtitle.setAlignmentX(LEFT_ALIGNMENT);
-        subtitle.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_XS, 0, SIZE_SPACING_MD, 0));
+        subtitle.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_SM, 0, SIZE_SPACING_MD, 0));
+        texts.add(subtitle);
 
-        header.add(title);
-        header.add(subtitle);
-        header.add(createControls());
+        header.add(createControls(), BorderLayout.CENTER);
 
         return header;
     }
 
     private JPanel createControls() {
-        final JPanel controls = new JPanel(new BorderLayout(SIZE_SPACING_MD, 0));
-        controls.setOpaque(false);
-        controls.setAlignmentX(LEFT_ALIGNMENT);
+        final JPanel controls = new JPanel();
+        controls.setLayout(new BoxLayout(controls, BoxLayout.PAGE_AXIS));
 
-        final JPanel choices = new JPanel(new FlowLayout(FlowLayout.LEFT, SIZE_SPACING_SM, 0));
-        choices.setOpaque(false);
-        choices.add(createHeadingLabel("Colour"));
-        choices.add(colorChoice);
-        choices.add(createHeadingLabel("Style"));
-        choices.add(styleChoice);
+        final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        top.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
+        top.add(new JLabel("Color:"));
+        top.add(choiceColor);
+        top.add(new JLabel("Style:"));
+        top.add(choiceStyle);
+        controls.add(top);
 
-        final JButton recommend = new JButton("Get recommendation");
+        final JPanel bottom = new JPanel(new BorderLayout());
+        controls.add(bottom);
+
+        final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        left.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_SM, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
+        left.add(new JLabel("Mode:"));
+        choiceMode.setPreferredSize(new Dimension(SIZE_WIDTH_XXL, choiceMode.getPreferredSize().height));
+        choiceMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch (selectedMode()) {
+                    case OPTION_CONTEXT_BASED:
+                        fieldTags.setVisible(false);
+                        break;
+                    case OPTION_TAG_BASED:
+                        fieldTags.setVisible(true);
+                        break;
+                    default:
+                        break;
+                }
+                left.revalidate();
+                repaint();
+            }
+        });
+        left.add(choiceMode);
+        fieldTags.setVisible(false);
+        fieldTags.setPreferredSize(new Dimension(SIZE_WIDTH_XL, fieldTags.getPreferredSize().height));
+        left.add(fieldTags);
+        bottom.add(left, BorderLayout.CENTER);
+
+        final JButton recommend = new JButton("Get Recommendation");
         recommend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 requestRecommendation(recommend);
             }
         });
-
-        controls.add(choices, BorderLayout.CENTER);
-        controls.add(recommend, BorderLayout.EAST);
+        bottom.add(recommend, BorderLayout.LINE_END);
 
         return controls;
     }
 
     private JPanel createResults() {
-        final JPanel results = new JPanel(new GridLayout(1, 2, SIZE_SPACING_XL, 0));
-        results.setOpaque(false);
+        final JPanel results = new JPanel(new GridLayout(1, 2, SIZE_SPACING_LG, 0));
         results.add(createSection("Outfit", createSlots()));
         results.add(createSection("Why this outfit?", reason));
 
@@ -144,20 +167,22 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     }
 
     private JPanel createSlots() {
-        final JPanel slots = new JPanel(new GridLayout(SLOT_LABELS.length, 2, SIZE_SPACING_MD, 0));
-        slots.setOpaque(false);
+        final JPanel slots = new JPanel(new GridLayout(SLOT_LABELS.length, 1, 0, 0));
 
         for (int index = 0; index < SLOT_LABELS.length; index++) {
+            final JPanel slot = new JPanel(new GridLayout(1, 2, SIZE_SPACING_MD, 0));
+            if (index < SLOT_LABELS.length - 1) {
+                slot.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
+            }
+            slots.add(slot);
+
             final JLabel name = new JLabel(SLOT_LABELS[index]);
             name.setForeground(COLOR_MUTED);
-            name.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_LINE));
+            slot.add(name);
 
-            final JLabel value = new JLabel(EMPTY_SLOT);
-            value.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_LINE));
+            final JLabel value = new JLabel(SLOT_EMPTY);
             slotValues[index] = value;
-
-            slots.add(name);
-            slots.add(value);
+            slot.add(value);
         }
 
         return slots;
@@ -165,56 +190,50 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private static JPanel createSection(String heading, Component body) {
         final JPanel section = new JPanel(new BorderLayout(0, SIZE_SPACING_MD));
-        section.setOpaque(false);
-        section.add(createHeadingLabel(heading), BorderLayout.NORTH);
+
+        final JLabel header = new JLabel(heading);
+        header.setFont(FONT_SUBTITLE);
+        section.add(header, BorderLayout.PAGE_START);
         section.add(body, BorderLayout.CENTER);
 
         return section;
     }
 
-    private static JLabel createHeadingLabel(String text) {
-        final JLabel label = new JLabel(text);
-        label.setFont(label.getFont().deriveFont(Font.BOLD, FONT_SIZE_SECTION));
-
-        return label;
-    }
-
     private static JTextArea createReason() {
-        final JTextArea area = new JTextArea(REASON_ROWS, REASON_COLUMNS);
+        final JTextArea area = new JTextArea(
+            "Please choose your (optional) preferences, then press the \"Get Recommendation\" button."
+        );
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setEditable(false);
         area.setFocusable(false);
-        area.setOpaque(false);
         area.setForeground(COLOR_MUTED);
-        area.setText(PROMPT);
+        area.setBackground(COLOR_AREA);
+        area.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
 
         return area;
     }
 
     private static JComboBox<String> createChoice(Object[] values) {
         final String[] options = new String[values.length + 1];
-        options[0] = ANY_OPTION;
+        options[0] = OPTION_NONE;
         for (int index = 0; index < values.length; index++) {
-            options[index + 1] = displayNameOf(values[index]);
+            String option = values[index].toString();
+            if (values[index] instanceof WearColor) {
+                option = ((WearColor) values[index]).getDisplayName();
+            } else if (values[index] instanceof WearStyle) {
+                option = ((WearStyle) values[index]).getDisplayName();
+            }
+            options[index + 1] = option;
         }
 
-        return new JComboBox<>(options);
+        final JComboBox<String> combo = new JComboBox<>(options);
+        combo.setPreferredSize(new Dimension(SIZE_WIDTH_XL, combo.getPreferredSize().height));
+
+        return combo;
     }
 
-    private static String displayNameOf(Object value) {
-        String result = value.toString();
-        if (value instanceof WearColor) {
-            result = ((WearColor) value).getDisplayName();
-        }
-        else if (value instanceof WearStyle) {
-            result = ((WearStyle) value).getDisplayName();
-        }
-
-        return result;
-    }
-
-    private static List<String> selected(JComboBox<String> choice, Object[] values) {
+    private static List<String> selectedEnum(JComboBox<String> choice, Object[] values) {
         final List<String> names = new ArrayList<>();
         final int index = choice.getSelectedIndex();
         if (index > 0) {
@@ -222,6 +241,14 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         }
 
         return names;
+    }
+
+    private String selectedMode() {
+        if (choiceMode.getSelectedItem() == null) {
+            return OPTION_CONTEXT_BASED;
+        }
+
+        return choiceMode.getSelectedItem().toString();
     }
 
     private void showOutfit(Outfit outfit) {
@@ -235,25 +262,23 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         };
         for (int index = 0; index < slotValues.length; index++) {
             slotValues[index].setText(values[index]);
+            repaint();
         }
     }
 
     private void clearOutfit() {
         for (JLabel value : slotValues) {
-            value.setText(EMPTY_SLOT);
+            value.setText(SLOT_EMPTY);
+            repaint();
         }
     }
 
     private static String nameOf(AbstractWear item) {
-        String result = EMPTY_SLOT;
-        if (item != null) {
-            result = item.getName();
-            if (result == null || result.isBlank()) {
-                result = item.getClass().getSimpleName();
-            }
+        if (item == null) {
+            return SLOT_EMPTY;
         }
 
-        return result;
+        return item.getDisplayString();
     }
 
     private static String accessoriesOf(Outfit outfit) {
@@ -262,7 +287,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
             names.add(nameOf(accessory));
         }
 
-        String result = EMPTY_SLOT;
+        String result = SLOT_EMPTY;
         if (!names.isEmpty()) {
             result = String.join(", ", names);
         }
@@ -286,16 +311,29 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
      * @param trigger the button that asked for the recommendation
      */
     private void requestRecommendation(JButton trigger) {
-        final List<String> colors = selected(colorChoice, WearColor.values());
-        final List<String> styles = selected(styleChoice, WearStyle.values());
+        final List<String> colors = selectedEnum(choiceColor, WearColor.values());
+        final List<String> styles = selectedEnum(choiceStyle, WearStyle.values());
+        final List<String> tags = List.of(fieldTags.getText().split(","));
 
         trigger.setEnabled(false);
         reason.setForeground(COLOR_MUTED);
-        reason.setText(WORKING);
+        reason.setText(OUTPUT_WORKING);
+        repaint();
 
-        BackgroundRequest.run(
-            () -> controller.recommend(colors, styles),
-            succeeded -> finishRecommendation(trigger, succeeded));
+        switch (selectedMode()) {
+            case OPTION_CONTEXT_BASED:
+                BackgroundRequest.run(
+                    () -> contextBasedController.recommend(colors, styles),
+                    succeeded -> finishRecommendation(trigger, succeeded));
+                break;
+            case OPTION_TAG_BASED:
+                BackgroundRequest.run(
+                    () -> tagBasedController.recommend(colors, styles, tags),
+                    succeeded -> finishRecommendation(trigger, succeeded));
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -308,7 +346,8 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         trigger.setEnabled(true);
         if (!succeeded) {
             reason.setForeground(COLOR_ERROR);
-            reason.setText(UNEXPECTED_FAILURE);
+            reason.setText(OUTPUT_FAILURE);
+            repaint();
         }
     }
 
@@ -319,8 +358,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         // so the update is handed back to it here, at the last moment before it is applied.
         if (SwingUtilities.isEventDispatchThread()) {
             render(e.getPropertyName());
-        }
-        else {
+        } else {
             SwingUtilities.invokeLater(() -> render(e.getPropertyName()));
         }
     }
@@ -331,11 +369,13 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
                 showOutfit(viewModel.getOutfit());
                 reason.setForeground(COLOR_MUTED);
                 reason.setText(viewModel.getReason());
+                repaint();
                 break;
             case RecommendationViewModel.PROPERTY_ERROR_MESSAGE:
                 clearOutfit();
                 reason.setForeground(COLOR_ERROR);
                 reason.setText(viewModel.getErrorMessage());
+                repaint();
                 break;
             default:
                 break;
