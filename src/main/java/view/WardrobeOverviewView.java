@@ -68,10 +68,12 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
 
         // Add the list.
         this.list = new JPanel();
+        this.list.setOpaque(false);
         this.list.setLayout(new BoxLayout(this.list, BoxLayout.PAGE_AXIS));
 
         final JScrollPane scroll = new JScrollPane(this.list);
-        scroll.setBackground(COLOR_BACKGROUND);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
         scroll.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -87,11 +89,13 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
 
     private JPanel createHeader() {
         final JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
 
         final JLabel headerTitle = new JLabel("Wardrobe");
         headerTitle.setFont(FONT_TITLE);
         header.add(headerTitle, BorderLayout.LINE_START);
         final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, SIZE_SPACING_SM, 0));
+        right.setOpaque(false);
         right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         header.add(right, BorderLayout.LINE_END);
 
@@ -118,6 +122,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
 
     private void addCard(AbstractWear wear) {
         final JPanel card = new JPanel(new BorderLayout());
+        card.setOpaque(false);
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, SIZE_HEIGHT_XL));
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
@@ -125,6 +130,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         ));
 
         final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        left.setOpaque(false);
         left.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_XS, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         card.add(left, BorderLayout.LINE_START);
         final JLabel icon = new JLabel(WearFactory.getIcon(wear.getClass()));
@@ -133,6 +139,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         left.add(new JLabel(wear.getDisplayString()));
 
         final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, SIZE_SPACING_SM, 0));
+        right.setOpaque(false);
         right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         card.add(right, BorderLayout.LINE_END);
 
@@ -178,7 +185,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
                     addCard(wear);
                 }
                 list.revalidate();
-                repaint();
+                list.repaint();
                 break;
             default:
                 break;

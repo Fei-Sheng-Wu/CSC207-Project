@@ -10,6 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -91,6 +92,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
     private JPanel createHeader() {
         final JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
         header.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
             BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)
@@ -100,6 +102,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
         headerTitle.setFont(FONT_TITLE);
         header.add(headerTitle, BorderLayout.LINE_START);
         final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, SIZE_SPACING_SM, 0));
+        right.setOpaque(false);
         right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         header.add(right, BorderLayout.LINE_END);
 
@@ -139,6 +142,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
     private JPanel createFields() {
         final JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setOpaque(false);
 
         final JButton inspire = new JButton("Get Inspired");
         inspire.addActionListener(new ActionListener() {
@@ -150,7 +154,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
         final Component[] components = {
             new JLabel("Type:"), choiceType,
-            icon, new JPanel(),
+            icon, Box.createHorizontalGlue(),
             new JLabel("Name:"), fieldName,
             new JLabel("Brand:"), fieldBrand,
             new JLabel("Color:"), choiceColor,
@@ -159,18 +163,18 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
             new JLabel("Purchase Date:"), pickerPurchaseDate,
             new JLabel("Fondness:"), sliderFondness,
             new JLabel("Tags:"), fieldTags,
-            new JPanel(), new JPanel(), new JPanel(), inspire,
+            Box.createHorizontalGlue(), Box.createHorizontalGlue(), Box.createHorizontalGlue(), inspire,
         };
         final JPanel fields = new JPanel(new GridLayout(
             components.length / 4, 4, SIZE_SPACING_MD, SIZE_SPACING_MD
         ));
+        fields.setOpaque(false);
         wrapper.add(fields, BorderLayout.PAGE_START);
 
         choiceType.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 icon.setText(WearFactory.getIcon(ITEM_TYPES[choiceType.getSelectedIndex()]));
-                repaint();
             }
         });
         icon.setFont(FONT_EMOJI);
@@ -289,7 +293,6 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
                 }
                 sliderFondness.setValue((int) (item.getFondness() * sliderFondness.getMaximum()));
                 fieldTags.setText(String.join(", ", item.getTags()));
-                repaint();
 
                 break;
             default:

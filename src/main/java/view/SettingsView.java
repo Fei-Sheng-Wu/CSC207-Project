@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -59,11 +60,12 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         final Component[] components = {
             new JLabel("Your city:"), this.fieldLocationCity,
             new JLabel("Your 2-digit country code:"), this.fieldLocationCountryCode,
-            new JPanel(), save,
+            Box.createHorizontalGlue(), save,
         };
         final JPanel fields = new JPanel(new GridLayout(
             components.length / 2, 2, SIZE_SPACING_MD, SIZE_SPACING_MD
         ));
+        fields.setOpaque(false);
         for (Component component : components) {
             fields.add(component);
         }

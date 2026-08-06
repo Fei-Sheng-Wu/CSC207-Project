@@ -82,22 +82,24 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private JPanel createHeader() {
         final JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
         header.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
             BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)
         ));
 
-        final JPanel texts = new JPanel();
-        texts.setLayout(new BoxLayout(texts, BoxLayout.PAGE_AXIS));
-        header.add(texts, BorderLayout.PAGE_START);
+        final JPanel top = new JPanel();
+        top.setOpaque(false);
+        top.setLayout(new BoxLayout(top, BoxLayout.PAGE_AXIS));
+        header.add(top, BorderLayout.PAGE_START);
 
         final JLabel title = new JLabel("Recommendation");
         title.setFont(FONT_TITLE);
-        texts.add(title);
+        top.add(title);
         final JLabel subtitle = new JLabel("Let Suitable curate a perfect outfit for you!");
         subtitle.setForeground(COLOR_MUTED);
         subtitle.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_SM, 0, SIZE_SPACING_MD, 0));
-        texts.add(subtitle);
+        top.add(subtitle);
 
         header.add(createControls(), BorderLayout.CENTER);
 
@@ -106,9 +108,11 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private JPanel createControls() {
         final JPanel controls = new JPanel();
+        controls.setOpaque(false);
         controls.setLayout(new BoxLayout(controls, BoxLayout.PAGE_AXIS));
 
         final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        top.setOpaque(false);
         top.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         top.add(new JLabel("Color:"));
         top.add(choiceColor);
@@ -117,9 +121,11 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         controls.add(top);
 
         final JPanel bottom = new JPanel(new BorderLayout());
+        bottom.setOpaque(false);
         controls.add(bottom);
 
         final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
+        left.setOpaque(false);
         left.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_SM, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         left.add(new JLabel("Mode:"));
         choiceMode.setPreferredSize(new Dimension(SIZE_WIDTH_XXL, choiceMode.getPreferredSize().height));
@@ -137,7 +143,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
                         break;
                 }
                 left.revalidate();
-                repaint();
+                left.repaint();
             }
         });
         left.add(choiceMode);
@@ -160,6 +166,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private JPanel createResults() {
         final JPanel results = new JPanel(new GridLayout(1, 2, SIZE_SPACING_LG, 0));
+        results.setOpaque(false);
         results.add(createSection("Outfit", createSlots()));
         results.add(createSection("Why this outfit?", reason));
 
@@ -168,9 +175,11 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private JPanel createSlots() {
         final JPanel slots = new JPanel(new GridLayout(SLOT_LABELS.length, 1, 0, 0));
+        slots.setOpaque(false);
 
         for (int index = 0; index < SLOT_LABELS.length; index++) {
             final JPanel slot = new JPanel(new GridLayout(1, 2, SIZE_SPACING_MD, 0));
+            slot.setOpaque(false);
             if (index < SLOT_LABELS.length - 1) {
                 slot.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
             }
@@ -190,6 +199,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private static JPanel createSection(String heading, Component body) {
         final JPanel section = new JPanel(new BorderLayout(0, SIZE_SPACING_MD));
+        section.setOpaque(false);
 
         final JLabel header = new JLabel(heading);
         header.setFont(FONT_SUBTITLE);
@@ -201,7 +211,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
 
     private static JTextArea createReason() {
         final JTextArea area = new JTextArea(
-            "Please choose your (optional) preferences, then press the \"Get Recommendation\" button."
+            "Please choose your preferences (optional), then press the \"Get Recommendation\" button."
         );
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
@@ -262,14 +272,12 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         };
         for (int index = 0; index < slotValues.length; index++) {
             slotValues[index].setText(values[index]);
-            repaint();
         }
     }
 
     private void clearOutfit() {
         for (JLabel value : slotValues) {
             value.setText(SLOT_EMPTY);
-            repaint();
         }
     }
 
@@ -318,7 +326,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         trigger.setEnabled(false);
         reason.setForeground(COLOR_MUTED);
         reason.setText(OUTPUT_WORKING);
-        repaint();
 
         switch (selectedMode()) {
             case OPTION_CONTEXT_BASED:
@@ -347,7 +354,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         if (!succeeded) {
             reason.setForeground(COLOR_ERROR);
             reason.setText(OUTPUT_FAILURE);
-            repaint();
         }
     }
 
@@ -369,13 +375,11 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
                 showOutfit(viewModel.getOutfit());
                 reason.setForeground(COLOR_MUTED);
                 reason.setText(viewModel.getReason());
-                repaint();
                 break;
             case RecommendationViewModel.PROPERTY_ERROR_MESSAGE:
                 clearOutfit();
                 reason.setForeground(COLOR_ERROR);
                 reason.setText(viewModel.getErrorMessage());
-                repaint();
                 break;
             default:
                 break;

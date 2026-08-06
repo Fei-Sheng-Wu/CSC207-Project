@@ -2,7 +2,6 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 /**
@@ -34,7 +32,7 @@ public class ApplicationManager {
     private final List<Class<? extends AbstractView>> navigationsBottom;
 
     private final JFrame window;
-    private final Container navigator;
+    private final JPanel navigator;
     private final CardLayout navigatorLayout;
 
     /**
@@ -56,9 +54,7 @@ public class ApplicationManager {
         this.window = new JFrame();
         this.navigatorLayout = new CardLayout();
         this.navigator = new JPanel(this.navigatorLayout);
-
-        // Setup default styles.
-        UIManager.put("Panel.background", AbstractView.COLOR_BACKGROUND);
+        this.navigator.setOpaque(false);
     }
 
     /**
@@ -139,10 +135,8 @@ public class ApplicationManager {
         navigationsConstraints.weightx = 1.0;
         navigationsConstraints.fill = GridBagConstraints.HORIZONTAL;
         navigationsConstraints.insets = new Insets(
-            AbstractView.SIZE_SPACING_XS,
-            AbstractView.SIZE_SPACING_SM,
-            AbstractView.SIZE_SPACING_XS,
-            AbstractView.SIZE_SPACING_SM
+            AbstractView.SIZE_SPACING_XS, AbstractView.SIZE_SPACING_SM,
+            AbstractView.SIZE_SPACING_XS, AbstractView.SIZE_SPACING_SM
         );
 
         final JLabel navigationsHeader = new JLabel("Navigations");
