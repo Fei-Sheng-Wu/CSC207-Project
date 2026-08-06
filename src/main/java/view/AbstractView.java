@@ -32,7 +32,6 @@ public abstract class AbstractView extends JPanel {
     protected static final int SIZE_HEIGHT_XL = 52;
     protected static final int SIZE_HEIGHT_XXL = 72;
 
-    protected static final Color COLOR_NONE = new Color(0, 0, 0, 0);
     protected static final Color COLOR_BACKGROUND = new Color(251, 251, 251);
     protected static final Color COLOR_AREA = new Color(247, 248, 250);
     protected static final Color COLOR_MUTED = new Color(110, 116, 128);

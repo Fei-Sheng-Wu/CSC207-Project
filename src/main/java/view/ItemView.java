@@ -91,6 +91,10 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
     private JPanel createHeader() {
         final JPanel header = new JPanel(new BorderLayout());
+        header.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
+            BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)
+        ));
 
         final JLabel headerTitle = new JLabel("Edit Item");
         headerTitle.setFont(FONT_TITLE);

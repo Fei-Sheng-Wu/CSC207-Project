@@ -58,7 +58,7 @@ public class ApplicationManager {
         this.navigator = new JPanel(this.navigatorLayout);
 
         // Setup default styles.
-        UIManager.put("Panel.background", AbstractView.COLOR_NONE);
+        UIManager.put("Panel.background", AbstractView.COLOR_BACKGROUND);
     }
 
     /**

@@ -22,7 +22,7 @@ public class InspirationView extends AbstractView {
         this.viewModel = manager.get(InspirationViewModel.class);
         // this.viewModel.addPropertyChangeListener(this);
 
-        add(new JLabel("@TODO: inspiration view"));
+        add(new JLabel("@TODO: inspiration view (WIP by Jet)"));
     }
 
     @Override

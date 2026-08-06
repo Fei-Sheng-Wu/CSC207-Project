@@ -71,7 +71,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         this.list.setLayout(new BoxLayout(this.list, BoxLayout.PAGE_AXIS));
 
         final JScrollPane scroll = new JScrollPane(this.list);
-        scroll.setBackground(COLOR_NONE);
+        scroll.setBackground(COLOR_BACKGROUND);
         scroll.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
