@@ -1,31 +1,26 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
 import entity.AbstractWear;
 import entity.InnerTopwear;
 import entity.WearFactory;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_adder.WardrobeAdderController;
+import interface_adapter.wardrobe_filterer.WardrobeFiltererController;
 import interface_adapter.wardrobe_remover.WardrobeRemoverController;
 import interface_adapter.wardrobe_reporter.WardrobeReporterController;
+import interface_adapter.wardrobe_sorter.WardrobeSorterController;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.List;
 
 /**
  * Represents the wardrobe view.
@@ -37,6 +32,8 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     private final WardrobeViewModel wardrobeViewModel;
     private final ItemViewModel itemViewModel;
     private final WardrobeReporterController reporterController;
+    private final WardrobeFiltererController filtererController;
+    private final WardrobeSorterController sorterController;
     private final WardrobeAdderController adderController;
     private final WardrobeRemoverController removerController;
 
@@ -57,6 +54,8 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         this.itemViewModel = manager.get(ItemViewModel.class);
         this.itemViewModel.addPropertyChangeListener(this);
         this.reporterController = manager.get(WardrobeReporterController.class);
+        this.filtererController = manager.get(WardrobeFiltererController.class);
+        this.sorterController = manager.get(WardrobeSorterController.class);
         this.adderController = manager.get(WardrobeAdderController.class);
         this.removerController = manager.get(WardrobeRemoverController.class);
 
@@ -85,6 +84,8 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
                 reporterController.reportWardrobe();
             }
         });
+
+        reporterController.reportWardrobe();
     }
 
     private JPanel createHeader() {
@@ -107,6 +108,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             }
         });
         right.add(report);
+
         final JButton add = new JButton("Add Item");
         add.addActionListener(new ActionListener() {
             @Override
@@ -117,7 +119,107 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         });
         right.add(add);
 
+        final JButton filter = new JButton("Filter");
+        filter.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleFilterButton();
+            }
+        });
+        right.add(filter);
+
+        final JButton sortBy = new JButton("Sort By");
+        sortBy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleSortByButton();
+            }
+        });
+        right.add(sortBy);
+
         return header;
+    }
+
+    private void handleSortByButton() {
+        final String[] options = {"Name (A-Z)", "Name (Z-A)", "Brand (A-Z)", "Brand (Z-A)", "Type"};
+
+        final String choice = (String) JOptionPane.showInputDialog(
+            WardrobeOverviewView.this,
+            "Choose sorting criteria:",
+            "Sort Wardrobe",
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+
+        if (choice != null) {
+            final String sortParam;
+            switch (choice) {
+                case "Type":
+                    sortParam = "TYPE";
+                    break;
+                case "Name (A-Z)":
+                    sortParam = "NAME_ASC";
+                    break;
+                case "Name (Z-A)":
+                    sortParam = "NAME_DESC";
+                    break;
+                case "Brand (A-Z)":
+                    sortParam = "BRAND_ASC";
+                    break;
+                case "Brand (Z-A)":
+                    sortParam = "BRAND_DESC";
+                    break;
+                default:
+                    sortParam = "NAME_ASC";
+                    break;
+            }
+            sorterController.sortWardrobe(sortParam);
+        }
+    }
+
+    private void handleFilterButton() {
+        final List<String> categories = getCategories();
+        final List<String> conditions = getConditions();
+
+        final FilterPanel filterPanel = new FilterPanel((name, category, purchaseMonths, condition, tag) -> {
+            filtererController.filterWardrobe(category, condition, name, purchaseMonths, tag);
+        }, categories, conditions);
+
+        JOptionPane.showOptionDialog(
+            WardrobeOverviewView.this,
+            filterPanel,
+            "Filter Wardrobe",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            new Object[]{},
+            null
+        );
+    }
+
+    @NotNull
+    private List<String> getCategories() {
+        final java.util.Set<String> uniqueCategories = new java.util.LinkedHashSet<>();
+        uniqueCategories.add("All Categories");
+        for (AbstractWear wear : wardrobeViewModel.getItems()) {
+            uniqueCategories.add(wear.getClass().getSimpleName());
+        }
+        final List<String> categories = new java.util.ArrayList<>(uniqueCategories);
+        return categories;
+    }
+
+    @NotNull
+    private List<String> getConditions() {
+        final java.util.Set<String> uniqueConditions = new java.util.LinkedHashSet<>();
+        uniqueConditions.add("All Conditions");
+        for (AbstractWear wear : wardrobeViewModel.getItems()) {
+            if (wear.getCondition() != null) {
+                uniqueConditions.add(wear.getCondition().name());
+            }
+        }
+        return new java.util.ArrayList<>(uniqueConditions);
     }
 
     private void addCard(AbstractWear wear) {
