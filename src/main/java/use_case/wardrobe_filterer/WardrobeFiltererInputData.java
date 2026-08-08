@@ -1,17 +1,17 @@
-package interface_adapter.wardrobe_filterer;
+package use_case.wardrobe_filterer;
 
-public class WardrobeFilteringModel {
+public class WardrobeFiltererInputData {
     private final String category;
     private final String condition;
     private final String name;
     private final int purchaseMonth;
     private final String tag;
 
-    public WardrobeFilteringModel(String category,
-                                  String condition,
-                                  String name,
-                                  int purchaseMonth,
-                                  String tag) {
+    public WardrobeFiltererInputData(String category,
+                                     String condition,
+                                     String name,
+                                     int purchaseMonth,
+                                     String tag) {
         this.category = category;
         this.condition = condition;
         this.name = name;

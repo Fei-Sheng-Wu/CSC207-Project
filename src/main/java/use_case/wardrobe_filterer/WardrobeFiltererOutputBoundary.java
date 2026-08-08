@@ -10,11 +10,4 @@ public interface WardrobeFiltererOutputBoundary {
      * @param outputData the output data
      */
     void prepareSuccessView(WardrobeFiltererOutputData outputData);
-
-    /**
-     * Prepares the failure view for the Wardrobe Reporter Use Case.
-     *
-     * @param message the explanation of the failure
-     */
-    void prepareFailView(String message);
 }
