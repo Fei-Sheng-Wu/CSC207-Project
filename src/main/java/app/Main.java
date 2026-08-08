@@ -27,10 +27,16 @@ import interface_adapter.settings_updater.SettingsUpdaterPresenter;
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_adder.WardrobeAdderController;
 import interface_adapter.wardrobe_adder.WardrobeAdderPresenter;
+import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerController;
+import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerPresenter;
+import interface_adapter.wardrobe_filterer.WardrobeFiltererController;
+import interface_adapter.wardrobe_filterer.WardrobeFiltererPresenter;
 import interface_adapter.wardrobe_remover.WardrobeRemoverController;
 import interface_adapter.wardrobe_remover.WardrobeRemoverPresenter;
 import interface_adapter.wardrobe_reporter.WardrobeReporterController;
 import interface_adapter.wardrobe_reporter.WardrobeReporterPresenter;
+import interface_adapter.wardrobe_sorter.WardrobeSorterController;
+import interface_adapter.wardrobe_sorter.WardrobeSorterPresenter;
 import interface_adapter.wardrobe_updater.WardrobeUpdaterController;
 import interface_adapter.wardrobe_updater.WardrobeUpdaterPresenter;
 import use_case.inspiration_curator.InspirationCuratorInputBoundary;
@@ -55,12 +61,21 @@ import use_case.wardrobe.WardrobeDataAccessInterface;
 import use_case.wardrobe_adder.WardrobeAdderInputBoundary;
 import use_case.wardrobe_adder.WardrobeAdderInteractor;
 import use_case.wardrobe_adder.WardrobeAdderOutputBoundary;
+import use_case.wardrobe_analyzer.WardrobeAnalyzerInputBoundary;
+import use_case.wardrobe_analyzer.WardrobeAnalyzerInteractor;
+import use_case.wardrobe_analyzer.WardrobeAnalyzerOutputBoundary;
+import use_case.wardrobe_filterer.WardrobeFiltererInputBoundary;
+import use_case.wardrobe_filterer.WardrobeFiltererInteractor;
+import use_case.wardrobe_filterer.WardrobeFiltererOutputBoundary;
 import use_case.wardrobe_remover.WardrobeRemoverInputBoundary;
 import use_case.wardrobe_remover.WardrobeRemoverInteractor;
 import use_case.wardrobe_remover.WardrobeRemoverOutputBoundary;
 import use_case.wardrobe_reporter.WardrobeReporterInputBoundary;
 import use_case.wardrobe_reporter.WardrobeReporterInteractor;
 import use_case.wardrobe_reporter.WardrobeReporterOutputBoundary;
+import use_case.wardrobe_sorter.WardrobeSorterInputBoundary;
+import use_case.wardrobe_sorter.WardrobeSorterInteractor;
+import use_case.wardrobe_sorter.WardrobeSorterOutputBoundary;
 import use_case.wardrobe_updater.WardrobeUpdaterInputBoundary;
 import use_case.wardrobe_updater.WardrobeUpdaterInteractor;
 import use_case.wardrobe_updater.WardrobeUpdaterOutputBoundary;
@@ -109,6 +124,18 @@ public class Main {
                 WardrobeViewModel.class
             )
             .registerImplementation(
+                WardrobeFiltererOutputBoundary.class, WardrobeFiltererPresenter.class,
+                WardrobeViewModel.class
+            )
+            .registerImplementation(
+                WardrobeSorterOutputBoundary.class, WardrobeSorterPresenter.class,
+                WardrobeViewModel.class
+            )
+            .registerImplementation(
+                WardrobeAnalyzerOutputBoundary.class, WardrobeAnalyzerPresenter.class,
+                WardrobeViewModel.class
+            )
+            .registerImplementation(
                 WardrobeAdderOutputBoundary.class, WardrobeAdderPresenter.class,
                 ItemViewModel.class
             )
@@ -141,6 +168,21 @@ public class Main {
                 WardrobeReporterInputBoundary.class, WardrobeReporterInteractor.class,
                 WardrobeDataAccessInterface.class,
                 WardrobeReporterOutputBoundary.class
+            )
+            .registerImplementation(
+                WardrobeFiltererInputBoundary.class, WardrobeFiltererInteractor.class,
+                WardrobeDataAccessInterface.class,
+                WardrobeFiltererOutputBoundary.class
+            )
+            .registerImplementation(
+                WardrobeSorterInputBoundary.class, WardrobeSorterInteractor.class,
+                WardrobeDataAccessInterface.class,
+                WardrobeSorterOutputBoundary.class
+            )
+            .registerImplementation(
+                WardrobeAnalyzerInputBoundary.class, WardrobeAnalyzerInteractor.class,
+                WardrobeDataAccessInterface.class,
+                WardrobeAnalyzerOutputBoundary.class
             )
             .registerImplementation(
                 WardrobeAdderInputBoundary.class, WardrobeAdderInteractor.class,
@@ -187,6 +229,9 @@ public class Main {
             )
             // Register the controllers.
             .registerSimple(WardrobeReporterController.class, WardrobeReporterInputBoundary.class)
+            .registerSimple(WardrobeFiltererController.class, WardrobeFiltererInputBoundary.class)
+            .registerSimple(WardrobeSorterController.class, WardrobeSorterInputBoundary.class)
+            .registerSimple(WardrobeAnalyzerController.class, WardrobeAnalyzerInputBoundary.class)
             .registerSimple(WardrobeAdderController.class, WardrobeAdderInputBoundary.class)
             .registerSimple(WardrobeUpdaterController.class, WardrobeUpdaterInputBoundary.class)
             .registerSimple(WardrobeRemoverController.class, WardrobeRemoverInputBoundary.class)
