@@ -3,6 +3,7 @@ package interface_adapter.wardrobe;
 import java.util.ArrayList;
 import java.util.List;
 
+import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerState;
 import org.jetbrains.annotations.Nullable;
 
 import entity.AbstractWear;
@@ -15,10 +16,12 @@ public class WardrobeViewModel extends AbstractViewModel {
     public static final String PROPERTY_ERROR = "error";
     public static final String PROPERTY_ITEMS = "items";
     public static final String PROPERTY_ITEMS_OLD = "itemsOld";
+    public static final String PROPERTY_ANALYZER_STATE = "analyzerState";
 
     private String error;
     private List<AbstractWear> items = new ArrayList<>();
     private List<AbstractWear> itemsOld = new ArrayList<>();
+    private WardrobeAnalyzerState analyzerState;
 
     /**
      * Returns the error.
@@ -76,5 +79,24 @@ public class WardrobeViewModel extends AbstractViewModel {
     public void setOldItems(List<AbstractWear> oldItems) {
         this.itemsOld = oldItems;
         firePropertyChange(PROPERTY_ITEMS_OLD, this.itemsOld);
+    }
+
+    /**
+     * Returns the analyzer state.
+     *
+     * @return the analyzer state
+     */
+    public WardrobeAnalyzerState getAnalyzerState() {
+        return analyzerState;
+    }
+
+    /**
+     * Sets the analyzer state and notifies listeners of the change.
+     *
+     * @param analyzerState the new analyzer state to set
+     */
+    public void setAnalyzerState(WardrobeAnalyzerState analyzerState) {
+        this.analyzerState = analyzerState;
+        firePropertyChange(PROPERTY_ANALYZER_STATE, this.analyzerState);
     }
 }
