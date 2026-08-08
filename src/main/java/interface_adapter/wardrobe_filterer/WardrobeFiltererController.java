@@ -1,6 +1,7 @@
 package interface_adapter.wardrobe_filterer;
 
 import use_case.wardrobe_filterer.WardrobeFiltererInputBoundary;
+import use_case.wardrobe_filterer.WardrobeFiltererInputData;
 
 /**
  * Controller for removing wardrobe items.
@@ -31,7 +32,7 @@ public class WardrobeFiltererController {
                                String name,
                                int purchaseDate,
                                String tag) {
-        final WardrobeFilteringModel filteringModel = new WardrobeFilteringModel(
+        final WardrobeFiltererInputData filteringModel = new WardrobeFiltererInputData(
             category,
             condition,
             name,

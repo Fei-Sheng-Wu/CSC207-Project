@@ -28,10 +28,10 @@ public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary
         final Wardrobe wardrobe = repository.fetchWardrobe();
         final List<AbstractWear> items = wardrobe.getItems();
 
-        if (items.isEmpty()) {
-            outputBoundary.prepareFailView("Your wardrobe is empty. Add some clothes to see statistics!");
-            return;
-        }
+//        if (items.isEmpty()) {
+//            outputBoundary.prepareFailView("Your wardrobe is empty. Add some clothes to see statistics!");
+//            return;
+//        }
 
         final Map<String, Integer> categoryCounts = new HashMap<>();
         final Map<String, Integer> conditionCounts = new HashMap<>();
@@ -75,7 +75,7 @@ public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary
             newestItemAge = 0;
         }
 
-        final double meanFondness = totalFondness / items.size();
+        final double meanFondness = items.isEmpty() ? 0.0 : (totalFondness / items.size());
 
         final WardrobeAnalyzerOutputData outputData = new WardrobeAnalyzerOutputData(
             items.size(),
