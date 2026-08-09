@@ -1,5 +1,7 @@
 package use_case.inspiration_curator;
 
+import entity.AbstractWear;
+
 /**
  * Represents the interactor for curating an inspiration feed.
  */
@@ -23,6 +25,20 @@ public class InspirationCuratorInteractor implements InspirationCuratorInputBoun
 
     @Override
     public void curate(InspirationCuratorInputData request) {
-        // @TODO
+        final AbstractWear wear = request.getWear();
+
+        String color = "";
+        if (wear.getColor() != null) {
+            color = wear.getColor().getDisplayName();
+        }
+
+        outputBoundary.prepareSuccessView(
+            new InspirationCuratorOutputData(repository.getOutfitIdeas(String.format(
+                "outfit inspirations with %s %s from %s",
+                color,
+                wear.getName(),
+                wear.getBrand()
+            )))
+        );
     }
 }

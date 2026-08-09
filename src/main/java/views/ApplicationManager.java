@@ -2,6 +2,7 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +19,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+
+import com.formdev.flatlaf.intellijthemes.FlatHighContrastIJTheme;
+import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
 
 /**
  * Represents an application manager.
@@ -26,6 +33,8 @@ import javax.swing.WindowConstants;
 public class ApplicationManager {
     private static final int WINDOW_WIDTH_MIN = 960;
     private static final int WINDOW_HEIGHT_MIN = 580;
+    private static final Color WINDOW_BACKGROUND_NORMAL = new Color(251, 251, 251);
+    private static final Color WINDOW_BACKGROUND_HIGH_CONTRAST = new Color(0, 0, 0);
 
     private final Map<Class<?>, Object> registry;
     private final List<Class<? extends AbstractView>> navigationsTop;
@@ -34,6 +43,8 @@ public class ApplicationManager {
     private final JFrame window;
     private final JPanel navigator;
     private final CardLayout navigatorLayout;
+
+    private boolean isHighContrast;
 
     /**
      * Constructs a new application.
@@ -52,7 +63,13 @@ public class ApplicationManager {
         this.navigationsBottom = navigationsBottom;
 
         this.window = new JFrame();
+        this.window.setLayout(new BorderLayout());
+        this.window.setMinimumSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
+        this.window.setSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
+        this.window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         this.navigatorLayout = new CardLayout();
+
         this.navigator = new JPanel(this.navigatorLayout);
         this.navigator.setOpaque(false);
     }
@@ -113,10 +130,40 @@ public class ApplicationManager {
         final AbstractView view = get(viewClass);
         if (!navigator.isAncestorOf(view)) {
             navigator.add(view, identifier);
+            SwingUtilities.updateComponentTreeUI(window);
         }
 
         navigatorLayout.show(navigator, identifier);
         window.setTitle(String.format("Suitable: Your Personal Outfit Advisor | %s", view.getTitle()));
+    }
+
+    /**
+     * Updates whether high contrast is preferred.
+     *
+     * @param isHighContrast whether high contrast is preferred
+     */
+    public void setIsHighContrast(boolean isHighContrast) {
+        final boolean isChanged = isHighContrast != this.isHighContrast;
+        this.isHighContrast = isHighContrast;
+
+        if (isChanged) {
+            applyHighContrast();
+        }
+    }
+
+    private void applyHighContrast() {
+        try {
+            if (isHighContrast) {
+                window.getContentPane().setBackground(WINDOW_BACKGROUND_HIGH_CONTRAST);
+                UIManager.setLookAndFeel(new FlatHighContrastIJTheme());
+            } else {
+                window.getContentPane().setBackground(WINDOW_BACKGROUND_NORMAL);
+                UIManager.setLookAndFeel(new FlatLightFlatIJTheme());
+            }
+            SwingUtilities.updateComponentTreeUI(window);
+        } catch (UnsupportedLookAndFeelException ex) {
+            throw new RuntimeException("The UI look cannot be updated.");
+        }
     }
 
     /**
@@ -126,8 +173,8 @@ public class ApplicationManager {
      */
     public JFrame buildWindow() {
         final JPanel navigations = new JPanel(new GridBagLayout());
+        navigations.setOpaque(false);
         navigations.setPreferredSize(new Dimension(AbstractView.SIZE_WIDTH_XXL, 0));
-        navigations.setBackground(AbstractView.COLOR_AREA);
         navigations.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AbstractView.COLOR_BORDER));
 
         final GridBagConstraints navigationsConstraints = new GridBagConstraints();
@@ -140,7 +187,6 @@ public class ApplicationManager {
         );
 
         final JLabel navigationsHeader = new JLabel("Navigations");
-        navigationsHeader.setForeground(AbstractView.COLOR_MUTED);
         navigations.add(navigationsHeader, navigationsConstraints);
         for (Class<? extends AbstractView> navigationClass : navigationsTop) {
             final JButton navigationsItem = new JButton(get(navigationClass).getTitle());
@@ -166,13 +212,11 @@ public class ApplicationManager {
             navigations.add(navigationsItem, navigationsConstraints);
         }
 
-        window.setLayout(new BorderLayout());
-        window.setMinimumSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
-        window.setSize(new Dimension(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN));
-        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.add(navigations, BorderLayout.LINE_START);
         window.add(navigator, BorderLayout.CENTER);
         window.pack();
+
+        applyHighContrast();
 
         return window;
     }

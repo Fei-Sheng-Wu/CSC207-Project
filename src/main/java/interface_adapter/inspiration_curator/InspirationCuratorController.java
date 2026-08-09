@@ -1,6 +1,8 @@
 package interface_adapter.inspiration_curator;
 
+import entity.AbstractWear;
 import use_case.inspiration_curator.InspirationCuratorInputBoundary;
+import use_case.inspiration_curator.InspirationCuratorInputData;
 
 /**
  * Controller for adding wardrobe items.
@@ -15,5 +17,14 @@ public class InspirationCuratorController {
      */
     public InspirationCuratorController(InspirationCuratorInputBoundary interactor) {
         this.interactor = interactor;
+    }
+
+    /**
+     * Curates inspiration.
+     *
+     * @param wear the clothing item
+     */
+    public void curate(AbstractWear wear) {
+        interactor.curate(new InspirationCuratorInputData(wear));
     }
 }

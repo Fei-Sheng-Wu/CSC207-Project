@@ -24,13 +24,13 @@ public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
         final List<AbstractWear> items = new ArrayList<>(wardrobe.getItems());
 
         switch (inputData.getSortBy()) {
-            case "NAME_ASC":
+            case NAME_ASC:
                 items.sort(Comparator.comparing(AbstractWear::getName, String.CASE_INSENSITIVE_ORDER));
                 break;
-            case "NAME_DESC":
+            case NAME_DESC:
                 items.sort(Comparator.comparing(AbstractWear::getName, String.CASE_INSENSITIVE_ORDER).reversed());
                 break;
-            case "BRAND_ASC":
+            case BRAND_ASC:
                 items.sort(Comparator.comparing(item -> {
                     final String brand = item.getBrand();
                     if (brand != null) {
@@ -39,7 +39,7 @@ public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
                     return "";
                 }, String.CASE_INSENSITIVE_ORDER));
                 break;
-            case "BRAND_DESC":
+            case BRAND_DESC:
                 items.sort(Comparator.comparing((AbstractWear item) -> {
                     final String brand = item.getBrand();
                     if (brand != null) {
@@ -48,7 +48,7 @@ public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
                     return "";
                 }, String.CASE_INSENSITIVE_ORDER).reversed());
                 break;
-            case "TYPE":
+            case TYPE:
                 items.sort(Comparator.comparing(item -> item.getClass().getSimpleName()));
                 break;
             default:

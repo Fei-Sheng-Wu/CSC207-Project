@@ -25,11 +25,13 @@ public class WardrobeReporterPresenter implements WardrobeReporterOutputBoundary
     public void prepareSuccessView(WardrobeReporterOutputData outputData) {
         viewModel.setItems(outputData.getWearsAll());
         viewModel.setOldItems(outputData.getWearsOld());
+        viewModel.setError(null);
     }
 
     @Override
     public void prepareFailView(String message) {
         viewModel.setItems(new ArrayList<>());
         viewModel.setOldItems(new ArrayList<>());
+        viewModel.setError(message);
     }
 }

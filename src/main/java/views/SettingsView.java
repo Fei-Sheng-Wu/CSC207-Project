@@ -5,13 +5,12 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -24,12 +23,14 @@ import interface_adapter.settings_updater.SettingsUpdaterController;
  * Represents the settings view.
  */
 public class SettingsView extends AbstractView implements PropertyChangeListener {
+    private final ApplicationManager manager;
     private final SettingsViewModel viewModel;
     private final SettingsRetrieverController retrieverController;
     private final SettingsUpdaterController updaterController;
 
     private final JTextField fieldLocationCity = new JTextField();
     private final JTextField fieldLocationCountryCode = new JTextField();
+    private final JCheckBox checkHighContrast = new JCheckBox("Enable high-contrast UI");
 
     /**
      * Constructs a new settings view.
@@ -40,6 +41,7 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         super(manager);
 
         // Retrieve the shared resources.
+        this.manager = manager;
         this.viewModel = manager.get(SettingsViewModel.class);
         this.viewModel.addPropertyChangeListener(this);
         this.retrieverController = manager.get(SettingsRetrieverController.class);
@@ -53,13 +55,19 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updaterController.update(fieldLocationCity.getText(), fieldLocationCountryCode.getText());
+                updaterController.update(
+                    checkHighContrast.isSelected(),
+                    fieldLocationCity.getText(),
+                    fieldLocationCountryCode.getText()
+                );
+                manager.setIsHighContrast(checkHighContrast.isSelected());
             }
         });
 
         final Component[] components = {
             new JLabel("Your city:"), this.fieldLocationCity,
             new JLabel("Your 2-digit country code:"), this.fieldLocationCountryCode,
+            Box.createHorizontalGlue(), this.checkHighContrast,
             Box.createHorizontalGlue(), save,
         };
         final JPanel fields = new JPanel(new GridLayout(
@@ -71,12 +79,7 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
         }
         add(fields);
 
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                retrieverController.retrieve();
-            }
-        });
+        retrieverController.retrieve();
     }
 
     @Override
@@ -87,6 +90,10 @@ public class SettingsView extends AbstractView implements PropertyChangeListener
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
+            case SettingsViewModel.PROPERTY_HIGH_CONTRAST:
+                checkHighContrast.setSelected(viewModel.isHighContrast());
+                manager.setIsHighContrast(viewModel.isHighContrast());
+                break;
             case SettingsViewModel.PROPERTY_LOCATION_CITY:
                 fieldLocationCity.setText(viewModel.getLocationCity());
                 break;

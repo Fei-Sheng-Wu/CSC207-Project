@@ -5,6 +5,20 @@ package use_case.settings;
  */
 public interface SettingsDataAccessInterface {
     /**
+     * Returns whether high contrast is preferred.
+     *
+     * @return whether high contrast is preferred
+     */
+    boolean isHighContrast();
+
+    /**
+     * Updates whether high contrast is preferred.
+     *
+     * @param isHighContrast whether high contrast is preferred
+     */
+    void setIsHighContrast(boolean isHighContrast);
+
+    /**
      * Returns the city of the current set location.
      *
      * @return the city of the current set location

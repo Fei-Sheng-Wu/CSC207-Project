@@ -13,6 +13,8 @@ public interface InspirationCuratorOutputBoundary {
 
     /**
      * Outputs a failed response.
+     *
+     * @param error the error of the response
      */
-    void prepareFailView();
+    void prepareFailView(String error);
 }

@@ -25,6 +25,7 @@ public class SettingsUpdaterInteractor implements SettingsUpdaterInputBoundary {
 
     @Override
     public void update(SettingsUpdaterInputData request) {
+        repository.setIsHighContrast(request.getSettings().isHighContrast());
         repository.setLocationCity(request.getSettings().getLocationCity());
         repository.setLocationCountryCode(request.getSettings().getLocationCountryCode());
         outputBoundary.prepareSuccessView();

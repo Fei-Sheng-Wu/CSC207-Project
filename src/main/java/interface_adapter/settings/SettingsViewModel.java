@@ -6,11 +6,32 @@ import interface_adapter.AbstractViewModel;
  * Represents the settings view model.
  */
 public class SettingsViewModel extends AbstractViewModel {
+    public static final String PROPERTY_HIGH_CONTRAST = "highContrast";
     public static final String PROPERTY_LOCATION_CITY = "locationCity";
     public static final String PROPERTY_LOCATION_COUNTRY_CODE = "locationCountryCode";
 
+    private boolean isHighContrast;
     private String locationCity = "";
     private String locationCountryCode = "";
+
+    /**
+     * Returns whether high contrast is preferred.
+     *
+     * @return whether high contrast is preferred
+     */
+    public boolean isHighContrast() {
+        return isHighContrast;
+    }
+
+    /**
+     * Updates whether high contrast is preferred.
+     *
+     * @param isHighContrast whether high contrast is preferred
+     */
+    public void setIsHighContrast(boolean isHighContrast) {
+        this.isHighContrast = isHighContrast;
+        firePropertyChange(PROPERTY_HIGH_CONTRAST, this.isHighContrast);
+    }
 
     /**
      * Returns the city of the location.

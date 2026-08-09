@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import entity.AbstractWear;
 import entity.InnerTopwear;
+import entity.WardrobeSort;
 import entity.WearFactory;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.wardrobe.WardrobeViewModel;
@@ -110,7 +111,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         right.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
         header.add(right, BorderLayout.LINE_END);
 
-        final JButton report = new JButton("Report");
+        final JButton report = new JButton("Report Statistics");
         report.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -151,11 +152,14 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     }
 
     private void handleSortByButton() {
-        final String[] options = {"Name (A-Z)", "Name (Z-A)", "Brand (A-Z)", "Brand (Z-A)", "Type"};
+        final String[] options = new String[WardrobeSort.values().length];
+        for (int i = 0; i < options.length; i++) {
+            options[i] = WardrobeSort.values()[i].getDisplayName();
+        }
 
         final String choice = (String) JOptionPane.showInputDialog(
             WardrobeOverviewView.this,
-            "Choose sorting criteria:",
+            "Please select sorting criteria:",
             "Sort Wardrobe",
             JOptionPane.PLAIN_MESSAGE,
             null,
@@ -164,28 +168,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         );
 
         if (choice != null) {
-            final String sortParam;
-            switch (choice) {
-                case "Type":
-                    sortParam = "TYPE";
-                    break;
-                case "Name (A-Z)":
-                    sortParam = "NAME_ASC";
-                    break;
-                case "Name (Z-A)":
-                    sortParam = "NAME_DESC";
-                    break;
-                case "Brand (A-Z)":
-                    sortParam = "BRAND_ASC";
-                    break;
-                case "Brand (Z-A)":
-                    sortParam = "BRAND_DESC";
-                    break;
-                default:
-                    sortParam = "NAME_ASC";
-                    break;
-            }
-            sorterController.sortWardrobe(sortParam);
+            sorterController.sortWardrobe(choice);
         }
     }
 
@@ -287,8 +270,8 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
             case WardrobeViewModel.PROPERTY_ERROR:
-                if (e.getNewValue() != null && isVisible()) {
-                    JOptionPane.showMessageDialog(this, e.getNewValue());
+                if (wardrobeViewModel.getError() != null && isVisible()) {
+                    JOptionPane.showMessageDialog(this, wardrobeViewModel.getError());
                 }
                 break;
             case WardrobeViewModel.PROPERTY_ITEMS:

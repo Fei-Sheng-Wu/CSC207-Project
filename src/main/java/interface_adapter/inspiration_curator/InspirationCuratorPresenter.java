@@ -1,5 +1,7 @@
 package interface_adapter.inspiration_curator;
 
+import java.util.ArrayList;
+
 import interface_adapter.inspiration.InspirationViewModel;
 import use_case.inspiration_curator.InspirationCuratorOutputBoundary;
 import use_case.inspiration_curator.InspirationCuratorOutputData;
@@ -21,11 +23,13 @@ public class InspirationCuratorPresenter implements InspirationCuratorOutputBoun
 
     @Override
     public void prepareSuccessView(InspirationCuratorOutputData output) {
-        // @TODO
+        viewModel.setIdeas(output.getOutfitIdeas());
+        viewModel.setError(null);
     }
 
     @Override
-    public void prepareFailView() {
-        // @TODO
+    public void prepareFailView(String error) {
+        viewModel.setIdeas(new ArrayList<>());
+        viewModel.setError(error);
     }
 }

@@ -27,6 +27,7 @@ public class SettingsRetrieverInteractor implements SettingsRetrieverInputBounda
     @Override
     public void retrieve() {
         final Settings settings = new Settings();
+        settings.setIsHighContrast(repository.isHighContrast());
         settings.setLocationCity(repository.getLocationCityOrDefault());
         settings.setLocationCountryCode(repository.getLocationCountryCodeOrDefault());
 

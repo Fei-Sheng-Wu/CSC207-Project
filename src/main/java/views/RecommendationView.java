@@ -23,8 +23,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import entity.AbstractWear;
+import entity.Accessory;
+import entity.Bottomwear;
+import entity.Footwear;
+import entity.Headwear;
+import entity.InnerTopwear;
+import entity.OuterTopwear;
 import entity.Outfit;
 import entity.WearColor;
+import entity.WearFactory;
 import entity.WearStyle;
 import interface_adapter.recommendation.RecommendationViewModel;
 import interface_adapter.recommendation_context.ContextBasedRecommendationController;
@@ -46,6 +53,9 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     private static final String OUTPUT_FAILURE = "Something went wrong while looking for an outfit!";
     private static final String[] SLOT_LABELS = {
         "Inner Topwear", "Outer Topwear", "Bottomwear", "Footwear", "Headwear", "Accessories",
+    };
+    private static final Class<?>[] SLOT_TYPES = {
+        InnerTopwear.class, OuterTopwear.class, Bottomwear.class, Footwear.class, Headwear.class, Accessory.class,
     };
 
     private final RecommendationViewModel viewModel;
@@ -97,7 +107,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         title.setFont(FONT_TITLE);
         top.add(title);
         final JLabel subtitle = new JLabel("Let Suitable curate a perfect outfit for you!");
-        subtitle.setForeground(COLOR_MUTED);
         subtitle.setBorder(BorderFactory.createEmptyBorder(SIZE_SPACING_SM, 0, SIZE_SPACING_MD, 0));
         top.add(subtitle);
 
@@ -147,8 +156,8 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
             }
         });
         left.add(choiceMode);
+        fieldTags.setPreferredSize(new Dimension(SIZE_WIDTH_XL, choiceMode.getPreferredSize().height));
         fieldTags.setVisible(false);
-        fieldTags.setPreferredSize(new Dimension(SIZE_WIDTH_XL, fieldTags.getPreferredSize().height));
         left.add(fieldTags);
         bottom.add(left, BorderLayout.CENTER);
 
@@ -185,9 +194,14 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
             }
             slots.add(slot);
 
-            final JLabel name = new JLabel(SLOT_LABELS[index]);
-            name.setForeground(COLOR_MUTED);
-            slot.add(name);
+            final JPanel left = new JPanel(new BorderLayout(SIZE_SPACING_XS, 0));
+            left.setOpaque(false);
+            slot.add(left);
+
+            final JLabel icon = new JLabel(WearFactory.getIcon(SLOT_TYPES[index]));
+            icon.setFont(FONT_EMOJI);
+            left.add(icon, BorderLayout.LINE_START);
+            left.add(new JLabel(SLOT_LABELS[index]), BorderLayout.CENTER);
 
             final JLabel value = new JLabel(SLOT_EMPTY);
             slotValues[index] = value;
@@ -217,9 +231,10 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         area.setWrapStyleWord(true);
         area.setEditable(false);
         area.setFocusable(false);
-        area.setForeground(COLOR_MUTED);
-        area.setBackground(COLOR_AREA);
-        area.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
+        area.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDER, 1),
+            BorderFactory.createEmptyBorder(SIZE_SPACING_XS, SIZE_SPACING_XS, SIZE_SPACING_XS, SIZE_SPACING_XS)
+        ));
 
         return area;
     }
@@ -324,7 +339,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         final List<String> tags = List.of(fieldTags.getText().split(","));
 
         trigger.setEnabled(false);
-        reason.setForeground(COLOR_MUTED);
         reason.setText(OUTPUT_WORKING);
 
         switch (selectedMode()) {
@@ -373,7 +387,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         switch (propertyName) {
             case RecommendationViewModel.PROPERTY_RECOMMENDATION:
                 showOutfit(viewModel.getOutfit());
-                reason.setForeground(COLOR_MUTED);
                 reason.setText(viewModel.getReason());
                 break;
             case RecommendationViewModel.PROPERTY_ERROR_MESSAGE:
