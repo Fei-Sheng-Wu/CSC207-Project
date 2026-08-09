@@ -25,6 +25,6 @@ public class HttpEventDataAccessObjectTest {
     public void testEvent() {
         final List<Event> result = dataAccess.getEvents("CA", LocalDate.of(2026, 7, 1));
         assertEquals(1, result.size());
-        assertEquals("Canada Day", result.get(1).getName());
+        assertEquals("Canada Day", result.get(0).getName());
     }
 }

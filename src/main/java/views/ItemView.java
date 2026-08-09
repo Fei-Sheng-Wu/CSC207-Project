@@ -32,6 +32,7 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearFactory;
 import entity.WearStyle;
+import interface_adapter.inspiration.InspirationViewModel;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.wardrobe_remover.WardrobeRemoverController;
 import interface_adapter.wardrobe_updater.WardrobeUpdaterController;
@@ -46,7 +47,8 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
     };
 
     private final ApplicationManager manager;
-    private final ItemViewModel viewModel;
+    private final ItemViewModel itemViewModel;
+    private final InspirationViewModel inspirationViewModel;
     private final WardrobeUpdaterController updaterController;
     private final WardrobeRemoverController removerController;
 
@@ -75,8 +77,9 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
         // Retrieve the shared resources.
         this.manager = manager;
-        this.viewModel = manager.get(ItemViewModel.class);
-        this.viewModel.addPropertyChangeListener(this);
+        this.itemViewModel = manager.get(ItemViewModel.class);
+        this.itemViewModel.addPropertyChangeListener(this);
+        this.inspirationViewModel = manager.get(InspirationViewModel.class);
         this.updaterController = manager.get(WardrobeUpdaterController.class);
         this.removerController = manager.get(WardrobeRemoverController.class);
 
@@ -148,6 +151,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
         inspire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                inspirationViewModel.setCurrentItem(item);
                 manager.showView(InspirationView.class);
             }
         });
@@ -260,12 +264,12 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent e) {
         switch (e.getPropertyName()) {
             case ItemViewModel.PROPERTY_ERROR:
-                if (viewModel.getError() != null && isVisible()) {
-                    JOptionPane.showMessageDialog(this, viewModel.getError());
+                if (itemViewModel.getError() != null && isVisible()) {
+                    JOptionPane.showMessageDialog(this, itemViewModel.getError());
                 }
                 break;
             case ItemViewModel.PROPERTY_CURRENT_ITEM:
-                item = viewModel.getCurrentItem();
+                item = itemViewModel.getCurrentItem();
                 if (item == null) {
                     break;
                 }

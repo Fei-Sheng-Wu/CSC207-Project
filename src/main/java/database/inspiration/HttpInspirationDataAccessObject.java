@@ -39,7 +39,7 @@ public class HttpInspirationDataAccessObject
 
     @Override
     public List<OutfitIdea> getOutfitIdeas(String query) {
-        try (Response response = fetch(String.format("/search?query=%s", query))) {
+        try (Response response = fetch(String.format("pinterest/search?query=%s", query))) {
             if (CODE_OK != response.code() || response.body() == null) {
                 throw new RuntimeException(String.format("The SocialScrawl API has failed (%d).", response.code()));
             }
