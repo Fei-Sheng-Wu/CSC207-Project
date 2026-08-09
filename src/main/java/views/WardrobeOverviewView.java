@@ -152,9 +152,10 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     }
 
     private void handleSortByButton() {
-        final String[] options = new String[WardrobeSort.values().length];
+        final WardrobeSort[] options = WardrobeSort.values();
+        final String[] displayNames = new String[options.length];
         for (int i = 0; i < options.length; i++) {
-            options[i] = WardrobeSort.values()[i].getDisplayName();
+            displayNames[i] = options[i].getDisplayName();
         }
 
         final String choice = (String) JOptionPane.showInputDialog(
@@ -163,12 +164,18 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             "Sort Wardrobe",
             JOptionPane.PLAIN_MESSAGE,
             null,
-            options,
-            options[0]
+            displayNames,
+            displayNames[0]
         );
 
         if (choice != null) {
-            sorterController.sortWardrobe(choice);
+            for (WardrobeSort sortOption : options) {
+                if (sortOption.getDisplayName().equals(choice)) {
+                    sorterController.sortWardrobe(sortOption.name());
+                    break;
+                }
+            }
+//            sorterController.sortWardrobe(choice);
         }
     }
 
