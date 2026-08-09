@@ -105,7 +105,12 @@ public class InspirationView extends AbstractView implements PropertyChangeListe
             BorderFactory.createEmptyBorder(SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM)
         ));
 
-        final JTextArea label = new JTextArea(idea.getDescription());
+        String content = idea.getDescription();
+        if (content.isBlank()) {
+            content = String.format("(%s)", idea.getUrl());
+        }
+
+        final JTextArea label = new JTextArea(content);
         label.setOpaque(false);
         label.setLineWrap(true);
         label.setWrapStyleWord(true);
