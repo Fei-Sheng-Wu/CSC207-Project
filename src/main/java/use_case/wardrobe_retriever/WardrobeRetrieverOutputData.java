@@ -1,4 +1,4 @@
-package use_case.wardrobe_reporter;
+package use_case.wardrobe_retriever;
 
 import java.util.List;
 
@@ -7,22 +7,18 @@ import entity.AbstractWear;
 /**
  * Output Data for the Wardrobe Reporter Use Case.
  */
-public class WardrobeReporterOutputData {
+public class WardrobeRetrieverOutputData {
     private final List<AbstractWear> wearsAll;
-    private final List<AbstractWear> wearsOld;
 
     /**
      * Constructs a new wardrobe reporter output data.
      *
      * @param wearsAll a list of all clothing items in the wardrobe.
-     * @param wearsOld a list of clothing items categorized as old.
      */
-    public WardrobeReporterOutputData(
-        List<AbstractWear> wearsAll,
-        List<AbstractWear> wearsOld
+    public WardrobeRetrieverOutputData(
+        List<AbstractWear> wearsAll
     ) {
         this.wearsAll = wearsAll;
-        this.wearsOld = wearsOld;
     }
 
     /**
@@ -32,14 +28,5 @@ public class WardrobeReporterOutputData {
      */
     public List<AbstractWear> getWearsAll() {
         return wearsAll;
-    }
-
-    /**
-     * Returns the list of old clothing items.
-     *
-     * @return a list of items categorized as old
-     */
-    public List<AbstractWear> getWearsOld() {
-        return wearsOld;
     }
 }
