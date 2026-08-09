@@ -169,13 +169,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         );
 
         if (choice != null) {
-            for (WardrobeSort sortOption : options) {
-                if (sortOption.getDisplayName().equals(choice)) {
-                    sorterController.sortWardrobe(sortOption.name());
-                    break;
-                }
-            }
-//            sorterController.sortWardrobe(choice);
+            sorterController.sortWardrobe(choice);
         }
     }
 

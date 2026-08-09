@@ -4,6 +4,7 @@ package entity;
  * Represents the sorting criteria of wardrobe.
  */
 public enum WardrobeSort {
+    NONE("None"),
     TYPE("Type"),
     NAME_ASC("Name (A-Z)"),
     NAME_DESC("Name (Z-A)"),
