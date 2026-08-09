@@ -1,5 +1,6 @@
 package use_case.settings_retriever;
 
+import entity.Settings;
 import use_case.settings.SettingsDataAccessInterface;
 
 /**
@@ -25,9 +26,10 @@ public class SettingsRetrieverInteractor implements SettingsRetrieverInputBounda
 
     @Override
     public void retrieve() {
-        outputBoundary.prepareSuccessView(new SettingsRetrieverOutputData(
-            repository.getLocationCityOrDefault(),
-            repository.getLocationCountryCodeOrDefault()
-        ));
+        final Settings settings = new Settings();
+        settings.setLocationCity(repository.getLocationCityOrDefault());
+        settings.setLocationCountryCode(repository.getLocationCountryCodeOrDefault());
+
+        outputBoundary.prepareSuccessView(settings);
     }
 }

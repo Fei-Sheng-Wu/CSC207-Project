@@ -4,5 +4,9 @@
 
 out/
 target/
+node_modules/
 
 *.iml
+
+package.json
+package-lock.json

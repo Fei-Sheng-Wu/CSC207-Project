@@ -1,5 +1,7 @@
 package use_case.settings_retriever;
 
+import entity.Settings;
+
 /**
  * Defines the output boundary for retrieving the settings.
  */
@@ -7,9 +9,9 @@ public interface SettingsRetrieverOutputBoundary {
     /**
      * Outputs a successful response.
      *
-     * @param output the output data
+     * @param settings the settings
      */
-    void prepareSuccessView(SettingsRetrieverOutputData output);
+    void prepareSuccessView(Settings settings);
 
     /**
      * Outputs a failed response.

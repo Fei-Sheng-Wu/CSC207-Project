@@ -37,7 +37,7 @@ import use_case.wardrobe.WardrobeDataAccessInterface;
  * <p>Every repository the interactor depends on is stubbed here, so the whole use case runs with
  * no network access, no API credentials, and no user interface.
  */
-class ContextBasedRecommendationInteractorTest {
+public class ContextBasedRecommendationInteractorTest {
     private static final UUID RED_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID BLUE_SHIRT_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
 

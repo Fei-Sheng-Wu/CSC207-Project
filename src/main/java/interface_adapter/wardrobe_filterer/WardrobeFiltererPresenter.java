@@ -4,8 +4,6 @@ import interface_adapter.wardrobe.WardrobeViewModel;
 import use_case.wardrobe_filterer.WardrobeFiltererOutputBoundary;
 import use_case.wardrobe_filterer.WardrobeFiltererOutputData;
 
-import java.util.ArrayList;
-
 public class WardrobeFiltererPresenter implements WardrobeFiltererOutputBoundary {
     private final WardrobeViewModel viewModel;
 

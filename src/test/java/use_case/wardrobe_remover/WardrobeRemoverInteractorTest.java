@@ -1,18 +1,19 @@
 package use_case.wardrobe_remover;
 
-import entity.AbstractWear;
-import entity.InnerTopwear;
-import entity.Wardrobe;
-import org.junit.jupiter.api.Test;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import entity.AbstractWear;
+import entity.InnerTopwear;
+import entity.Wardrobe;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**
  * Tests for the wardrobe remover use case.
@@ -78,7 +79,7 @@ class WardrobeRemoverInteractorTest {
         }
 
         @Override
-        public void saveWardrobe(Wardrobe wardrobe) {
+        public void saveWardrobe(Wardrobe newWardrobe) {
             saveCalled = true;
         }
     }

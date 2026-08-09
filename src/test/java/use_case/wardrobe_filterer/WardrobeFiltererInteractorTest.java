@@ -1,31 +1,31 @@
 package use_case.wardrobe_filterer;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import entity.WearCondition;
-import entity.WearFactory;
-import org.junit.jupiter.api.Test;
-import use_case.data_access.MockWardrobeRepository;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
+import entity.AbstractWear;
+import entity.Wardrobe;
+import entity.WearCondition;
+import entity.WearFactory;
+import use_case.data_access.MockWardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeFiltererInteractorTest {
 
     private void wardrobeFiltererTestHelper(List<AbstractWear> inputItems,
                                             WardrobeFiltererInputData filteringCriteria,
                                             String... expectedNames) {
-        WardrobeDataAccessInterface repository = new MockWardrobeRepository(
+        final WardrobeDataAccessInterface repository = new MockWardrobeRepository(
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(repository, outputData -> {
-            List<AbstractWear> filteredItems = outputData.getFilteredItems();
+        final WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(repository, outputData -> {
+            final List<AbstractWear> filteredItems = outputData.getFilteredItems();
 
             assertEquals(expectedNames.length, filteredItems.size());
             for (int i = 0; i < expectedNames.length; i++) {
@@ -38,7 +38,7 @@ public class WardrobeFiltererInteractorTest {
 
     @Test
     void filterEmptyWardrobeTest() {
-        WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
+        final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
             "innertopwear", null, null, 0, null
         );
         wardrobeFiltererTestHelper(List.of(), filteringCriteria);
@@ -51,7 +51,7 @@ public class WardrobeFiltererInteractorTest {
         item1.setCondition(WearCondition.NEW);
         item1.setTags(List.of("running"));
 
-        WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
+        final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
             "innertopwear", null, null, 0, null
         );
 
@@ -64,7 +64,7 @@ public class WardrobeFiltererInteractorTest {
         item1.setName("Blue pants");
         item1.setBrand("Adidas");
 
-        WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
+        final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
             "innertopwear", null, null, 0, null
         );
 
@@ -85,12 +85,12 @@ public class WardrobeFiltererInteractorTest {
         item3.setBrand("PUMA");
 
         // Filter for "innertopwear" should match item1 and item2, but exclude item3
-        WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
+        final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
             "innertopwear", null, null, 0, null
         );
 
         wardrobeFiltererTestHelper(List.of(item1, item2, item3), filteringCriteria,
             "Nike Jacket",
-                            "Adidas T-Shirt");
+            "Adidas T-Shirt");
     }
 }

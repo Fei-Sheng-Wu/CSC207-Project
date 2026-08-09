@@ -1,12 +1,12 @@
 package use_case.wardrobe_filterer;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import use_case.wardrobe.WardrobeDataAccessInterface;
-
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeFiltererInteractor implements WardrobeFiltererInputBoundary {
     private final WardrobeDataAccessInterface repository;

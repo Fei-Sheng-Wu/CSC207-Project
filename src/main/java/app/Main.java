@@ -6,11 +6,11 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import data_access.event.HttpEventDataAccessObject;
-import data_access.inspiration.HttpInspirationDataAccessObject;
-import data_access.settings.LocalSettingsDataAccessObject;
-import data_access.wardrobe.JsonWardrobeDataAccessObject;
-import data_access.weather.HttpWeatherDataAccessObject;
+import database.event.HttpEventDataAccessObject;
+import database.inspiration.HttpInspirationDataAccessObject;
+import database.settings.LocalSettingsDataAccessObject;
+import database.wardrobe.JsonWardrobeDataAccessObject;
+import database.weather.HttpWeatherDataAccessObject;
 import interface_adapter.inspiration.InspirationViewModel;
 import interface_adapter.inspiration_curator.InspirationCuratorController;
 import interface_adapter.inspiration_curator.InspirationCuratorPresenter;
@@ -79,12 +79,12 @@ import use_case.wardrobe_sorter.WardrobeSorterOutputBoundary;
 import use_case.wardrobe_updater.WardrobeUpdaterInputBoundary;
 import use_case.wardrobe_updater.WardrobeUpdaterInteractor;
 import use_case.wardrobe_updater.WardrobeUpdaterOutputBoundary;
-import view.InspirationView;
-import view.ItemView;
-import view.RecommendationView;
-import view.SettingsView;
-import view.WardrobeDetailsView;
-import view.WardrobeOverviewView;
+import views.InspirationView;
+import views.ItemView;
+import views.RecommendationView;
+import views.SettingsView;
+import views.WardrobeDetailsView;
+import views.WardrobeOverviewView;
 
 public class Main {
     /**
@@ -98,9 +98,40 @@ public class Main {
     }
 
     private static void start() {
-        final JFrame application = new ApplicationBuilder()
-            .registerSimple(Random.class)
-            // Register the data access objects.
+        final ApplicationBuilder builder = new ApplicationBuilder()
+            .registerSimple(Random.class);
+
+        // Register the data access objects.
+        registerDataAccess(builder);
+        // Register the view models.
+        registerViewModels(builder);
+        // Register the output boundaries.
+        registerOutputBoundaries(builder);
+        // Register the input boundaries.
+        registerInputBoundaries(builder);
+        // Register the controllers.
+        registerControllers(builder);
+
+        final JFrame application = builder
+            // Register the views.
+            .registerView(WardrobeOverviewView.class)
+            .registerView(WardrobeDetailsView.class)
+            .registerView(ItemView.class)
+            .registerView(InspirationView.class)
+            .registerView(RecommendationView.class)
+            .registerView(SettingsView.class)
+            // Configure the master layout.
+            .setTopNavigations(List.of(WardrobeOverviewView.class, RecommendationView.class))
+            .setBottomNavigations(List.of(SettingsView.class))
+            .setInitialView(WardrobeOverviewView.class)
+            // Build the application.
+            .build();
+
+        application.setVisible(true);
+    }
+
+    private static void registerDataAccess(ApplicationBuilder builder) {
+        builder
             .registerImplementation(
                 WardrobeDataAccessInterface.class, JsonWardrobeDataAccessObject.class,
                 "wardrobe.json"
@@ -111,14 +142,20 @@ public class Main {
             .registerImplementation(
                 SettingsDataAccessInterface.class, LocalSettingsDataAccessObject.class,
                 "user.properties"
-            )
-            // Register the view models.
+            );
+    }
+
+    private static void registerViewModels(ApplicationBuilder builder) {
+        builder
             .registerSimple(WardrobeViewModel.class)
             .registerSimple(ItemViewModel.class)
             .registerSimple(InspirationViewModel.class)
             .registerSimple(RecommendationViewModel.class)
-            .registerSimple(SettingsViewModel.class)
-            // Register the output boundaries.
+            .registerSimple(SettingsViewModel.class);
+    }
+
+    private static void registerOutputBoundaries(ApplicationBuilder builder) {
+        builder
             .registerImplementation(
                 WardrobeReporterOutputBoundary.class, WardrobeReporterPresenter.class,
                 WardrobeViewModel.class
@@ -162,8 +199,11 @@ public class Main {
             .registerImplementation(
                 SettingsUpdaterOutputBoundary.class, SettingsUpdaterPresenter.class,
                 SettingsViewModel.class
-            )
-            // Register the input boundaries.
+            );
+    }
+
+    private static void registerInputBoundaries(ApplicationBuilder builder) {
+        builder
             .registerImplementation(
                 WardrobeReporterInputBoundary.class, WardrobeReporterInteractor.class,
                 WardrobeDataAccessInterface.class,
@@ -226,8 +266,11 @@ public class Main {
                 SettingsUpdaterInputBoundary.class, SettingsUpdaterInteractor.class,
                 SettingsDataAccessInterface.class,
                 SettingsUpdaterOutputBoundary.class
-            )
-            // Register the controllers.
+            );
+    }
+
+    private static void registerControllers(ApplicationBuilder builder) {
+        builder
             .registerSimple(WardrobeReporterController.class, WardrobeReporterInputBoundary.class)
             .registerSimple(WardrobeFiltererController.class, WardrobeFiltererInputBoundary.class)
             .registerSimple(WardrobeSorterController.class, WardrobeSorterInputBoundary.class)
@@ -247,21 +290,6 @@ public class Main {
                 Random.class
             )
             .registerSimple(SettingsRetrieverController.class, SettingsRetrieverInputBoundary.class)
-            .registerSimple(SettingsUpdaterController.class, SettingsUpdaterInputBoundary.class)
-            // Register the views.
-            .registerView(WardrobeOverviewView.class)
-            .registerView(WardrobeDetailsView.class)
-            .registerView(ItemView.class)
-            .registerView(InspirationView.class)
-            .registerView(RecommendationView.class)
-            .registerView(SettingsView.class)
-            // Configure the master layout.
-            .setTopNavigations(List.of(WardrobeOverviewView.class, RecommendationView.class))
-            .setBottomNavigations(List.of(SettingsView.class))
-            .setInitialView(WardrobeOverviewView.class)
-            // Build the application.
-            .build();
-
-        application.setVisible(true);
+            .registerSimple(SettingsUpdaterController.class, SettingsUpdaterInputBoundary.class);
     }
 }

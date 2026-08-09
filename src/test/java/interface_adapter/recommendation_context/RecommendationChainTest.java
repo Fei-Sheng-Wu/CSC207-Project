@@ -26,9 +26,9 @@ import entity.Weather;
 import interface_adapter.recommendation.RecommendationPresenter;
 import interface_adapter.recommendation.RecommendationViewModel;
 import use_case.recommendation_context.ContextBasedRecommendationInteractor;
-import use_case.settings.SettingsDataAccessInterface;
 import use_case.recommendation_context.EventDataAccessInterface;
 import use_case.recommendation_context.WeatherDataAccessInterface;
+import use_case.settings.SettingsDataAccessInterface;
 import use_case.wardrobe.WardrobeDataAccessInterface;
 
 /**

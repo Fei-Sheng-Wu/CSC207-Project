@@ -1,8 +1,8 @@
 package use_case.wardrobe_filterer;
 
-import entity.AbstractWear;
-
 import java.util.List;
+
+import entity.AbstractWear;
 
 /**
  * Represents the output data for filtering the items in the wardrobe.

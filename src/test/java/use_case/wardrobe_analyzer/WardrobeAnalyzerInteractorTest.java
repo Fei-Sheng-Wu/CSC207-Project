@@ -1,19 +1,20 @@
 package use_case.wardrobe_analyzer;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import entity.WearCondition;
-import entity.WearFactory;
-import org.junit.jupiter.api.Test;
-import use_case.data_access.MockWardrobeRepository;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import entity.WearCondition;
+import entity.WearFactory;
+import use_case.data_access.MockWardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeAnalyzerInteractorTest {
 
@@ -24,11 +25,11 @@ public class WardrobeAnalyzerInteractorTest {
                                             int expectedOldestAge,
                                             int expectedNewestAge) {
 
-        WardrobeDataAccessInterface repository = new MockWardrobeRepository(
+        final WardrobeDataAccessInterface repository = new MockWardrobeRepository(
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        WardrobeAnalyzerOutputBoundary presenter = new WardrobeAnalyzerOutputBoundary() {
+        final WardrobeAnalyzerOutputBoundary presenter = new WardrobeAnalyzerOutputBoundary() {
             @Override
             public void prepareSuccessView(WardrobeAnalyzerOutputData outputData) {
                 assertEquals(expectedTotalCount, outputData.getTotalItems());
@@ -44,7 +45,7 @@ public class WardrobeAnalyzerInteractorTest {
             }
         };
 
-        WardrobeAnalyzerInputBoundary interactor = new WardrobeAnalyzerInteractor(repository, presenter);
+        final WardrobeAnalyzerInputBoundary interactor = new WardrobeAnalyzerInteractor(repository, presenter);
         interactor.analyze();
     }
 

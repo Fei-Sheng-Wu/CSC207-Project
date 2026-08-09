@@ -1,8 +1,8 @@
 package interface_adapter.settings_retriever;
 
+import entity.Settings;
 import interface_adapter.settings.SettingsViewModel;
 import use_case.settings_retriever.SettingsRetrieverOutputBoundary;
-import use_case.settings_retriever.SettingsRetrieverOutputData;
 
 /**
  * Presenter for the settings retriever use case.
@@ -20,7 +20,7 @@ public class SettingsRetrieverPresenter implements SettingsRetrieverOutputBounda
     }
 
     @Override
-    public void prepareSuccessView(SettingsRetrieverOutputData output) {
+    public void prepareSuccessView(Settings output) {
         viewModel.setLocationCity(output.getLocationCity());
         viewModel.setLocationCountryCode(output.getLocationCountryCode());
     }
