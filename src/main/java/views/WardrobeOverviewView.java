@@ -187,7 +187,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.PLAIN_MESSAGE,
             null,
-            new Object[]{},
+            null,
             null
         );
     }

@@ -120,6 +120,13 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         controls.setOpaque(false);
         controls.setLayout(new BoxLayout(controls, BoxLayout.PAGE_AXIS));
 
+        controls.add(createControlsTop());
+        controls.add(createControlsBottom());
+
+        return controls;
+    }
+
+    private JPanel createControlsTop() {
         final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
         top.setOpaque(false);
         top.setBorder(BorderFactory.createEmptyBorder(0, -SIZE_SPACING_SM, 0, -SIZE_SPACING_SM));
@@ -127,11 +134,12 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         top.add(choiceColor);
         top.add(new JLabel("Style:"));
         top.add(choiceStyle);
-        controls.add(top);
+        return top;
+    }
 
+    private JPanel createControlsBottom() {
         final JPanel bottom = new JPanel(new BorderLayout());
         bottom.setOpaque(false);
-        controls.add(bottom);
 
         final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, SIZE_SPACING_SM, 0));
         left.setOpaque(false);
@@ -141,16 +149,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         choiceMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                switch (selectedMode()) {
-                    case OPTION_CONTEXT_BASED:
-                        fieldTags.setVisible(false);
-                        break;
-                    case OPTION_TAG_BASED:
-                        fieldTags.setVisible(true);
-                        break;
-                    default:
-                        break;
-                }
+                fieldTags.setVisible(OPTION_TAG_BASED.equals(selectedMode()));
                 left.revalidate();
                 left.repaint();
             }
@@ -161,6 +160,9 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
         left.add(fieldTags);
         bottom.add(left, BorderLayout.CENTER);
 
+        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        right.setOpaque(false);
+        bottom.add(right, BorderLayout.LINE_END);
         final JButton recommend = new JButton("Get Recommendation");
         recommend.addActionListener(new ActionListener() {
             @Override
@@ -168,9 +170,9 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
                 requestRecommendation(recommend);
             }
         });
-        bottom.add(recommend, BorderLayout.LINE_END);
+        right.add(recommend);
 
-        return controls;
+        return bottom;
     }
 
     private JPanel createResults() {
@@ -194,7 +196,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
             }
             slots.add(slot);
 
-            final JPanel left = new JPanel(new BorderLayout(SIZE_SPACING_XS, 0));
+            final JPanel left = new JPanel(new BorderLayout(SIZE_SPACING_SM, 0));
             left.setOpaque(false);
             slot.add(left);
 

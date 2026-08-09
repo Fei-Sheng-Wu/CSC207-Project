@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -113,6 +114,10 @@ public class InspirationView extends AbstractView implements PropertyChangeListe
         label.setFont(UIManager.getFont("Label.font"));
         card.add(label, BorderLayout.CENTER);
 
+        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        right.setOpaque(false);
+        card.add(right, BorderLayout.LINE_END);
+
         final JButton update = new JButton("Open");
         final Component parent = this;
         update.addActionListener(new ActionListener() {
@@ -125,7 +130,7 @@ public class InspirationView extends AbstractView implements PropertyChangeListe
                 }
             }
         });
-        card.add(update, BorderLayout.LINE_END);
+        right.add(update);
 
         list.add(card);
     }
