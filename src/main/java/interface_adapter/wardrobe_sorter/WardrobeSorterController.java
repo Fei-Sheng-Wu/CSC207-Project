@@ -24,7 +24,7 @@ public class WardrobeSorterController {
     public void sortWardrobe(String sortBy) {
         WardrobeSort sort = WardrobeSort.TYPE;
         for (int i = 0; i < WardrobeSort.values().length; i++) {
-            if (WardrobeSort.values()[i].getDisplayName() == sortBy) {
+            if (sortBy.equals(WardrobeSort.values()[i].getDisplayName())) {
                 sort = WardrobeSort.values()[i];
             }
         }

@@ -1,36 +1,38 @@
 package use_case.wardrobe_sorter;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import entity.WearFactory;
-import org.junit.jupiter.api.Test;
-import use_case.data_access.MockWardrobeRepository;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import entity.WardrobeSort;
+import entity.WearFactory;
+import use_case.data_access.MockWardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 class WardrobeSorterInteractorTest {
 
-    private void wardrobeSorterTestHelper(List<AbstractWear> inputItems, String sortBy, String ... expectedNames) {
-        WardrobeDataAccessInterface repository = new MockWardrobeRepository(
+    private void wardrobeSorterTestHelper(List<AbstractWear> inputItems, WardrobeSort sortBy, String... expectedNames) {
+        final WardrobeDataAccessInterface repository = new MockWardrobeRepository(
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        WardrobeSorterOutputBoundary successPresenter = outputData -> {
-            List<AbstractWear> sortedItems = outputData.getSortedItems();
+        final WardrobeSorterOutputBoundary successPresenter = outputData -> {
+            final List<AbstractWear> sortedItems = outputData.getSortedItems();
             assertEquals(expectedNames.length, sortedItems.size());
             for (int i = 0; i < expectedNames.length; i++) {
                 assertEquals(expectedNames[i], sortedItems.get(i).getName());
             }
         };
 
-//        final SortingUtility sortingWays = new SortingUtility();
+        // final SortingUtility sortingWays = new SortingUtility();
 
-        WardrobeSorterInputBoundary interactor = new WardrobeSorterInteractor(
+        final WardrobeSorterInputBoundary interactor = new WardrobeSorterInteractor(
             repository,
             successPresenter);
         interactor.sortWardrobe(new WardrobeSorterInputData(sortBy));
@@ -38,14 +40,14 @@ class WardrobeSorterInteractorTest {
 
     @Test
     void sortEmptyWardrobeTest() {
-        wardrobeSorterTestHelper(List.of(), "NAME_ASC");
+        wardrobeSorterTestHelper(List.of(), WardrobeSort.NAME_ASC);
     }
 
     @Test
     void sortSingleItemTest() {
         final AbstractWear item = WearFactory.constructWear("outertopwear", UUID.randomUUID());
         item.setName("Very Cool Jacket");
-        wardrobeSorterTestHelper(List.of(item), "NAME_ASC", "Very Cool Jacket");
+        wardrobeSorterTestHelper(List.of(item), WardrobeSort.NAME_ASC, "Very Cool Jacket");
     }
 
     @Test
@@ -57,10 +59,10 @@ class WardrobeSorterInteractorTest {
         item2.setName("Apple Jacket");
         item3.setName("Pineapple Shoes");
         wardrobeSorterTestHelper(List.of(item1, item2, item3),
-                    "NAME_ASC",
-              "Apple Jacket",
+            WardrobeSort.NAME_ASC,
+            "Apple Jacket",
             "Pineapple Shoes",
-               "Zebra Shirt");
+            "Zebra Shirt");
     }
 
     @Test
@@ -73,7 +75,7 @@ class WardrobeSorterInteractorTest {
         item3.setName("Pineapple Shoes");
 
         wardrobeSorterTestHelper(List.of(item1, item2, item3),
-            "NAME_DESC",
+            WardrobeSort.NAME_DESC,
             "Zebra Shirt",
             "Pineapple Shoes",
             "Apple Jacket");
@@ -93,7 +95,7 @@ class WardrobeSorterInteractorTest {
         item3.setBrand("Pineapple");
 
         wardrobeSorterTestHelper(List.of(item2, item1, item3),
-            "BRAND_ASC",
+            WardrobeSort.BRAND_ASC,
             "No Brand Shirt",
             "Nike Shirt",
             "Pineapple Shoes");
@@ -113,7 +115,7 @@ class WardrobeSorterInteractorTest {
         item3.setBrand("Pineapple");
 
         wardrobeSorterTestHelper(List.of(item2, item1, item3),
-            "BRAND_DESC",
+            WardrobeSort.BRAND_DESC,
             "Pineapple Shoes",
             "Nike Shirt",
             "No Brand Shirt");
@@ -130,7 +132,7 @@ class WardrobeSorterInteractorTest {
         item3.setName("My Shoes");
 
         wardrobeSorterTestHelper(List.of(item1, item2, item3),
-            "TYPE",
+            WardrobeSort.TYPE,
             "My Shoes",
             "Inner Shirt",
             "Outer Cool Jacket");
