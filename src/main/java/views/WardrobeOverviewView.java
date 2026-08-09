@@ -30,7 +30,7 @@ import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_adder.WardrobeAdderController;
 import interface_adapter.wardrobe_filterer.WardrobeFiltererController;
 import interface_adapter.wardrobe_remover.WardrobeRemoverController;
-import interface_adapter.wardrobe_reporter.WardrobeReporterController;
+import interface_adapter.wardrobe_retriever.WardrobeRetrieverController;
 import interface_adapter.wardrobe_sorter.WardrobeSorterController;
 
 /**
@@ -42,7 +42,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
     private final ApplicationManager manager;
     private final WardrobeViewModel wardrobeViewModel;
     private final ItemViewModel itemViewModel;
-    private final WardrobeReporterController reporterController;
+    private final WardrobeRetrieverController retrieveController;
     private final WardrobeFiltererController filtererController;
     private final WardrobeSorterController sorterController;
     private final WardrobeAdderController adderController;
@@ -64,7 +64,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         this.wardrobeViewModel.addPropertyChangeListener(this);
         this.itemViewModel = manager.get(ItemViewModel.class);
         this.itemViewModel.addPropertyChangeListener(this);
-        this.reporterController = manager.get(WardrobeReporterController.class);
+        this.retrieveController = manager.get(WardrobeRetrieverController.class);
         this.filtererController = manager.get(WardrobeFiltererController.class);
         this.sorterController = manager.get(WardrobeSorterController.class);
         this.adderController = manager.get(WardrobeAdderController.class);
@@ -92,11 +92,11 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                reporterController.reportWardrobe();
+                retrieveController.retrieveWardrobe();
             }
         });
 
-        reporterController.reportWardrobe();
+        retrieveController.retrieveWardrobe();
     }
 
     private JPanel createHeader() {
@@ -253,7 +253,7 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             @Override
             public void actionPerformed(ActionEvent e) {
                 removerController.removeItem(wear);
-                reporterController.reportWardrobe();
+                retrieveController.retrieveWardrobe();
             }
         });
         right.add(remove);
