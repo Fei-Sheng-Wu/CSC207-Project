@@ -1,4 +1,4 @@
-package use_case.tag_based_recommendation;
+package use_case.recommendation_tag;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -21,8 +21,6 @@ import entity.WearCondition;
 import entity.WearStyle;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
-import use_case.recommendation_tag.TagBasedRecommendationInputData;
-import use_case.recommendation_tag.TagBasedRecommendationInteractor;
 import use_case.wardrobe.WardrobeDataAccessInterface;
 
 class TagBasedRecommendationProcessorTest {

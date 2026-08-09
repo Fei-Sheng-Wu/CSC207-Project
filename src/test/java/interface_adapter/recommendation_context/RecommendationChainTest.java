@@ -165,7 +165,7 @@ class RecommendationChainTest {
     /** No events today, so the event analyzer stays neutral. */
     private static final class StubEventRepository implements EventDataAccessInterface {
         @Override
-        public List<Event> getEvents(String country) {
+        public List<Event> getEvents(String country, LocalDate date) {
             return List.of();
         }
     }

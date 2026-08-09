@@ -161,7 +161,7 @@ class ContextBasedRecommendationIntegrationTest {
         }
 
         @Override
-        public List<Event> getEvents(String country) {
+        public List<Event> getEvents(String country, LocalDate date) {
             return events;
         }
     }

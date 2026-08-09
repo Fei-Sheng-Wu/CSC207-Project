@@ -211,7 +211,7 @@ public final class RecommendationViewDemo {
     /** Stands in for the event API, so no key is required. */
     private static final class FixedEvents implements EventDataAccessInterface {
         @Override
-        public List<Event> getEvents(String country) {
+        public List<Event> getEvents(String country, LocalDate date) {
             return List.of(new Event(
                 "Canada Day",
                 OffsetDateTime.parse("2026-07-01T00:00:00-04:00"),

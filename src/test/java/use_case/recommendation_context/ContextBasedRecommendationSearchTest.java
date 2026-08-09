@@ -91,7 +91,7 @@ class ContextBasedRecommendationSearchTest {
         new ContextBasedRecommendationInteractor(
                 new StubWardrobeRepository(wardrobe),
                 new StubSettingsRepository(),
-                country -> List.of(),
+                (country, date) -> List.of(),
                 new StubWeatherRepository(),
                 new CapturingOutputBoundary(),
                 List.of(analyzer)
@@ -103,7 +103,7 @@ class ContextBasedRecommendationSearchTest {
         return new ContextBasedRecommendationInteractor(
                 new StubWardrobeRepository(wardrobe),
                 new StubSettingsRepository(),
-                country -> List.of(),
+                (country, date) -> List.of(),
                 new StubWeatherRepository(),
                 output
         );
