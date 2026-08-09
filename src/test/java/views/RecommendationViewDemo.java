@@ -181,6 +181,15 @@ public final class RecommendationViewDemo {
     /** Stands in for the settings file. */
     private static final class FixedSettings implements SettingsDataAccessInterface {
         @Override
+        public boolean isHighContrast() {
+            return false;
+        }
+
+        @Override
+        public void setIsHighContrast(boolean isHighContrast) {
+        }
+
+        @Override
         public String getLocationCityOrDefault() {
             return "Toronto";
         }

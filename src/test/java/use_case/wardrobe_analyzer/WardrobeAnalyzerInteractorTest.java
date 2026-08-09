@@ -1,8 +1,10 @@
 package use_case.wardrobe_analyzer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,16 +17,6 @@ import entity.WearCondition;
 import entity.WearFactory;
 import use_case.data_access.MockWardrobeRepository;
 import use_case.wardrobe.WardrobeDataAccessInterface;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
 
 public class WardrobeAnalyzerInteractorTest {
 
@@ -100,15 +92,18 @@ public class WardrobeAnalyzerInteractorTest {
     void analyzeDonationCandidateAndAgesTest() {
         final AbstractWear oldItem = WearFactory.constructWear("innertopwear", UUID.randomUUID());
         oldItem.setName("Old Shirt");
-        oldItem.setFondness(20.0); // Low fondness (< 50.0)
+        // Low fondness (< 50.0)
+        oldItem.setFondness(20.0);
         oldItem.setCondition(WearCondition.FAIR);
-        oldItem.setPurchaseDate(LocalDate.now().minusMonths(15)); // Older than 12 months -> Donation candidate
+        // Older than 12 months -> Donation candidate
+        oldItem.setPurchaseDate(LocalDate.now().minusMonths(15));
 
         final AbstractWear newerItem = WearFactory.constructWear("bottomwear", UUID.randomUUID());
         newerItem.setName("Recent Pants");
         newerItem.setFondness(80.0);
         newerItem.setCondition(WearCondition.NEW);
-        newerItem.setPurchaseDate(LocalDate.now().minusMonths(2)); // Newer item
+        // Newer item
+        newerItem.setPurchaseDate(LocalDate.now().minusMonths(2));
 
         wardrobeAnalyzerTestHelper(List.of(oldItem, newerItem),
             2, 50.0, 1, 15, 2);
@@ -120,7 +115,8 @@ public class WardrobeAnalyzerInteractorTest {
             "innertopwear", UUID.randomUUID()
         );
         oldLovedItem.setName("Jacket");
-        oldLovedItem.setFondness(90.0); // High fondness (>= 50.0) -> false branch
+        // High fondness (>= 50.0) -> false branch
+        oldLovedItem.setFondness(90.0);
         oldLovedItem.setCondition(WearCondition.NEW);
         oldLovedItem.setPurchaseDate(
             LocalDate.now().minusMonths(24)

@@ -11,9 +11,11 @@ import use_case.settings.SettingsDataAccessInterface;
 public class LocalSettingsDataAccessObject
     extends AbstractFileDataAccessObject
     implements SettingsDataAccessInterface {
+    private static final String KEY_HIGH_CONTRAST = "isHighContrast";
     private static final String KEY_LOCATION_CITY = "locationCity";
     private static final String KEY_LOCATION_COUNTRY = "locationCountry";
 
+    private static final String DEFAULT_HIGH_CONTRAST = "false";
     private static final String DEFAULT_LOCATION_CITY = "Toronto";
     private static final String DEFAULT_LOCATION_COUNTRY = "CA";
 
@@ -45,12 +47,23 @@ public class LocalSettingsDataAccessObject
     }
 
     @Override
-    public String getLocationCityOrDefault() {
-        if (!properties.containsKey(KEY_LOCATION_CITY)) {
-            return DEFAULT_LOCATION_CITY;
-        }
+    public boolean isHighContrast() {
+        return "true".equals(properties.getProperty(KEY_HIGH_CONTRAST, DEFAULT_HIGH_CONTRAST));
+    }
 
-        return properties.getProperty(KEY_LOCATION_CITY);
+    @Override
+    public void setIsHighContrast(boolean isHighContrast) {
+        if (isHighContrast) {
+            properties.setProperty(KEY_HIGH_CONTRAST, "true");
+        } else {
+            properties.setProperty(KEY_HIGH_CONTRAST, "false");
+        }
+        writeUpdates();
+    }
+
+    @Override
+    public String getLocationCityOrDefault() {
+        return properties.getProperty(KEY_LOCATION_CITY, DEFAULT_LOCATION_CITY);
     }
 
     @Override
@@ -61,11 +74,7 @@ public class LocalSettingsDataAccessObject
 
     @Override
     public String getLocationCountryCodeOrDefault() {
-        if (!properties.containsKey(KEY_LOCATION_COUNTRY)) {
-            return DEFAULT_LOCATION_COUNTRY;
-        }
-
-        return properties.getProperty(KEY_LOCATION_COUNTRY);
+        return properties.getProperty(KEY_LOCATION_COUNTRY, DEFAULT_LOCATION_COUNTRY);
     }
 
     @Override

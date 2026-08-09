@@ -95,11 +95,6 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         final JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
 
-        header.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
-            BorderFactory.createEmptyBorder(0, 0, SIZE_SPACING_MD, 0)
-        ));
-
         final JLabel headerTitle = new JLabel("Wardrobe Details");
         headerTitle.setFont(FONT_TITLE);
         header.add(headerTitle, BorderLayout.LINE_START);
@@ -194,6 +189,7 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
                 break;
             case "items":
                 // @TODO: update content
+                // If we cannot finish this on time, it is fine to just remove the two lists from this view -Jet
             case "itemsOld":
                 // @TODO: update content
             default:
@@ -229,7 +225,10 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         final JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder(title));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder(title),
+            BorderFactory.createEmptyBorder(SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM)
+        ));
         return panel;
     }
 

@@ -47,12 +47,14 @@ public class FilterPanel extends JPanel {
             new JLabel("Name:"), nameTextField,
             new JLabel("Type:"), categoryComboBox,
             new JLabel("Condition:"), conditionComboBox,
-            new JLabel("Tag/Occasion:"), tagTextField,
+            new JLabel("Tag:"), tagTextField,
             new JLabel("Months Since Purchase:"), monthsTextField,
             new JLabel(""), applyButton,
         };
 
-        setLayout(new GridLayout(components.length / 2, 2, AbstractView.SIZE_SPACING_MD, AbstractView.SIZE_SPACING_MD));
+        setLayout(new GridLayout(
+            components.length / 2, 2, AbstractView.SIZE_SPACING_MD, AbstractView.SIZE_SPACING_XS
+        ));
 
         for (Component component : components) {
             add(component);

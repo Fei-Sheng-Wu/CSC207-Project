@@ -21,13 +21,15 @@ public class SettingsRetrieverPresenter implements SettingsRetrieverOutputBounda
 
     @Override
     public void prepareSuccessView(Settings output) {
+        viewModel.setIsHighContrast(output.isHighContrast());
         viewModel.setLocationCity(output.getLocationCity());
         viewModel.setLocationCountryCode(output.getLocationCountryCode());
     }
 
     @Override
     public void prepareFailView(String message) {
-        viewModel.setLocationCity(null);
-        viewModel.setLocationCountryCode(null);
+        viewModel.setIsHighContrast(false);
+        viewModel.setLocationCity("");
+        viewModel.setLocationCountryCode("");
     }
 }

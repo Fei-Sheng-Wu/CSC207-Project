@@ -4,8 +4,27 @@ package entity;
  * Represents application settings.
  */
 public final class Settings {
+    private boolean isHighContrast;
     private String locationCity = "";
     private String locationCountryCode = "";
+
+    /**
+     * Returns whether high contrast is preferred.
+     *
+     * @return whether high contrast is preferred
+     */
+    public boolean isHighContrast() {
+        return isHighContrast;
+    }
+
+    /**
+     * Updates whether high contrast is preferred.
+     *
+     * @param isHighContrast whether high contrast is preferred
+     */
+    public void setIsHighContrast(boolean isHighContrast) {
+        this.isHighContrast = isHighContrast;
+    }
 
     /**
      * Returns the city of the location of the settings.

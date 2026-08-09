@@ -280,7 +280,8 @@ public class WardrobeFiltererInteractorTest {
             "innertopwear", UUID.randomUUID()
         );
         itemNoDate.setName("No Date Shirt");
-        itemNoDate.setPurchaseDate(null); // Forces age to be null (hits else branch)
+        // Forces age to be null (hits else branch)
+        itemNoDate.setPurchaseDate(null);
 
         // Branch 1: purchaseMonth <= 0 (Skips the month check entirely)
         wardrobeFiltererTestHelper(

@@ -116,6 +116,15 @@ class ContextBasedRecommendationFailureTest {
 
     private static final class StubSettingsRepository implements SettingsDataAccessInterface {
         @Override
+        public boolean isHighContrast() {
+            return false;
+        }
+
+        @Override
+        public void setIsHighContrast(boolean isHighContrast) {
+        }
+
+        @Override
         public String getLocationCityOrDefault() {
             return "Toronto";
         }

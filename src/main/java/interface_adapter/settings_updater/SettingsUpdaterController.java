@@ -22,11 +22,13 @@ public class SettingsUpdaterController {
     /**
      * Executes the update settings use case.
      *
+     * @param isHighContrast      whether high contrast is preferred
      * @param locationCity        the city of the location
      * @param locationCountryCode the 2-digit country code of the location
      */
-    public void update(String locationCity, String locationCountryCode) {
+    public void update(boolean isHighContrast, String locationCity, String locationCountryCode) {
         final Settings settings = new Settings();
+        settings.setIsHighContrast(isHighContrast);
         settings.setLocationCity(locationCity);
         settings.setLocationCountryCode(locationCountryCode);
 
