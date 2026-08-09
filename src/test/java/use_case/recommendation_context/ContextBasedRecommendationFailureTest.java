@@ -54,7 +54,7 @@ class ContextBasedRecommendationFailureTest {
         final ContextBasedRecommendationInteractor interactor = new ContextBasedRecommendationInteractor(
                 new StubWardrobeRepository(),
                 new StubSettingsRepository(),
-                country -> {
+                (country, date) -> {
                     throw new ContextUnavailableException("The events service is unavailable.");
                 },
                 new StubWeatherRepository(),
@@ -86,7 +86,7 @@ class ContextBasedRecommendationFailureTest {
         return new ContextBasedRecommendationInteractor(
                 new StubWardrobeRepository(),
                 new StubSettingsRepository(),
-                country -> List.of(),
+                (country, date) -> List.of(),
                 weather,
                 output
         );

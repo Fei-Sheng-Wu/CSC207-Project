@@ -1,18 +1,19 @@
 package use_case.wardrobe_retriever;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import entity.WearFactory;
-import org.junit.jupiter.api.Test;
-import use_case.data_access.MockWardrobeRepository;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import entity.WearFactory;
+import use_case.data_access.MockWardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeRetrieverInteractorTest {
 

@@ -81,15 +81,14 @@ public class HttpEventDataAccessObject
     }
 
     @Override
-    public List<Event> getEvents(String country) {
-        final LocalDate now = LocalDate.now();
+    public List<Event> getEvents(String country, LocalDate date) {
         try (Response response = fetch(String.format(
             "holidays?api_key=%s&country=%s&year=%d&month=%d&day=%d",
             API_KEY,
             country,
-            now.getYear(),
-            now.getMonthValue(),
-            now.getDayOfMonth()
+            date.getYear(),
+            date.getMonthValue(),
+            date.getDayOfMonth()
         ))) {
             if (CODE_OK != response.code() || response.body() == null) {
                 throw new ContextUnavailableException(

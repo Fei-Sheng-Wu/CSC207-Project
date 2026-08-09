@@ -1,5 +1,6 @@
 package use_case.recommendation_context;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -137,7 +138,7 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         try {
             context = new RecommendationContext(
                     weatherProvider.getCurrentByLocation(settingsProvider.getLocationCityOrDefault()),
-                    eventProvider.getEvents(settingsProvider.getLocationCountryCodeOrDefault()),
+                    eventProvider.getEvents(settingsProvider.getLocationCountryCodeOrDefault(), LocalDate.now()),
                     inputData.getPreferredColors(),
                     inputData.getPreferredStyles()
             );

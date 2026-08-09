@@ -1,4 +1,4 @@
-package database.social_scrawl;
+package database.inspiration;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
-import database.inspiration.HttpInspirationDataAccessObject;
 import entity.OutfitIdea;
 
 /**
