@@ -126,13 +126,13 @@ class WardrobeSorterInteractorTest {
         final AbstractWear item3 = WearFactory.constructWear("footwear", UUID.randomUUID());
 
         item1.setName("Inner Shirt");
-        item2.setName("Outer Jacket");
+        item2.setName("Outer Cool Jacket");
         item3.setName("My Shoes");
 
         wardrobeSorterTestHelper(List.of(item1, item2, item3),
             "TYPE",
             "My Shoes",
             "Inner Shirt",
-            "Outer Jacket");
+            "Outer Cool Jacket");
     }
 }

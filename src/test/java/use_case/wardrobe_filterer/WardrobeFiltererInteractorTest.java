@@ -47,7 +47,7 @@ public class WardrobeFiltererInteractorTest {
     @Test
     void filterSingleItemByCategoryTest() {
         final AbstractWear item1 = WearFactory.constructWear("innertopwear", UUID.randomUUID());
-        item1.setName("Nike Shoes");
+        item1.setName("Nike Cool Shoes");
         item1.setCondition(WearCondition.NEW);
         item1.setTags(List.of("running"));
 
@@ -55,7 +55,7 @@ public class WardrobeFiltererInteractorTest {
             "innertopwear", null, null, 0, null
         );
 
-        wardrobeFiltererTestHelper(List.of(item1), filteringCriteria, "Nike Shoes");
+        wardrobeFiltererTestHelper(List.of(item1), filteringCriteria, "Nike Cool Shoes");
     }
 
     @Test

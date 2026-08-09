@@ -65,7 +65,7 @@ public class WardrobeAnalyzerInteractorTest {
         final AbstractWear item1 = WearFactory.constructWear("innertopwear", UUID.randomUUID());
         final AbstractWear item2 = WearFactory.constructWear("bottomwear", UUID.randomUUID());
 
-        item1.setName("Favorite Hoodie");
+        item1.setName("Hoodie");
         item1.setFondness(90.0);
         item1.setCondition(WearCondition.NEW);
 
@@ -80,7 +80,7 @@ public class WardrobeAnalyzerInteractorTest {
     @Test
     void analyzeItemWithNullConditionTest() {
         final AbstractWear item = WearFactory.constructWear("headwear", UUID.randomUUID());
-        item.setName("Plain Hat");
+        item.setName("Hat");
         item.setFondness(50.0);
         item.setCondition(null);
 
@@ -91,7 +91,7 @@ public class WardrobeAnalyzerInteractorTest {
     @Test
     void analyzeDonationCandidateAndAgesTest() {
         final AbstractWear oldItem = WearFactory.constructWear("innertopwear", UUID.randomUUID());
-        oldItem.setName("Old Dusty Shirt");
+        oldItem.setName("Old Shirt");
         oldItem.setFondness(20.0); // Low fondness (< 50.0)
         oldItem.setCondition(WearCondition.FAIR);
         oldItem.setPurchaseDate(LocalDate.now().minusMonths(15)); // Older than 12 months -> Donation candidate
@@ -111,7 +111,7 @@ public class WardrobeAnalyzerInteractorTest {
         final AbstractWear oldLovedItem = WearFactory.constructWear(
             "innertopwear", UUID.randomUUID()
         );
-        oldLovedItem.setName("Valued Vintage Jacket");
+        oldLovedItem.setName("Jacket");
         oldLovedItem.setFondness(90.0); // High fondness (>= 50.0) -> false branch
         oldLovedItem.setCondition(WearCondition.NEW);
         oldLovedItem.setPurchaseDate(
