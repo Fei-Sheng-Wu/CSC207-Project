@@ -1,12 +1,12 @@
 package use_case.wardrobe_sorter;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import use_case.wardrobe.WardrobeDataAccessInterface;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
     private final WardrobeDataAccessInterface repository;

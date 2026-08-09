@@ -1,5 +1,6 @@
 package interface_adapter.settings_updater;
 
+import entity.Settings;
 import use_case.settings_updater.SettingsUpdaterInputBoundary;
 import use_case.settings_updater.SettingsUpdaterInputData;
 
@@ -25,6 +26,10 @@ public class SettingsUpdaterController {
      * @param locationCountryCode the 2-digit country code of the location
      */
     public void update(String locationCity, String locationCountryCode) {
-        interactor.update(new SettingsUpdaterInputData(locationCity, locationCountryCode));
+        final Settings settings = new Settings();
+        settings.setLocationCity(locationCity);
+        settings.setLocationCountryCode(locationCountryCode);
+
+        interactor.update(new SettingsUpdaterInputData(settings));
     }
 }

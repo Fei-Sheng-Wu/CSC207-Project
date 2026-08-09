@@ -1,9 +1,9 @@
 package interface_adapter.wardrobe_analyzer;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jetbrains.annotations.Nullable;
 
 public class WardrobeAnalyzerState {
     private int totalItemsCount;

@@ -1,38 +1,28 @@
 package use_case.settings_updater;
 
+import entity.Settings;
+
 /**
  * Represents the input data for adding an item to the wardrobe.
  */
 public class SettingsUpdaterInputData {
-    private final String locationCity;
-    private final String locationCountryCode;
+    private final Settings settings;
 
     /**
      * Constructs a new input data.
      *
-     * @param locationCity        the city of the location of the input data
-     * @param locationCountryCode the 2-digit country code of the location of the input data
+     * @param settings the settings of the input data
      */
-    public SettingsUpdaterInputData(String locationCity, String locationCountryCode) {
-        this.locationCity = locationCity;
-        this.locationCountryCode = locationCountryCode;
+    public SettingsUpdaterInputData(Settings settings) {
+        this.settings = settings;
     }
 
     /**
-     * Returns the city of the location of the input data.
+     * Returns the settings of the input data.
      *
-     * @return the city of the location of the input data
+     * @return the settings of the input data
      */
-    public String getLocationCity() {
-        return locationCity;
-    }
-
-    /**
-     * Returns the 2-digit country code of the location of the input data.
-     *
-     * @return the 2-digit country code of the location of the input data
-     */
-    public String getLocationCountryCode() {
-        return locationCountryCode;
+    public Settings getSettings() {
+        return settings;
     }
 }

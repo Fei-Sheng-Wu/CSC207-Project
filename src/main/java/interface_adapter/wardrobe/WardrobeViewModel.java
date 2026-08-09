@@ -3,11 +3,11 @@ package interface_adapter.wardrobe;
 import java.util.ArrayList;
 import java.util.List;
 
-import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerState;
 import org.jetbrains.annotations.Nullable;
 
 import entity.AbstractWear;
 import interface_adapter.AbstractViewModel;
+import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerState;
 
 /**
  * Represents the wardrobe view model.

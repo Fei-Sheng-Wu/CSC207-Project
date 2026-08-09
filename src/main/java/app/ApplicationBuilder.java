@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
-import view.AbstractView;
-import view.ApplicationManager;
+import views.AbstractView;
+import views.ApplicationManager;
 
 /**
  * Represents an application builder.

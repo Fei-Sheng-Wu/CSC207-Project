@@ -69,9 +69,9 @@ public class WardrobeAdderInteractorTest {
         }
 
         @Override
-        public void saveWardrobe(Wardrobe wardrobe) {
+        public void saveWardrobe(Wardrobe newWardrobe) {
             this.saveWardrobeCalled = true;
-            this.savedWardrobe = wardrobe;
+            this.savedWardrobe = newWardrobe;
         }
     }
 

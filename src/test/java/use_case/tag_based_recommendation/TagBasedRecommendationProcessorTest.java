@@ -20,10 +20,10 @@ import entity.WearColor;
 import entity.WearCondition;
 import entity.WearStyle;
 import use_case.recommendation.RecommendationOutputBoundary;
-import use_case.wardrobe.WardrobeDataAccessInterface;
 import use_case.recommendation.RecommendationOutputData;
-import use_case.recommendation_tag.TagBasedRecommendationInteractor;
 import use_case.recommendation_tag.TagBasedRecommendationInputData;
+import use_case.recommendation_tag.TagBasedRecommendationInteractor;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 class TagBasedRecommendationProcessorTest {
     private static final UUID RED_SHIRT_ID =

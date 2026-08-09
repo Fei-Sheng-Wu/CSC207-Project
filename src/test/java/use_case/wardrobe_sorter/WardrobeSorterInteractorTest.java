@@ -1,27 +1,28 @@
 package use_case.wardrobe_sorter;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import entity.WearFactory;
-import org.junit.jupiter.api.Test;
-import use_case.data_access.MockWardrobeRepository;
-import use_case.wardrobe.WardrobeDataAccessInterface;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import entity.WearFactory;
+import use_case.data_access.MockWardrobeRepository;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 class WardrobeSorterInteractorTest {
 
-    private void wardrobeSorterTestHelper(List<AbstractWear> inputItems, String sortBy, String ... expectedNames) {
-        WardrobeDataAccessInterface repository = new MockWardrobeRepository(
+    private void wardrobeSorterTestHelper(List<AbstractWear> inputItems, String sortBy, String... expectedNames) {
+        final WardrobeDataAccessInterface repository = new MockWardrobeRepository(
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        WardrobeSorterOutputBoundary successPresenter = outputData -> {
-            List<AbstractWear> sortedItems = outputData.getSortedItems();
+        final WardrobeSorterOutputBoundary successPresenter = outputData -> {
+            final List<AbstractWear> sortedItems = outputData.getSortedItems();
             assertEquals(expectedNames.length, sortedItems.size());
             for (int i = 0; i < expectedNames.length; i++) {
                 assertEquals(expectedNames[i], sortedItems.get(i).getName());

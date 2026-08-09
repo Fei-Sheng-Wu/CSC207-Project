@@ -1,8 +1,8 @@
 package use_case.wardrobe_sorter;
 
-import entity.AbstractWear;
-
 import java.util.List;
+
+import entity.AbstractWear;
 
 public class WardrobeSorterOutputData {
     private final List<AbstractWear> sortedItems;

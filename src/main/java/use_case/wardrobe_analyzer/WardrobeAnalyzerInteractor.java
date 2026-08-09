@@ -1,13 +1,13 @@
 package use_case.wardrobe_analyzer;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import use_case.wardrobe.WardrobeDataAccessInterface;
-
 import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import entity.AbstractWear;
+import entity.Wardrobe;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary {
     private static final double DONATION_FONDNESS_THRESHOLD = 50.0;
@@ -28,10 +28,10 @@ public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary
         final Wardrobe wardrobe = repository.fetchWardrobe();
         final List<AbstractWear> items = wardrobe.getItems();
 
-//        if (items.isEmpty()) {
-//            outputBoundary.prepareFailView("Your wardrobe is empty. Add some clothes to see statistics!");
-//            return;
-//        }
+        //        if (items.isEmpty()) {
+        //            outputBoundary.prepareFailView("Your wardrobe is empty. Add some clothes to see statistics!");
+        //            return;
+        //        }
 
         final Map<String, Integer> categoryCounts = new HashMap<>();
         final Map<String, Integer> conditionCounts = new HashMap<>();
@@ -75,7 +75,12 @@ public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary
             newestItemAge = 0;
         }
 
-        final double meanFondness = items.isEmpty() ? 0.0 : (totalFondness / items.size());
+        final double meanFondness;
+        if (items.isEmpty()) {
+            meanFondness = 0.0;
+        } else {
+            meanFondness = totalFondness / items.size();
+        }
 
         final WardrobeAnalyzerOutputData outputData = new WardrobeAnalyzerOutputData(
             items.size(),
