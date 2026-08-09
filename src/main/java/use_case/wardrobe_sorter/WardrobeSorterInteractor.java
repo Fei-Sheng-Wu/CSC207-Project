@@ -1,14 +1,12 @@
 package use_case.wardrobe_sorter;
 
-import entity.AbstractWear;
-import entity.Wardrobe;
-import use_case.wardrobe.WardrobeDataAccessInterface;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static use_case.wardrobe_sorter.SortingUtility.SORTING_WAYS;
+import entity.AbstractWear;
+import entity.Wardrobe;
+import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
     private final WardrobeDataAccessInterface repository;
@@ -27,9 +25,7 @@ public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
         final Wardrobe wardrobe = repository.fetchWardrobe();
         final List<AbstractWear> items = new ArrayList<>(wardrobe.getItems());
 
-        final String sortKey = inputData.getSortBy().toUpperCase();
-
-        Comparator<AbstractWear> sortBy = SORTING_WAYS.get(sortKey);
+        final Comparator<AbstractWear> sortBy = SortingUtility.SORTING_WAYS.get(inputData.getSortBy());
         if (sortBy != null) {
             items.sort(sortBy);
         }

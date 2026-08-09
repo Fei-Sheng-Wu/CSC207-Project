@@ -1,13 +1,15 @@
 package use_case.wardrobe_sorter;
 
-public class WardrobeSorterInputData {
-    private final String sortBy;
+import entity.WardrobeSort;
 
-    public WardrobeSorterInputData(String sortBy) {
+public class WardrobeSorterInputData {
+    private final WardrobeSort sortBy;
+
+    public WardrobeSorterInputData(WardrobeSort sortBy) {
         this.sortBy = sortBy;
     }
 
-    public String getSortBy() {
+    public WardrobeSort getSortBy() {
         return sortBy;
     }
 }

@@ -1,5 +1,6 @@
 package interface_adapter.wardrobe_sorter;
 
+import entity.WardrobeSort;
 import use_case.wardrobe_sorter.WardrobeSorterInputBoundary;
 import use_case.wardrobe_sorter.WardrobeSorterInputData;
 
@@ -21,7 +22,17 @@ public class WardrobeSorterController {
      * @param sortBy the sorting by criteria
      */
     public void sortWardrobe(String sortBy) {
-        final WardrobeSorterInputData inputData = new WardrobeSorterInputData(sortBy);
+        WardrobeSort sort = null;
+        for (WardrobeSort sortOption : WardrobeSort.values()) {
+            if (!sortOption.getDisplayName().equals(sortBy)) {
+                continue;
+            }
+
+            sort = sortOption;
+            break;
+        }
+
+        final WardrobeSorterInputData inputData = new WardrobeSorterInputData(sort);
         interactor.sortWardrobe(inputData);
     }
 }
