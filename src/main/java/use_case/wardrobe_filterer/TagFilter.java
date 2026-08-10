@@ -8,7 +8,7 @@ public class TagFilter implements WardrobeFilter {
     @Override
     public boolean matches(AbstractWear wear, WardrobeFiltererInputData criteria) {
         final String filterTag = criteria.getTag();
-        if (filterTag == null || filterTag.isEmpty()) {
+        if (filterTag == null || filterTag.isBlank()) {
             return true;
         }
         final List<String> wearTags = wear.getTags();

@@ -2,6 +2,7 @@ package entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
@@ -84,5 +85,18 @@ public class WearFactoryTest {
         final UUID uuid = UUID.randomUUID();
 
         assertThrows(IllegalArgumentException.class, () -> WearFactory.constructWear("InvalidType", uuid));
+    }
+
+    @Test void testGetIcon() {
+        final String innerTopwear = WearFactory.getIcon(InnerTopwear.class);
+        assertEquals("👕", innerTopwear);
+
+        final String bottomwear = WearFactory.getIcon(Bottomwear.class);
+        assertEquals("👖", bottomwear);
+    }
+
+    @Test void testGetIconFail() {
+        final String failure = WearFactory.getIcon(AbstractWear.class);
+        assertNull(failure);
     }
 }

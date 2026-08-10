@@ -47,7 +47,7 @@ public class WardrobeUpdaterController {
      */
     public void updateItem(
         AbstractWear item,
-        String type,
+        Class<?> type,
         String name,
         String brand,
         String color,
@@ -60,8 +60,8 @@ public class WardrobeUpdaterController {
         String tags
     ) {
         AbstractWear updated = item;
-        if (!type.equals(item.getClass().getSimpleName())) {
-            updated = WearFactory.constructWear(type, item.getUuid());
+        if (!type.equals(item.getClass())) {
+            updated = WearFactory.constructWear(type.getSimpleName(), item.getUuid());
         }
 
         updated.setName(name.strip());

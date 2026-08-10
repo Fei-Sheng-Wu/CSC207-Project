@@ -4,11 +4,12 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import interface_adapter.wardrobe_filterer.WardrobeFiltererController;
 
 public class FilterPanel extends JPanel {
     private final JTextField nameTextField = new JTextField(20);
@@ -16,30 +17,18 @@ public class FilterPanel extends JPanel {
     private final JTextField monthsTextField = new JTextField(20);
     private final JComboBox<String> conditionComboBox;
     private final JTextField tagTextField = new JTextField(20);
-    private final JButton applyButton = new JButton("Apply Filter");
 
     /**
      * Constructs a new FilterPanel.
      *
-     * @param listener   the listener when the filter is applied
      * @param categories the list of categories to populate the dropdown
      * @param conditions the list of conditions to populate the dropdown
      */
-    public FilterPanel(FilterListener listener, List<String> categories, List<String> conditions) {
+    public FilterPanel(List<String> categories, List<String> conditions) {
         this.categoryComboBox = new JComboBox<>(categories.toArray(new String[0]));
         this.conditionComboBox = new JComboBox<>(conditions.toArray(new String[0]));
 
         createFields();
-
-        applyButton.addActionListener(event -> {
-            final String selectedCategory = (String) categoryComboBox.getSelectedItem();
-            final String selectedCondition = (String) conditionComboBox.getSelectedItem();
-            final int purchaseMonths = parsePurchaseMonths();
-            final String name = nameTextField.getText();
-            final String tag = tagTextField.getText();
-
-            listener.onFilterApplied(name, selectedCategory, purchaseMonths, selectedCondition, tag);
-        });
     }
 
     private void createFields() {
@@ -49,7 +38,6 @@ public class FilterPanel extends JPanel {
             new JLabel("Condition:"), conditionComboBox,
             new JLabel("Tag:"), tagTextField,
             new JLabel("Months Since Purchase:"), monthsTextField,
-            new JLabel(""), applyButton,
         };
 
         setLayout(new GridLayout(
@@ -74,22 +62,23 @@ public class FilterPanel extends JPanel {
     }
 
     /**
-     * Interface for listening to filter application events.
+     * Applies the filter.
+     *
+     * @param controller the filterer controller
      */
-    public interface FilterListener {
-        /**
-         * Called when the apply filter button is clicked.
-         *
-         * @param name           the name filter string
-         * @param category       the category filter string
-         * @param purchaseMonths the purchase months filter integer
-         * @param condition      the condition filter string
-         * @param tag            the tag filter string
-         */
-        void onFilterApplied(String name,
-                             String category,
-                             int purchaseMonths,
-                             String condition,
-                             String tag);
+    public void apply(WardrobeFiltererController controller) {
+        String selectedCategory = null;
+        if (categoryComboBox.getSelectedIndex() > 0) {
+            selectedCategory = (String) categoryComboBox.getSelectedItem();
+        }
+        String selectedCondition = null;
+        if (conditionComboBox.getSelectedIndex() > 0) {
+            selectedCondition = (String) conditionComboBox.getSelectedItem();
+        }
+        final int purchaseMonths = parsePurchaseMonths();
+        final String name = nameTextField.getText();
+        final String tag = tagTextField.getText();
+
+        controller.filterWardrobe(name, selectedCategory, selectedCondition, purchaseMonths, tag);
     }
 }

@@ -13,7 +13,7 @@ public final class ConditionCountStatistic implements WardrobeStatistic {
         final Map<String, Integer> conditionCounts = new HashMap<>();
         for (AbstractWear wear : items) {
             if (wear.getCondition() != null) {
-                final String condition = wear.getCondition().name();
+                final String condition = wear.getCondition().getDisplayName();
                 conditionCounts.put(condition, conditionCounts.getOrDefault(condition, 0) + 1);
             }
         }

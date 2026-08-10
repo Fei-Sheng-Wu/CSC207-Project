@@ -9,6 +9,6 @@ public class NameFilter implements WardrobeFilter {
         if (criteriaName == null || criteriaName.isEmpty()) {
             return true;
         }
-        return wear.getName().toLowerCase().startsWith(criteriaName.toLowerCase());
+        return wear.getName().toLowerCase().contains(criteriaName.toLowerCase());
     }
 }
