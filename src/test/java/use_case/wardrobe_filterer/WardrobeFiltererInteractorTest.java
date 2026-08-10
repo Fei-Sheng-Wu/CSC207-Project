@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import entity.AbstractWear;
+import entity.Bottomwear;
+import entity.Footwear;
+import entity.InnerTopwear;
 import entity.Wardrobe;
 import entity.WearCondition;
 import entity.WearFactory;
@@ -24,14 +27,24 @@ public class WardrobeFiltererInteractorTest {
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        final WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(repository, outputData -> {
-            final List<AbstractWear> filteredItems = outputData.getFilteredItems();
+        final WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(
+            repository,
+            new WardrobeFiltererOutputBoundary() {
+                @Override
+                public void prepareSuccessView(WardrobeFiltererOutputData outputData) {
+                    final List<AbstractWear> filteredItems = outputData.getFilteredItems();
 
-            assertEquals(expectedNames.length, filteredItems.size());
-            for (int i = 0; i < expectedNames.length; i++) {
-                assertEquals(expectedNames[i], filteredItems.get(i).getName());
+                    assertEquals(expectedNames.length, filteredItems.size());
+                    for (int i = 0; i < expectedNames.length; i++) {
+                        assertEquals(expectedNames[i], filteredItems.get(i).getName());
+                    }
+                }
+
+                @Override
+                public void prepareFailView(String error) {
+                }
             }
-        });
+        );
 
         interactor.filterItems(filteringCriteria);
     }
@@ -39,20 +52,20 @@ public class WardrobeFiltererInteractorTest {
     @Test
     void filterEmptyWardrobeTest() {
         final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
-            "innertopwear", null, null, 0, null
+            null, InnerTopwear.class.getSimpleName(), null, 0, null
         );
         wardrobeFiltererTestHelper(List.of(), filteringCriteria);
     }
 
     @Test
     void filterSingleItemByCategoryTest() {
-        final AbstractWear item1 = WearFactory.constructWear("innertopwear", UUID.randomUUID());
+        final AbstractWear item1 = WearFactory.constructWear(InnerTopwear.class.getSimpleName(), UUID.randomUUID());
         item1.setName("Nike Cool Shoes");
         item1.setCondition(WearCondition.NEW);
         item1.setTags(List.of("running"));
 
         final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
-            "innertopwear", null, null, 0, null
+            null, WearFactory.getDisplayName(InnerTopwear.class), null, 0, null
         );
 
         wardrobeFiltererTestHelper(List.of(item1), filteringCriteria, "Nike Cool Shoes");
@@ -60,12 +73,12 @@ public class WardrobeFiltererInteractorTest {
 
     @Test
     void filterNoMatchesTest() {
-        final AbstractWear item1 = WearFactory.constructWear("bottomwear", UUID.randomUUID());
+        final AbstractWear item1 = WearFactory.constructWear(Bottomwear.class.getSimpleName(), UUID.randomUUID());
         item1.setName("Blue pants");
         item1.setBrand("Adidas");
 
         final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
-            "innertopwear", null, null, 0, null
+            null, WearFactory.getDisplayName(InnerTopwear.class), null, 0, null
         );
 
         wardrobeFiltererTestHelper(List.of(item1), filteringCriteria);
@@ -73,9 +86,9 @@ public class WardrobeFiltererInteractorTest {
 
     @Test
     void filterMultipleItemsMatchesSubsetTest() {
-        final AbstractWear item1 = WearFactory.constructWear("innertopwear", UUID.randomUUID());
-        final AbstractWear item2 = WearFactory.constructWear("innertopwear", UUID.randomUUID());
-        final AbstractWear item3 = WearFactory.constructWear("bottomwear", UUID.randomUUID());
+        final AbstractWear item1 = WearFactory.constructWear(InnerTopwear.class.getSimpleName(), UUID.randomUUID());
+        final AbstractWear item2 = WearFactory.constructWear(InnerTopwear.class.getSimpleName(), UUID.randomUUID());
+        final AbstractWear item3 = WearFactory.constructWear(Bottomwear.class.getSimpleName(), UUID.randomUUID());
 
         item1.setName("Nike Jacket");
         item1.setBrand("Nike");
@@ -84,9 +97,9 @@ public class WardrobeFiltererInteractorTest {
         item3.setName("Blue pants");
         item3.setBrand("PUMA");
 
-        // Filter for "innertopwear" should match item1 and item2, but exclude item3
+        // Filter for innerTopwear.class.getSimpleName() should match item1 and item2, but exclude item3
         final WardrobeFiltererInputData filteringCriteria = new WardrobeFiltererInputData(
-            "innertopwear", null, null, 0, null
+            null, WearFactory.getDisplayName(InnerTopwear.class), null, 0, null
         );
 
         wardrobeFiltererTestHelper(List.of(item1, item2, item3), filteringCriteria,
@@ -96,66 +109,66 @@ public class WardrobeFiltererInteractorTest {
 
     @Test
     void filterNameMatchBranchesTest() {
-        final AbstractWear item = WearFactory.constructWear("innertopwear", UUID.randomUUID());
+        final AbstractWear item = WearFactory.constructWear(InnerTopwear.class.getSimpleName(), UUID.randomUUID());
         item.setName("Red Shirt");
 
         // Branch 1: Name is empty string (Should match and return the shirt)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, ""),
+                "", null, null, 0, ""),
             "Red Shirt");
 
         // Branch 2: Substring match case-insensitive (Should match and return the shirt)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "red s", 0, ""),
+                "red s", null, null, 0, ""),
             "Red Shirt");
 
         // Branch 3: No match (Should filter out the shirt and return nothing)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "blue jacket", 0, ""));
+                "blue jacket", null, null, 0, ""));
     }
 
     @Test
     void filterCategoryMatchBranchesTest() {
-        final AbstractWear item = WearFactory.constructWear("innertopwear", UUID.randomUUID());
+        final AbstractWear item = WearFactory.constructWear(InnerTopwear.class.getSimpleName(), UUID.randomUUID());
         item.setName("Category Shirt");
 
         // Branch 1: "All Categories" (Should match and return the shirt)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, ""),
+                "", null, null, 0, ""),
             "Category Shirt");
 
         // Branch 2: Specific category match (Should match and return the shirt)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                item.getClass().getSimpleName(), "All Conditions", "", 0, ""),
+                "", WearFactory.getDisplayName(item.getClass()), null, 0, ""),
             "Category Shirt");
 
         // Branch 3: Category mismatch (Should filter out the shirt and return nothing)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                "footwear", "All Conditions", "", 0, ""));
+                "", WearFactory.getDisplayName(Footwear.class), null, 0, ""));
 
         // Branch 4: Category is null (Should match)
         wardrobeFiltererTestHelper(List.of(item),
             new WardrobeFiltererInputData(
-                null, "All Conditions", "", 0, ""),
+                "", null, null, 0, ""),
             "Category Shirt");
     }
 
     @Test
     void filterConditionMatchBranchesTest() {
         final AbstractWear itemNew = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemNew.setName("New Shirt");
         itemNew.setCondition(WearCondition.NEW);
 
         final AbstractWear itemNullCond = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemNullCond.setName("Null Condition Shirt");
         itemNullCond.setCondition(null);
@@ -164,7 +177,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNew, itemNullCond),
             new WardrobeFiltererInputData(
-                "All Categories", "", "", 0, ""
+                "", null, "", 0, ""
             ),
             "New Shirt", "Null Condition Shirt"
         );
@@ -173,7 +186,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNew, itemNullCond),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, ""
+                "", null, null, 0, ""
             ),
             "New Shirt", "Null Condition Shirt"
         );
@@ -182,7 +195,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNullCond),
             new WardrobeFiltererInputData(
-                "All Categories", "NEW", "", 0, ""
+                "", null, WearCondition.NEW.getDisplayName(), 0, ""
             )
         );
 
@@ -190,7 +203,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNew),
             new WardrobeFiltererInputData(
-                "All Categories", "new", "", 0, ""
+                "", null, WearCondition.NEW.getDisplayName(), 0, ""
             ),
             "New Shirt"
         );
@@ -199,7 +212,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNew),
             new WardrobeFiltererInputData(
-                "All Categories", "USED", "", 0, ""
+                "", null, WearCondition.DAMAGED.getDisplayName(), 0, ""
             )
         );
     }
@@ -207,19 +220,19 @@ public class WardrobeFiltererInteractorTest {
     @Test
     void filterTagMatchBranchesTest() {
         final AbstractWear itemTagged = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemTagged.setName("Tagged Shirt");
         itemTagged.setTags(List.of("winter", "casual"));
 
         final AbstractWear itemNullTags = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemNullTags.setName("Null Tags Shirt");
         itemNullTags.setTags(null);
 
         final AbstractWear itemEmptyTags = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemEmptyTags.setName("Empty Tags Shirt");
         itemEmptyTags.setTags(new ArrayList<>());
@@ -228,7 +241,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemTagged),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, ""
+                "", null, null, 0, ""
             ),
             "Tagged Shirt"
         );
@@ -237,7 +250,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNullTags),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, "winter"
+                "", null, null, 0, "winter"
             )
         );
 
@@ -245,7 +258,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemEmptyTags),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, "winter"
+                "", null, null, 0, "winter"
             )
         );
 
@@ -253,7 +266,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemTagged),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, "WIN"
+                "", null, null, 0, "WIN"
             ),
             "Tagged Shirt"
         );
@@ -262,7 +275,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemTagged),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, "summer"
+                "", null, null, 0, "summer"
             )
         );
     }
@@ -270,14 +283,14 @@ public class WardrobeFiltererInteractorTest {
     @Test
     void filterMonthMatchBranchesTest() {
         final AbstractWear itemWithDate = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemWithDate.setName("Aged Shirt");
         // Sets purchase date to 12 months ago to make age non-null
         itemWithDate.setPurchaseDate(java.time.LocalDate.now().minusMonths(12));
 
         final AbstractWear itemNoDate = WearFactory.constructWear(
-            "innertopwear", UUID.randomUUID()
+            InnerTopwear.class.getSimpleName(), UUID.randomUUID()
         );
         itemNoDate.setName("No Date Shirt");
         // Forces age to be null (hits else branch)
@@ -287,7 +300,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemWithDate),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 0, ""
+                "", null, null, 0, ""
             ),
             "Aged Shirt"
         );
@@ -296,7 +309,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemNoDate),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 5, ""
+                "", null, null, 5, ""
             )
         );
 
@@ -304,7 +317,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemWithDate),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 24, ""
+                "", null, null, 24, ""
             )
         );
 
@@ -312,7 +325,7 @@ public class WardrobeFiltererInteractorTest {
         wardrobeFiltererTestHelper(
             List.of(itemWithDate),
             new WardrobeFiltererInputData(
-                "All Categories", "All Conditions", "", 6, ""
+                "", null, null, 6, ""
             ),
             "Aged Shirt"
         );

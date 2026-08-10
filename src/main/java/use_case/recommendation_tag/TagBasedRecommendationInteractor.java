@@ -181,10 +181,7 @@ public class TagBasedRecommendationInteractor implements TagBasedRecommendationI
      */
     private static void appendPreferences(StringBuilder response, String label, List<String> values) {
         if (!values.isEmpty()) {
-            response.append("including ").append(label).append(": ");
-            for (String value : values) {
-                response.append(value).append(SEPARATOR);
-            }
+            response.append("including ").append(label).append(": ").append(String.join(SEPARATOR, values));
         }
     }
 

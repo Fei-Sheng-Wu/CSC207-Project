@@ -35,13 +35,12 @@ public class WardrobeAnalyzerInteractorTest {
         final WardrobeAnalyzerOutputBoundary presenter = new WardrobeAnalyzerOutputBoundary() {
             @Override
             public void prepareSuccessView(WardrobeAnalyzerOutputData outputData) {
-                assertEquals(expectedTotalCount, outputData.getTotalItems());
-                assertEquals(expectedMeanFondness, outputData.getAverageFondness(), 0.01);
-                assertEquals(expectedDonationCandidates, outputData.getDonationCandidateCount());
-                assertEquals(expectedOldestAge, outputData.getOldestItemAge());
-                assertEquals(expectedNewestAge, outputData.getNewestItemAge());
-                assertNotNull(outputData.getCategoryCounts());
-                assertNotNull(outputData.getConditionCounts());
+                assertNotNull(outputData.getStatistics());
+                assertEquals(expectedTotalCount, outputData.getStatistics().get("totalItems"));
+                assertEquals(expectedMeanFondness, (double) (outputData.getStatistics().get("meanFondness")), 0.01);
+                assertEquals(expectedDonationCandidates, outputData.getStatistics().get("donationCandidateCount"));
+                assertEquals(expectedOldestAge, outputData.getStatistics().get("oldestItemAge"));
+                assertEquals(expectedNewestAge, outputData.getStatistics().get("newestItemAge"));
             }
 
             @Override
