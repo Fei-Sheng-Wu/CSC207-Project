@@ -60,6 +60,42 @@ class OutfitAnalyzerTest {
     }
 
     @Test
+    void weatherAnalyzerRejectsMissingColdWeatherLayers() {
+        final Weather coldWeather = new Weather(
+                LocalDate.of(2026, 7, 1), "Cold", -5.0, 0.0, 0.0, 0.0, 0);
+
+        final OutfitAnalysis analysis = new WeatherOutfitAnalyzer().analyze(
+                basicOutfit(),
+                new RecommendationContext(coldWeather, List.of(), List.of(), List.of())
+        );
+
+        assertFalse(analysis.isAcceptable());
+        assertTrue(analysis.getReasons().get(0).contains("suitable coverage"));
+    }
+
+    @Test
+    void weatherAnalyzerExplainsBothCoolTemperatureRanges() {
+        final InnerTopwear shirt = wear(
+                new InnerTopwear(UUID.randomUUID()), WearColor.RED, WearStyle.CASUAL);
+        final OuterTopwear coat = wear(
+                new OuterTopwear(UUID.randomUUID()), WearColor.WHITE, WearStyle.CASUAL);
+        final Bottomwear bottom = wear(
+                new Bottomwear(UUID.randomUUID()), WearColor.BLACK, WearStyle.CASUAL);
+        bottom.setIsLong(true);
+        final Footwear footwear = wear(
+                new Footwear(UUID.randomUUID()), WearColor.BLACK, WearStyle.CASUAL);
+        final Outfit outfit = new Outfit(shirt, coat, bottom, footwear, null, List.of());
+
+        final OutfitAnalysis colder = analyzeWeather(outfit, 3.0);
+        final OutfitAnalysis warmer = analyzeWeather(outfit, 7.0);
+
+        assertTrue(colder.isAcceptable());
+        assertTrue(colder.getReasons().get(0).contains("long bottomwear"));
+        assertTrue(warmer.isAcceptable());
+        assertTrue(warmer.getReasons().get(0).contains("Outerwear was selected"));
+    }
+
+    @Test
     void eventAndPreferenceAnalyzersCountMatchingAttributes() {
         final Outfit outfit = basicOutfit();
         outfit.getTopwearInner().setColor(WearColor.RED);
@@ -90,6 +126,15 @@ class OutfitAnalyzerTest {
         final Bottomwear bottom = wear(new Bottomwear(UUID.randomUUID()), WearColor.BLACK, WearStyle.FORMAL);
         final Footwear footwear = wear(new Footwear(UUID.randomUUID()), WearColor.BLACK, WearStyle.FORMAL);
         return new Outfit(shirt, null, bottom, footwear, null, List.of());
+    }
+
+    private static OutfitAnalysis analyzeWeather(Outfit outfit, double temperature) {
+        final Weather weather = new Weather(
+                LocalDate.of(2026, 7, 1), "Cool", temperature, 0.0, 0.0, 0.0, 0);
+        return new WeatherOutfitAnalyzer().analyze(
+                outfit,
+                new RecommendationContext(weather, List.of(), List.of(), List.of())
+        );
     }
 
     private static <T extends AbstractWear> T wear(T item, WearColor color, WearStyle style) {
