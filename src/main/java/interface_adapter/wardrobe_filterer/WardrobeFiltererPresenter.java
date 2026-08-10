@@ -20,4 +20,9 @@ public class WardrobeFiltererPresenter implements WardrobeFiltererOutputBoundary
     public void prepareSuccessView(WardrobeFiltererOutputData outputData) {
         viewModel.setItems(outputData.getFilteredItems());
     }
+
+    @Override
+    public void prepareFailView(String error) {
+        viewModel.setError(error);
+    }
 }
