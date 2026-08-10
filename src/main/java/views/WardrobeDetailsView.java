@@ -12,16 +12,12 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import interface_adapter.wardrobe.WardrobeViewModel;
 import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerController;
-import interface_adapter.wardrobe_analyzer.WardrobeAnalyzerState;
 
 /**
  * Represents the wardrobe view.
@@ -31,9 +27,6 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
 
     private final WardrobeViewModel viewModel;
     private final WardrobeAnalyzerController analyzerController;
-
-    private final DefaultListModel<String> allItemsModel;
-    private final DefaultListModel<String> oldItemsModel;
 
     private final JLabel totalItemsLabel;
     private final JLabel averageFondnessLabel;
@@ -59,10 +52,6 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
 
         // Initialize the layout.
         setLayout(new BorderLayout(SIZE_SPACING_MD, SIZE_SPACING_MD));
-
-        // Initialize UI Models
-        this.allItemsModel = new DefaultListModel<>();
-        this.oldItemsModel = new DefaultListModel<>();
 
         // Initialize Analyzer Labels
         this.totalItemsLabel = new JLabel("Total Items: --");
@@ -133,35 +122,11 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         return statsGrid;
     }
 
-    // We should actually delete this if we find no use for it!!
-    private JPanel createListsPanel() {
-        final JList<String> allItemsList = new JList<>(allItemsModel);
-        final JList<String> oldItemsList = new JList<>(oldItemsModel);
-
-        final JScrollPane allItemsScroll = new JScrollPane(allItemsList);
-        allItemsScroll.setBorder(BorderFactory.createTitledBorder("All Items"));
-        allItemsScroll.setOpaque(false);
-        allItemsScroll.getViewport().setOpaque(false);
-
-        final JScrollPane oldItemsScroll = new JScrollPane(oldItemsList);
-        oldItemsScroll.setBorder(BorderFactory.createTitledBorder("Old Items (Donation Candidates)"));
-        oldItemsScroll.setOpaque(false);
-        oldItemsScroll.getViewport().setOpaque(false);
-
-        final JPanel listsPanel = new JPanel(new GridLayout(1, 2, SIZE_SPACING_MD, SIZE_SPACING_MD));
-        listsPanel.setOpaque(false);
-        listsPanel.add(allItemsScroll);
-        listsPanel.add(oldItemsScroll);
-
-        return listsPanel;
-    }
-
     private JPanel createMainContentPanel() {
         final JPanel wrapper = new JPanel(new BorderLayout(SIZE_SPACING_MD, SIZE_SPACING_MD));
         wrapper.setOpaque(false);
 
         wrapper.add(createStatsGrid(), BorderLayout.PAGE_START);
-        wrapper.add(createListsPanel(), BorderLayout.CENTER);
 
         return wrapper;
     }
@@ -184,35 +149,38 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
                     JOptionPane.showMessageDialog(this, viewModel.getError());
                 }
                 break;
-            case WardrobeViewModel.PROPERTY_ANALYZER_STATE:
-                buildAnalyzerUi(viewModel.getAnalyzerState());
+            case WardrobeViewModel.PROPERTY_ANALYZER_STATISTICS:
+                buildAnalyzerUi(viewModel.getAnalyzerStatistics());
                 break;
-            case "items":
-                // @TODO: update content
-                // If we cannot finish this on time, it is fine to just remove the two lists from this view -Jet
-            case "itemsOld":
-                // @TODO: update content
             default:
                 break;
         }
     }
 
-    private void buildAnalyzerUi(WardrobeAnalyzerState state) {
-        if (state.getError() != null && isVisible()) {
-            JOptionPane.showMessageDialog(this, state.getError(), "Analyzer Error", JOptionPane.ERROR_MESSAGE);
+    private void buildAnalyzerUi(Map<String, Object> stat) {
+        if (stat == null) {
             return;
         }
 
-        totalItemsLabel.setText("Total Items: " + state.getTotalItemsCount());
-        averageFondnessLabel.setText("Average Fondness: " + state.getAverageFondnessString());
-        donationCandidatesLabel.setText("Donation Candidates (> 1 year; <0.5 fondness): "
-                                                                    + state.getDonationCandidateCount());
-        oldestAgeLabel.setText("Oldest Item Age: " + state.getOldestItemAge());
-        newestAgeLabel.setText("Newest Item Age: " + state.getNewestItemAge());
+        final int totalItems = (int) stat.getOrDefault("totalItems", 0);
+        final double meanFondness = (double) stat.getOrDefault("meanFondness", 0.0);
+        final int donationCount = (int) stat.getOrDefault("donationCandidateCount", 0);
+        final int oldestAge = (int) stat.getOrDefault("oldestItemAge", 0);
+        final int newestAge = (int) stat.getOrDefault("newestItemAge", 0);
 
-        final int totalItems = state.getTotalItemsCount();
-        populateDistributionPanel(categoryBreakdownPanel, state.getCategoryDistribution(), totalItems);
-        populateDistributionPanel(conditionBreakdownPanel, state.getConditionDistribution(), totalItems);
+        totalItemsLabel.setText("Total Items: " + totalItems);
+        averageFondnessLabel.setText(String.format("Average Fondness: %.0f%%", meanFondness * PERCENTAGE_MULTIPLIER));
+        donationCandidatesLabel.setText("Donation Candidates (> 1 year; <0.5 fondness): " + donationCount);
+        oldestAgeLabel.setText("Oldest Item Age: " + oldestAge + " months");
+        newestAgeLabel.setText("Newest Item Age: " + newestAge + " months");
+
+        final Map<String, Integer> categoryDist = (Map<String, Integer>)
+            stat.getOrDefault("categoryCounts", Map.of());
+        final Map<String, Integer> conditionDist = (Map<String, Integer>)
+            stat.getOrDefault("conditionCounts", Map.of());
+
+        populateDistributionPanel(categoryBreakdownPanel, categoryDist, totalItems);
+        populateDistributionPanel(conditionBreakdownPanel, conditionDist, totalItems);
     }
 
     /**
@@ -260,40 +228,5 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
 
         panel.revalidate();
         panel.repaint();
-    }
-
-    /**
-     * Builds reporting view for old items and other stats.
-     */
-    private void buildReportingUi() {
-        final JList<String> allItemsList = new JList<>(allItemsModel);
-        final JList<String> oldItemsList = new JList<>(oldItemsModel);
-
-        final JScrollPane allItemsScroll = new JScrollPane(allItemsList);
-        allItemsScroll.setBorder(BorderFactory.createTitledBorder("All Items"));
-
-        final JScrollPane oldItemsScroll = new JScrollPane(oldItemsList);
-        oldItemsScroll.setBorder(BorderFactory.createTitledBorder("Old Items (Needs Review)"));
-
-        final JPanel listsPanel = new JPanel(new GridLayout(1, 2, SIZE_SPACING_MD, SIZE_SPACING_MD));
-        listsPanel.add(allItemsScroll);
-        listsPanel.add(oldItemsScroll);
-
-        final JPanel statsPanel = new JPanel(new GridLayout(5, 1, 5, 5));
-        statsPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder("Wardrobe Stats"),
-            BorderFactory.createEmptyBorder(SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM, SIZE_SPACING_SM)
-        ));
-
-        statsPanel.add(totalItemsLabel);
-        statsPanel.add(averageFondnessLabel);
-        statsPanel.add(donationCandidatesLabel);
-        statsPanel.add(oldestAgeLabel);
-        statsPanel.add(newestAgeLabel);
-        statsPanel.add(categoryBreakdownPanel);
-        statsPanel.add(conditionBreakdownPanel);
-
-        add(statsPanel, BorderLayout.NORTH);
-        add(listsPanel, BorderLayout.CENTER);
     }
 }

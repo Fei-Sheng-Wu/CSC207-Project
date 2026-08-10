@@ -1,6 +1,5 @@
 package use_case.wardrobe_analyzer;
 
-import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +9,6 @@ import entity.Wardrobe;
 import use_case.wardrobe.WardrobeDataAccessInterface;
 
 public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary {
-    private static final double DONATION_FONDNESS_THRESHOLD = 50.0;
-    private static final int MONTHS_IN_YEAR = 12;
-    private static final int DONATION_MONTHS_THRESHOLD = 12;
-
     private final WardrobeDataAccessInterface repository;
     private final WardrobeAnalyzerOutputBoundary outputBoundary;
 
@@ -28,70 +23,18 @@ public class WardrobeAnalyzerInteractor implements WardrobeAnalyzerInputBoundary
         final Wardrobe wardrobe = repository.fetchWardrobe();
         final List<AbstractWear> items = wardrobe.getItems();
 
-        //        if (items.isEmpty()) {
-        //            outputBoundary.prepareFailView("Your wardrobe is empty. Add some clothes to see statistics!");
-        //            return;
-        //        }
-
-        final Map<String, Integer> categoryCounts = new HashMap<>();
-        final Map<String, Integer> conditionCounts = new HashMap<>();
-        double totalFondness = 0;
-
-        int donationCandidateCount = 0;
-        int oldestItemAge = 0;
-        int newestItemAge = Integer.MAX_VALUE;
-
-        for (AbstractWear wear : items) {
-            final String category = wear.getClass().getSimpleName();
-            categoryCounts.put(category, categoryCounts.getOrDefault(category, 0) + 1);
-
-            if (wear.getCondition() != null) {
-                final String condition = wear.getCondition().name();
-                conditionCounts.put(condition, conditionCounts.getOrDefault(condition, 0) + 1);
-            }
-
-            totalFondness += wear.getFondness();
-
-            int ageInMonths = 0;
-            final Period age = wear.getAge();
-            if (age != null) {
-                ageInMonths = (age.getYears() * MONTHS_IN_YEAR) + age.getMonths();
-            }
-
-            if (ageInMonths > oldestItemAge) {
-                oldestItemAge = ageInMonths;
-            }
-            if (ageInMonths < newestItemAge) {
-                newestItemAge = ageInMonths;
-            }
-
-            // Donation Candidate Logic: Older than a year and low fondness
-            if (ageInMonths >= DONATION_MONTHS_THRESHOLD && wear.getFondness() < DONATION_FONDNESS_THRESHOLD) {
-                donationCandidateCount++;
-            }
+        if (wardrobe == null || wardrobe.getItems() == null) {
+            outputBoundary.prepareFailView("Failed to load wardrobe data for analysis.");
+            return;
         }
 
-        if (newestItemAge == Integer.MAX_VALUE) {
-            newestItemAge = 0;
+        final Map<String, Object> resultsMap = new HashMap<>();
+        final List<WardrobeStatistic> statistics = AnalyzerFactory.createStatistics();
+
+        for (WardrobeStatistic statistic : statistics) {
+            statistic.calculate(items, resultsMap);
         }
-
-        final double meanFondness;
-        if (items.isEmpty()) {
-            meanFondness = 0.0;
-        } else {
-            meanFondness = totalFondness / items.size();
-        }
-
-        final WardrobeAnalyzerOutputData outputData = new WardrobeAnalyzerOutputData(
-            items.size(),
-            categoryCounts,
-            conditionCounts,
-            meanFondness,
-            donationCandidateCount,
-            oldestItemAge,
-            newestItemAge
-        );
-
+        final WardrobeAnalyzerOutputData outputData = new WardrobeAnalyzerOutputData(resultsMap);
         outputBoundary.prepareSuccessView(outputData);
     }
 }
