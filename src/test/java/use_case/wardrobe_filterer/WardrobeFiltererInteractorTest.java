@@ -1,6 +1,7 @@
 package use_case.wardrobe_filterer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +25,24 @@ public class WardrobeFiltererInteractorTest {
             new Wardrobe(new ArrayList<>(inputItems))
         );
 
-        final WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(repository, outputData -> {
-            final List<AbstractWear> filteredItems = outputData.getFilteredItems();
+        final WardrobeFiltererOutputBoundary presenter = new WardrobeFiltererOutputBoundary() {
+            @Override
+            public void prepareSuccessView(WardrobeFiltererOutputData outputData) {
+                final List<AbstractWear> filteredItems = outputData.getFilteredItems();
 
-            assertEquals(expectedNames.length, filteredItems.size());
-            for (int i = 0; i < expectedNames.length; i++) {
-                assertEquals(expectedNames[i], filteredItems.get(i).getName());
+                assertEquals(expectedNames.length, filteredItems.size());
+                for (int i = 0; i < expectedNames.length; i++) {
+                    assertEquals(expectedNames[i], filteredItems.get(i).getName());
+                }
             }
-        });
 
+            @Override
+            public void prepareFailView(String message) {
+                fail("Use case failed unexpectedly: " + message);
+            }
+        };
+
+        final WardrobeFiltererInputBoundary interactor = new WardrobeFiltererInteractor(repository, presenter);
         interactor.filterItems(filteringCriteria);
     }
 

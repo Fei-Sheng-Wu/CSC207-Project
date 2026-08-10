@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -35,13 +36,15 @@ public class WardrobeAnalyzerInteractorTest {
         final WardrobeAnalyzerOutputBoundary presenter = new WardrobeAnalyzerOutputBoundary() {
             @Override
             public void prepareSuccessView(WardrobeAnalyzerOutputData outputData) {
-                assertEquals(expectedTotalCount, outputData.getTotalItems());
-                assertEquals(expectedMeanFondness, outputData.getAverageFondness(), 0.01);
-                assertEquals(expectedDonationCandidates, outputData.getDonationCandidateCount());
-                assertEquals(expectedOldestAge, outputData.getOldestItemAge());
-                assertEquals(expectedNewestAge, outputData.getNewestItemAge());
-                assertNotNull(outputData.getCategoryCounts());
-                assertNotNull(outputData.getConditionCounts());
+                final Map<String, Object> stats = outputData.getStatistics();
+
+                assertEquals(expectedTotalCount, (Integer) stats.get("totalItems"));
+                assertEquals(expectedMeanFondness, (Double) stats.get("meanFondness"), 0.01);
+                assertEquals(expectedDonationCandidates, (Integer) stats.get("donationCandidateCount"));
+                assertEquals(expectedOldestAge, (Integer) stats.get("oldestItemAge"));
+                assertEquals(expectedNewestAge, (Integer) stats.get("newestItemAge"));
+                assertNotNull(stats.get("categoryCounts"));
+                assertNotNull(stats.get("conditionCounts"));
             }
 
             @Override
