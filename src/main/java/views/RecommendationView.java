@@ -23,12 +23,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import entity.AbstractWear;
-import entity.Accessory;
-import entity.Bottomwear;
-import entity.Footwear;
-import entity.Headwear;
-import entity.InnerTopwear;
-import entity.OuterTopwear;
 import entity.Outfit;
 import entity.WearColor;
 import entity.WearFactory;
@@ -51,12 +45,6 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     private static final String SLOT_EMPTY = "—";
     private static final String OUTPUT_WORKING = "Looking for an outfit...";
     private static final String OUTPUT_FAILURE = "Something went wrong while looking for an outfit!";
-    private static final String[] SLOT_LABELS = {
-        "Inner Topwear", "Outer Topwear", "Bottomwear", "Footwear", "Headwear", "Accessories",
-    };
-    private static final Class<?>[] SLOT_TYPES = {
-        InnerTopwear.class, OuterTopwear.class, Bottomwear.class, Footwear.class, Headwear.class, Accessory.class,
-    };
 
     private final RecommendationViewModel viewModel;
     private final ContextBasedRecommendationController contextBasedController;
@@ -66,7 +54,7 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     private final JComboBox<String> choiceStyle = createChoice(WearStyle.values());
     private final JComboBox<String> choiceMode = new JComboBox<>(new String[]{OPTION_CONTEXT_BASED, OPTION_TAG_BASED});
     private final JTextField fieldTags = new JTextField();
-    private final JLabel[] slotValues = new JLabel[SLOT_LABELS.length];
+    private final JLabel[] slotValues = new JLabel[WearFactory.getAllTypes().length];
     private final JTextArea reason = createReason();
 
     /**
@@ -185,13 +173,15 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
     }
 
     private JPanel createSlots() {
-        final JPanel slots = new JPanel(new GridLayout(SLOT_LABELS.length, 1, 0, 0));
+        final Class<?>[] types = WearFactory.getAllTypes();
+
+        final JPanel slots = new JPanel(new GridLayout(types.length, 1, 0, 0));
         slots.setOpaque(false);
 
-        for (int index = 0; index < SLOT_LABELS.length; index++) {
+        for (int index = 0; index < types.length; index++) {
             final JPanel slot = new JPanel(new GridLayout(1, 2, SIZE_SPACING_MD, 0));
             slot.setOpaque(false);
-            if (index < SLOT_LABELS.length - 1) {
+            if (index < types.length - 1) {
                 slot.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
             }
             slots.add(slot);
@@ -200,10 +190,10 @@ public class RecommendationView extends AbstractView implements PropertyChangeLi
             left.setOpaque(false);
             slot.add(left);
 
-            final JLabel icon = new JLabel(WearFactory.getIcon(SLOT_TYPES[index]));
+            final JLabel icon = new JLabel(WearFactory.getIcon(types[index]));
             icon.setFont(FONT_EMOJI);
             left.add(icon, BorderLayout.LINE_START);
-            left.add(new JLabel(SLOT_LABELS[index]), BorderLayout.CENTER);
+            left.add(new JLabel(WearFactory.getDisplayName(types[index])), BorderLayout.CENTER);
 
             final JLabel value = new JLabel(SLOT_EMPTY);
             slotValues[index] = value;

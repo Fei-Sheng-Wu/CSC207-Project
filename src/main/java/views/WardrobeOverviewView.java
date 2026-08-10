@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import entity.AbstractWear;
 import entity.InnerTopwear;
 import entity.WardrobeSort;
+import entity.WearCondition;
 import entity.WearFactory;
 import interface_adapter.item.ItemViewModel;
 import interface_adapter.wardrobe.WardrobeViewModel;
@@ -37,7 +38,7 @@ import interface_adapter.wardrobe_sorter.WardrobeSorterController;
  * Represents the wardrobe view.
  */
 public class WardrobeOverviewView extends AbstractView implements PropertyChangeListener {
-    private static final String DEFAULT_ITEM_TYPE = InnerTopwear.class.getSimpleName();
+    private static final Class<?> DEFAULT_ITEM_TYPE = InnerTopwear.class;
 
     private final ApplicationManager manager;
     private final WardrobeViewModel wardrobeViewModel;
@@ -177,11 +178,9 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
         final List<String> categories = getCategories();
         final List<String> conditions = getConditions();
 
-        final FilterPanel filterPanel = new FilterPanel((name, category, purchaseMonths, condition, tag) -> {
-            filtererController.filterWardrobe(category, condition, name, purchaseMonths, tag);
-        }, categories, conditions);
+        final FilterPanel filterPanel = new FilterPanel(categories, conditions);
 
-        JOptionPane.showOptionDialog(
+        final int result = JOptionPane.showOptionDialog(
             WardrobeOverviewView.this,
             filterPanel,
             "Filter Wardrobe",
@@ -191,29 +190,31 @@ public class WardrobeOverviewView extends AbstractView implements PropertyChange
             null,
             null
         );
+
+        if (result == JOptionPane.OK_OPTION) {
+            filterPanel.apply(filtererController);
+        }
     }
 
     @NotNull
     private List<String> getCategories() {
-        final java.util.Set<String> uniqueCategories = new java.util.LinkedHashSet<>();
-        uniqueCategories.add("All Categories");
-        for (AbstractWear wear : wardrobeViewModel.getItems()) {
-            uniqueCategories.add(wear.getClass().getSimpleName());
+        final List<String> categories = new java.util.ArrayList<>();
+        categories.add("All Categories");
+        for (Class<?> wear : WearFactory.getAllTypes()) {
+            categories.add(WearFactory.getDisplayName(wear));
         }
-        final List<String> categories = new java.util.ArrayList<>(uniqueCategories);
+
         return categories;
     }
 
     @NotNull
     private List<String> getConditions() {
-        final java.util.Set<String> uniqueConditions = new java.util.LinkedHashSet<>();
-        uniqueConditions.add("All Conditions");
-        for (AbstractWear wear : wardrobeViewModel.getItems()) {
-            if (wear.getCondition() != null) {
-                uniqueConditions.add(wear.getCondition().name());
-            }
+        final List<String> conditions = new java.util.ArrayList<>();
+        conditions.add("All Conditions");
+        for (WearCondition condition : WearCondition.values()) {
+            conditions.add(condition.getDisplayName());
         }
-        return new java.util.ArrayList<>(uniqueConditions);
+        return conditions;
     }
 
     private void addCard(AbstractWear wear) {

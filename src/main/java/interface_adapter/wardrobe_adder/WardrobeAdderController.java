@@ -27,8 +27,8 @@ public class WardrobeAdderController {
      *
      * @param type the clothing item type
      */
-    public void addItem(String type) {
-        final AbstractWear item = WearFactory.constructWear(type, UUID.randomUUID());
+    public void addItem(Class<?> type) {
+        final AbstractWear item = WearFactory.constructWear(type.getSimpleName(), UUID.randomUUID());
 
         interactor.addItem(new WardrobeAdderInputData(item));
     }

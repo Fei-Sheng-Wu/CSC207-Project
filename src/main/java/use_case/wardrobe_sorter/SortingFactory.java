@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import entity.AbstractWear;
 import entity.WardrobeSort;
+import entity.WearFactory;
 
 public final class SortingFactory {
 
@@ -28,18 +29,30 @@ public final class SortingFactory {
                 ).reversed();
             case BRAND_ASC:
                 return Comparator.comparing(
-                    AbstractWear::getBrand,
+                    (AbstractWear item) -> {
+                        if (item.getBrand() == null) {
+                            return "";
+                        }
+                        return item.getBrand();
+                    },
                     String.CASE_INSENSITIVE_ORDER
                 );
             case BRAND_DESC:
                 return Comparator.comparing(
-                    AbstractWear::getBrand,
+                    (AbstractWear item) -> {
+                        if (item.getBrand() == null) {
+                            return "";
+                        }
+                        return item.getBrand();
+                    },
                     String.CASE_INSENSITIVE_ORDER
                 ).reversed();
             case TYPE:
                 return Comparator.comparing(
-                    item -> item.getClass().getSimpleName()
+                    item -> WearFactory.getDisplayName(item.getClass())
                 );
+            case NONE:
+                return (left, right) -> 0;
             default:
                 throw new IllegalArgumentException("Unsupported sort type: " + sortType);
         }

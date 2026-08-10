@@ -65,7 +65,7 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         this.conditionBreakdownPanel = createDistributionPanel("Condition Distribution");
 
         add(createHeader(), BorderLayout.PAGE_START);
-        add(createMainContentPanel(), BorderLayout.CENTER);
+        add(createStatsGrid(), BorderLayout.CENTER);
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -120,15 +120,6 @@ public class WardrobeDetailsView extends AbstractView implements PropertyChangeL
         statsGrid.add(metricsCard);
         statsGrid.add(distributionsCard);
         return statsGrid;
-    }
-
-    private JPanel createMainContentPanel() {
-        final JPanel wrapper = new JPanel(new BorderLayout(SIZE_SPACING_MD, SIZE_SPACING_MD));
-        wrapper.setOpaque(false);
-
-        wrapper.add(createStatsGrid(), BorderLayout.PAGE_START);
-
-        return wrapper;
     }
 
     private JPanel createCardPanel(String title) {

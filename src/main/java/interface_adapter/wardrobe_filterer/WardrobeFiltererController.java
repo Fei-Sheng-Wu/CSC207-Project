@@ -21,23 +21,26 @@ public class WardrobeFiltererController {
     /**
      * Executes the filter wardrobe use case.
      *
-     * @param category the category by which to filter the wardrobe
-     * @param condition the condition by which to filter the wardrobe
-     * @param name the name by which to filter the wardrobe
+     * @param category     the category by which to filter the wardrobe
+     * @param condition    the condition by which to filter the wardrobe
+     * @param name         the name by which to filter the wardrobe
      * @param purchaseDate the purchase date/months limit by which to filter the wardrobe
-     * @param tag the tag/occasion by which to filter the wardrobe
+     * @param tag          the tag/occasion by which to filter the wardrobe
      */
-    public void filterWardrobe(String category,
-                               String condition,
-                               String name,
-                               int purchaseDate,
-                               String tag) {
+    public void filterWardrobe(
+        String name,
+        String category,
+        String condition,
+        int purchaseDate,
+        String tag
+    ) {
         final WardrobeFiltererInputData filteringModel = new WardrobeFiltererInputData(
+            name,
             category,
             condition,
-            name,
             purchaseDate,
-            tag);
+            tag
+        );
         interactor.filterItems(filteringModel);
     }
 }

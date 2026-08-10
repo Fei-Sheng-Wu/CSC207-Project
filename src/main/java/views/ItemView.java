@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,12 +23,6 @@ import javax.swing.JTextField;
 import org.jdatepicker.JDatePicker;
 
 import entity.AbstractWear;
-import entity.Accessory;
-import entity.Bottomwear;
-import entity.Footwear;
-import entity.Headwear;
-import entity.InnerTopwear;
-import entity.OuterTopwear;
 import entity.WearColor;
 import entity.WearCondition;
 import entity.WearFactory;
@@ -42,9 +37,6 @@ import interface_adapter.wardrobe_updater.WardrobeUpdaterController;
  */
 public class ItemView extends AbstractView implements PropertyChangeListener {
     private static final String OPTION_NONE = "(No Input)";
-    private static final Class<?>[] ITEM_TYPES = new Class<?>[]{
-        InnerTopwear.class, OuterTopwear.class, Bottomwear.class, Footwear.class, Headwear.class, Accessory.class,
-    };
 
     private final ApplicationManager manager;
     private final ItemViewModel itemViewModel;
@@ -52,8 +44,10 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
     private final WardrobeUpdaterController updaterController;
     private final WardrobeRemoverController removerController;
 
-    private JComboBox<String> choiceType = new JComboBox<>(
-        new String[]{"Inner Topwear", "Outer Topwear", "Bottomwear", "Footwear", "Headwear", "Accessories"}
+    private final JComboBox<String> choiceType = new JComboBox<>(
+        Arrays.stream(WearFactory.getAllTypes())
+            .map(WearFactory::getDisplayName)
+            .toArray(String[]::new)
     );
     private final JLabel icon = new JLabel();
     private final JTextField fieldName = new JTextField();
@@ -178,7 +172,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
         choiceType.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                icon.setText(WearFactory.getIcon(ITEM_TYPES[choiceType.getSelectedIndex()]));
+                icon.setText(WearFactory.getIcon(WearFactory.getAllTypes()[choiceType.getSelectedIndex()]));
             }
         });
         icon.setFont(FONT_EMOJI);
@@ -241,7 +235,7 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
 
         updaterController.updateItem(
             item,
-            ITEM_TYPES[choiceType.getSelectedIndex()].getSimpleName(),
+            WearFactory.getAllTypes()[choiceType.getSelectedIndex()],
             fieldName.getText(),
             fieldBrand.getText(),
             selectedEnum(choiceColor, WearColor.values()),
@@ -274,8 +268,9 @@ public class ItemView extends AbstractView implements PropertyChangeListener {
                     break;
                 }
 
-                for (int i = 0; i < ITEM_TYPES.length; i++) {
-                    if (ITEM_TYPES[i].equals(item.getClass())) {
+                final Class<?>[] types = WearFactory.getAllTypes();
+                for (int i = 0; i < types.length; i++) {
+                    if (types[i].equals(item.getClass())) {
                         choiceType.setSelectedIndex(i);
                     }
                 }

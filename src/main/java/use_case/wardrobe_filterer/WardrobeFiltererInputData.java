@@ -1,20 +1,22 @@
 package use_case.wardrobe_filterer;
 
 public class WardrobeFiltererInputData {
+    private final String name;
     private final String category;
     private final String condition;
-    private final String name;
     private final int purchaseMonth;
     private final String tag;
 
-    public WardrobeFiltererInputData(String category,
-                                     String condition,
-                                     String name,
-                                     int purchaseMonth,
-                                     String tag) {
+    public WardrobeFiltererInputData(
+        String name,
+        String category,
+        String condition,
+        int purchaseMonth,
+        String tag
+    ) {
+        this.name = name;
         this.category = category;
         this.condition = condition;
-        this.name = name;
         this.purchaseMonth = purchaseMonth;
         this.tag = tag;
     }
