@@ -19,24 +19,11 @@ public class WardrobeAnalyzerPresenter implements WardrobeAnalyzerOutputBoundary
 
     @Override
     public void prepareSuccessView(WardrobeAnalyzerOutputData outputData) {
-        final WardrobeAnalyzerState state = new WardrobeAnalyzerState();
-
-        final String formattedFondness = String.format("%.2f", outputData.getAverageFondness());
-        state.setTotalItemsCount(outputData.getTotalItems());
-        state.setAverageFondnessString(formattedFondness + "/100");
-        state.setDonationCandidateCount(outputData.getDonationCandidateCount());
-        state.setOldestItemAge(outputData.getOldestItemAge() + " months");
-        state.setNewestItemAge(outputData.getNewestItemAge() + " months");
-        state.setCategoryDistribution(outputData.getCategoryCounts());
-        state.setConditionDistribution(outputData.getConditionCounts());
-
-        viewModel.setAnalyzerState(state);
+        viewModel.setAnalyzerStatistics(outputData.getStatistics());
     }
 
     @Override
     public void prepareFailView(String error) {
-        final WardrobeAnalyzerState state = new WardrobeAnalyzerState();
-        state.setError(error);
-        viewModel.setAnalyzerState(state);
+        viewModel.setError(error);
     }
 }
