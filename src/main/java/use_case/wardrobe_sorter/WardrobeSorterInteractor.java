@@ -25,7 +25,7 @@ public class WardrobeSorterInteractor implements WardrobeSorterInputBoundary {
         final Wardrobe wardrobe = repository.fetchWardrobe();
         final List<AbstractWear> items = new ArrayList<>(wardrobe.getItems());
 
-        final Comparator<AbstractWear> sortBy = SortingUtility.SORTING_WAYS.get(inputData.getSortBy());
+        final Comparator<AbstractWear> sortBy = SortingFactory.createComparator(inputData.getSortBy());
         if (sortBy != null) {
             items.sort(sortBy);
         }
