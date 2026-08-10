@@ -38,19 +38,66 @@ import use_case.wardrobe.WardrobeDataAccessInterface;
 class ContextBasedRecommendationSearchTest {
     private static final int CANDIDATE_CEILING = 10000;
     private static final int MATCHING_ACCESSORIES = 5;
+    private static final int SMALL_WARDROBE_SIZE = 4;
+    private static final int LARGE_WARDROBE_SIZE = 40;
 
     @Test
-    void examinesTheSameNumberOfCandidatesHoweverLargeTheWardrobeGets() {
+    void accessorySearchGrowsLinearlyRatherThanExponentially() {
         final CountingAnalyzer smallAnalyzer = new CountingAnalyzer();
         final CountingAnalyzer largeAnalyzer = new CountingAnalyzer();
 
-        recommendWith(wardrobeOfEachType(4), smallAnalyzer);
-        recommendWith(wardrobeOfEachType(40), largeAnalyzer);
+        recommendWith(wardrobeOfEachType(SMALL_WARDROBE_SIZE), smallAnalyzer);
+        recommendWith(wardrobeOfEachType(LARGE_WARDROBE_SIZE), largeAnalyzer);
 
-        // A wardrobe ten times the size costs the same to search. Were every combination still
-        // built, the larger wardrobe alone would offer more candidates than could be enumerated.
-        assertEquals(smallAnalyzer.getInvocationCount(), largeAnalyzer.getInvocationCount());
+        // Each base outfit evaluates one candidate per accessory prefix. Increasing the number of
+        // neutral accessories tenfold therefore remains linear instead of producing 2^40 subsets.
+        final int smallCandidatesPerPrefix =
+                smallAnalyzer.getInvocationCount() / (SMALL_WARDROBE_SIZE + 1);
+        final int largeCandidatesPerPrefix =
+                largeAnalyzer.getInvocationCount() / (LARGE_WARDROBE_SIZE + 1);
+        assertEquals(smallCandidatesPerPrefix, largeCandidatesPerPrefix);
         assertTrue(largeAnalyzer.getInvocationCount() < CANDIDATE_CEILING);
+    }
+
+    @Test
+    void keepsEveryNeutralAccessoryThatImprovesAverageFondness() {
+        final List<AbstractWear> items = new ArrayList<>();
+        items.add(wearWithFondness(new InnerTopwear(new UUID(1L, 1L)), 0.0));
+        items.add(wearWithFondness(new Bottomwear(new UUID(2L, 1L)), 0.0));
+        items.add(wearWithFondness(new Footwear(new UUID(3L, 1L)), 0.0));
+
+        final List<Accessory> accessories = new ArrayList<>();
+        for (int index = 0; index < SMALL_WARDROBE_SIZE; index++) {
+            accessories.add(wearWithFondness(new Accessory(new UUID(4L, index)), 1.0));
+        }
+        items.addAll(accessories);
+        final CapturingOutputBoundary output = new CapturingOutputBoundary();
+
+        interactor(new Wardrobe(items), output).recommend(
+                new ContextBasedRecommendationInputData(0, List.of(), List.of()));
+
+        assertNotNull(output.outputData);
+        assertEquals(accessories, output.outputData.getOutfit().getAccessories());
+        assertEquals(
+                (double) accessories.size() / items.size(),
+                new FondnessOutfitAnalyzer().analyze(
+                        output.outputData.getOutfit(),
+                        new RecommendationContext(
+                                StubWeatherRepository.MILD, List.of(), List.of(), List.of())
+                ).getFondness()
+        );
+    }
+
+    @Test
+    void fetchesOneWardrobeSnapshotPerRecommendation() {
+        final StubWardrobeRepository wardrobe = new StubWardrobeRepository(new Wardrobe(basicItems()));
+        final CapturingOutputBoundary output = new CapturingOutputBoundary();
+
+        interactor(wardrobe, output).recommend(
+                new ContextBasedRecommendationInputData(0, List.of(), List.of()));
+
+        assertNotNull(output.outputData);
+        assertEquals(1, wardrobe.getFetchCount());
     }
 
     @Test
@@ -100,8 +147,13 @@ class ContextBasedRecommendationSearchTest {
 
     private static ContextBasedRecommendationInteractor interactor(Wardrobe wardrobe,
                                                                    RecommendationOutputBoundary output) {
+        return interactor(new StubWardrobeRepository(wardrobe), output);
+    }
+
+    private static ContextBasedRecommendationInteractor interactor(StubWardrobeRepository wardrobe,
+                                                                   RecommendationOutputBoundary output) {
         return new ContextBasedRecommendationInteractor(
-                new StubWardrobeRepository(wardrobe),
+                wardrobe,
                 new StubSettingsRepository(),
                 (country, date) -> List.of(),
                 new StubWeatherRepository(),
@@ -136,8 +188,15 @@ class ContextBasedRecommendationSearchTest {
         return item;
     }
 
+    private static <T extends AbstractWear> T wearWithFondness(T item, double fondness) {
+        item.setCondition(WearCondition.NEW);
+        item.setFondness(fondness);
+        return item;
+    }
+
     private static final class StubWardrobeRepository implements WardrobeDataAccessInterface {
         private final Wardrobe wardrobe;
+        private int fetchCount;
 
         private StubWardrobeRepository(Wardrobe wardrobe) {
             this.wardrobe = wardrobe;
@@ -145,7 +204,12 @@ class ContextBasedRecommendationSearchTest {
 
         @Override
         public Wardrobe fetchWardrobe() {
+            fetchCount++;
             return wardrobe;
+        }
+
+        private int getFetchCount() {
+            return fetchCount;
         }
 
         @Override

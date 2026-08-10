@@ -1,6 +1,5 @@
 package use_case.recommendation_context;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +14,7 @@ import entity.InnerTopwear;
 import entity.OuterTopwear;
 import entity.Outfit;
 import entity.WearCondition;
+import entity.Weather;
 import entity.WeatherSuitability;
 import use_case.recommendation.RecommendationOutputBoundary;
 import use_case.recommendation.RecommendationOutputData;
@@ -28,9 +28,8 @@ import use_case.wardrobe.WardrobeDataAccessInterface;
  * the few garments that best suit the context, using the criteria a single garment can be judged
  * on; only those survivors are then combined into whole outfits and scored. Searching every
  * combination directly is not affordable, because the accessories alone contribute a subset for
- * every garment the user owns, and no amount of weather filtering reduces that: filtering shrinks
- * how many garments there are, while the cost grows with how many ways they can be worn together.
- * Narrowing first bounds the second stage no matter how large the wardrobe becomes.
+ * every garment the user owns. Narrowing ordinary slots and considering fondness-ranked accessory
+ * prefixes keeps that second stage polynomial rather than exponential.
  */
 public final class ContextBasedRecommendationInteractor implements ContextBasedRecommendationInputBoundary {
     private static final String MISSING_REQUIRED_ITEMS =
@@ -136,9 +135,12 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
     public void recommend(ContextBasedRecommendationInputData inputData) {
         final RecommendationContext context;
         try {
+            final String city = settingsProvider.getLocationCityOrDefault();
+            final String countryCode = settingsProvider.getLocationCountryCodeOrDefault();
+            final Weather weather = weatherProvider.getCurrentByLocation(city);
             context = new RecommendationContext(
-                    weatherProvider.getCurrentByLocation(settingsProvider.getLocationCityOrDefault()),
-                    eventProvider.getEvents(settingsProvider.getLocationCountryCodeOrDefault(), LocalDate.now()),
+                    weather,
+                    eventProvider.getEvents(countryCode, weather.getTimestamp()),
                     inputData.getPreferredColors(),
                     inputData.getPreferredStyles()
             );
@@ -149,7 +151,8 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
             return;
         }
 
-        final CandidatePools candidatePools = buildCandidatePools(context);
+        final List<AbstractWear> wardrobeItems = List.copyOf(wardrobe.fetchWardrobe().getItems());
+        final CandidatePools candidatePools = buildCandidatePools(context, wardrobeItems);
         if (candidatePools.isMissingRequiredItems()) {
             outputBoundary.prepareFailView(MISSING_REQUIRED_ITEMS);
             return;
@@ -171,10 +174,10 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         ));
     }
 
-    private CandidatePools buildCandidatePools(RecommendationContext context) {
-        final List<InnerTopwear> innerTopwears = itemsOfType(InnerTopwear.class);
-        final List<Bottomwear> bottomwears = itemsOfType(Bottomwear.class);
-        final List<Footwear> footwears = itemsOfType(Footwear.class);
+    private CandidatePools buildCandidatePools(RecommendationContext context, List<AbstractWear> wardrobeItems) {
+        final List<InnerTopwear> innerTopwears = itemsOfType(wardrobeItems, InnerTopwear.class);
+        final List<Bottomwear> bottomwears = itemsOfType(wardrobeItems, Bottomwear.class);
+        final List<Footwear> footwears = itemsOfType(wardrobeItems, Footwear.class);
         if (innerTopwears.isEmpty() || bottomwears.isEmpty() || footwears.isEmpty()) {
             return CandidatePools.missingRequiredItems();
         }
@@ -198,11 +201,11 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
 
         return new CandidatePools(
                 narrower.narrow(innerTopwears, context),
-                eligibleOuterTopwears(context),
+                eligibleOuterTopwears(context, wardrobeItems),
                 narrower.narrow(eligibleBottomwears, context),
                 narrower.narrow(eligibleFootwears, context),
-                optionalItems(narrower.narrow(itemsOfType(Headwear.class), context)),
-                accessoryPools(context),
+                optionalItems(narrower.narrow(itemsOfType(wardrobeItems, Headwear.class), context)),
+                accessoryPools(context, wardrobeItems),
                 false
         );
     }
@@ -216,12 +219,13 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
      * suit nothing in particular, which only the criteria judging a finished outfit can rule on.
      *
      * @param context the current recommendation context
+     * @param wardrobeItems the wardrobe snapshot used for this recommendation
      * @return the accessories to wear and the accessories to decide between
      */
-    private AccessoryPools accessoryPools(RecommendationContext context) {
+    private AccessoryPools accessoryPools(RecommendationContext context, List<AbstractWear> wardrobeItems) {
         final List<Accessory> worn = new ArrayList<>();
         final List<Accessory> undecided = new ArrayList<>();
-        for (Accessory accessory : itemsOfType(Accessory.class)) {
+        for (Accessory accessory : itemsOfType(wardrobeItems, Accessory.class)) {
             if (narrower.contributes(accessory, context)) {
                 worn.add(accessory);
             }
@@ -230,12 +234,17 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
             }
         }
 
-        return new AccessoryPools(List.copyOf(worn), narrower.narrow(undecided, context));
+        undecided.sort(Comparator
+                .comparingDouble(Accessory::getFondness)
+                .reversed()
+                .thenComparing(accessory -> accessory.getUuid().toString()));
+        return new AccessoryPools(List.copyOf(worn), List.copyOf(undecided));
     }
 
-    private List<OuterTopwear> eligibleOuterTopwears(RecommendationContext context) {
+    private List<OuterTopwear> eligibleOuterTopwears(RecommendationContext context,
+                                                     List<AbstractWear> wardrobeItems) {
         final double temperature = context.getWeather().getTemperature();
-        final List<OuterTopwear> outerTopwears = itemsOfType(OuterTopwear.class);
+        final List<OuterTopwear> outerTopwears = itemsOfType(wardrobeItems, OuterTopwear.class);
         if (!WeatherSuitability.requiresOuterTopwear(temperature)) {
             return optionalItems(narrower.narrow(outerTopwears, context));
         }
@@ -289,40 +298,30 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
             final OutfitBase base = new OutfitBase(
                     inner, outer, bottom, footwear, headwear, pools.accessories.worn
             );
-            analyzeAccessoryChoices(
+            analyzeAccessoryPrefixes(
                     base,
                     pools.accessories.undecided,
-                    0,
-                    new ArrayList<>(),
                     context,
                     bestOutfit
             );
         }
     }
 
-    private void analyzeAccessoryChoices(OutfitBase base,
-                                         List<Accessory> accessories,
-                                         int index,
-                                         List<Accessory> selectedAccessories,
-                                         RecommendationContext context,
-                                         BestOutfit bestOutfit) {
-        if (index == accessories.size()) {
-            final Outfit candidate = base.toOutfit(selectedAccessories);
+    private void analyzeAccessoryPrefixes(OutfitBase base,
+                                          List<Accessory> accessories,
+                                          RecommendationContext context,
+                                          BestOutfit bestOutfit) {
+        // The accessories contribute nothing to event or preference scores and are ordered by
+        // fondness. For any chosen count, its best possible subset is therefore that prefix.
+        // Trying every prefix finds the best average-fondness result in linear, not exponential,
+        // candidate growth.
+        for (int count = 0; count <= accessories.size(); count++) {
+            final Outfit candidate = base.toOutfit(accessories.subList(0, count));
             final OutfitAnalysis analysis = analyze(candidate, context);
             if (analysis.isAcceptable()) {
                 bestOutfit.consider(candidate, analysis);
             }
-            return;
         }
-
-        analyzeAccessoryChoices(
-                base, accessories, index + 1, selectedAccessories, context, bestOutfit
-        );
-        selectedAccessories.add(accessories.get(index));
-        analyzeAccessoryChoices(
-                base, accessories, index + 1, selectedAccessories, context, bestOutfit
-        );
-        selectedAccessories.remove(selectedAccessories.size() - 1);
     }
 
     private OutfitAnalysis analyze(Outfit outfit, RecommendationContext context) {
@@ -354,8 +353,9 @@ public final class ContextBasedRecommendationInteractor implements ContextBasedR
         return String.join(" ", analysis.getReasons());
     }
 
-    private <T extends AbstractWear> List<T> itemsOfType(Class<T> itemType) {
-        return wardrobe.fetchWardrobe().getItems().stream()
+    private static <T extends AbstractWear> List<T> itemsOfType(List<AbstractWear> wardrobeItems,
+                                                               Class<T> itemType) {
+        return wardrobeItems.stream()
                 .filter(item -> item.getCondition() != WearCondition.DAMAGED)
                 .filter(itemType::isInstance)
                 .map(itemType::cast)

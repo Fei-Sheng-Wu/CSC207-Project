@@ -217,7 +217,7 @@ public class ContextBasedRecommendationInteractorTest {
         final List<Footwear> footwears = new ArrayList<>();
         for (int index = 0; index < 5; index++) {
             final Footwear footwear = wear(
-                    new Footwear(new UUID(0L, 7L + index)),
+                    new Footwear(id(7L + index)),
                     WearColor.BLACK,
                     WearStyle.CASUAL,
                     1.0
@@ -271,6 +271,30 @@ public class ContextBasedRecommendationInteractorTest {
         assertEquals("The candidate was analyzed.", output.outputData.getReason());
     }
 
+    @Test
+    void requestsEventsForTheWeatherLocationsCurrentDate() {
+        final LocalDate locationDate = LocalDate.of(2026, 8, 10);
+        final Weather locationWeather = new Weather(
+                locationDate, "Clear", 20.0, 0.0, 0.0, 0.0, 0);
+        final StubEventRepository events = new StubEventRepository(List.of());
+        final CapturingOutputBoundary output = new CapturingOutputBoundary();
+
+        new ContextBasedRecommendationInteractor(
+                new StubWardrobeRepository(new Wardrobe(new ArrayList<>(List.of(
+                        wear(new InnerTopwear(id(1L)), WearColor.RED, WearStyle.CASUAL, 1.0),
+                        wear(new Bottomwear(id(2L)), WearColor.RED, WearStyle.CASUAL, 1.0),
+                        wear(new Footwear(id(3L)), WearColor.RED, WearStyle.CASUAL, 1.0)
+                )))),
+                new StubSettingsRepository(),
+                events,
+                new StubWeatherRepository(locationWeather),
+                output
+        ).recommend(new ContextBasedRecommendationInputData(0, List.of(), List.of()));
+
+        assertNotNull(output.outputData);
+        assertEquals(locationDate, events.getRequestedDate());
+    }
+
     private static ContextBasedRecommendationInteractor interactor(Wardrobe wardrobe,
                                                                    Weather weather,
                                                                    List<Event> events,
@@ -301,6 +325,10 @@ public class ContextBasedRecommendationInteractorTest {
 
     private static Weather weather(double temperature, double precipitation) {
         return new Weather(LocalDate.of(2026, 7, 1), "Test", temperature, precipitation, 0.0, 0.0, 0);
+    }
+
+    private static UUID id(long value) {
+        return UUID.fromString(String.format("00000000-0000-0000-0000-%012d", value));
     }
 
     private static <T extends AbstractWear> T wear(T item,
@@ -362,6 +390,7 @@ public class ContextBasedRecommendationInteractorTest {
 
     private static final class StubEventRepository implements EventDataAccessInterface {
         private final List<Event> events;
+        private LocalDate requestedDate;
 
         private StubEventRepository(List<Event> events) {
             this.events = events;
@@ -369,7 +398,12 @@ public class ContextBasedRecommendationInteractorTest {
 
         @Override
         public List<Event> getEvents(String country, LocalDate date) {
+            requestedDate = date;
             return events;
+        }
+
+        private LocalDate getRequestedDate() {
+            return requestedDate;
         }
     }
 
