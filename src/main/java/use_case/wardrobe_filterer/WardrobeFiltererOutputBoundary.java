@@ -5,9 +5,16 @@ package use_case.wardrobe_filterer;
  */
 public interface WardrobeFiltererOutputBoundary {
     /**
-     * Prepares the success view for the Wardrobe Reporter Use Case.
+     * Prepares the success view for the Wardrobe Filterer Use Case.
      *
      * @param outputData the output data
      */
     void prepareSuccessView(WardrobeFiltererOutputData outputData);
+
+    /**
+     * Prepares the success view for the Wardrobe Filterer Use Case.
+     *
+     * @param error the error string
+     */
+    void prepareFailView(String error);
 }
